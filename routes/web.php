@@ -21,5 +21,9 @@ Route::group(['middleware' => 'auth'], function () {
         'brand' => 'BrandController',
         'item' => 'ItemController',
     ]);
+
+    Route::get('/price_upload', 'ItemController@showPriceUploadForm')->name('item.price_upload_form');
+    Route::post('/price_upload', 'ItemController@priceUpload')->name('item.price_upload');
+
 });
 
