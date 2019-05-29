@@ -1,0 +1,66 @@
+version: '3'
+services:
+
+  # PHP Service
+  price-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: digitalocean.com/php
+    container_name: price-app
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: price-app
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./config/docker-images/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - price-app-network
+
+  # Nginx Service
+  price-web:
+    image: nginx:alpine
+    container_name: price-web
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: price-web
+      SERVICE_TAGS: dev
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+    - ./:/var/www
+    - ./config/docker-images/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - price-app-network
+
+  # Postgres Service
+  price-db:
+    image: postgres:latest
+    container_name: price-db
+    restart: always
+    tty: true
+    environment:
+      POSTGRES_PASSWORD: 'postgres'
+      SERVICE_NAME: price-db
+      SERVICE_TAGS: dev
+    ports:
+      - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - price-app-network
+
+# Docker Networks
+networks:
+  price-app-network:
+    driver: bridge
+
+# Volumes
+volumes:
+  db-data:
+    driver: local
