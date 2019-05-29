@@ -15,7 +15,8 @@ class ItemController extends Controller
      */
     public function index()
     {
-        return view('item/index');
+        $items = Item::paginate(30);
+        return view('item/index', compact('items'));
     }
 
     /**
@@ -25,7 +26,8 @@ class ItemController extends Controller
      */
     public function create()
     {
-        //
+        $brands = Brand::all();
+        return view('item/create', compact('brands'));
     }
 
     /**
@@ -36,7 +38,18 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $item = Item::create([
+            'brand_id' => $request->brand_id,
+            'article' => $request->article,
+            'name' => $request->name,
+            'price' => $request->price,
+            'stock' => $request->stock,
+        ]);
+
+        $request->session()->flash('message', 'Новый товар успешно добавлен!');
+
+        return redirect(route('item.show' , $item->id));
+
     }
 
     /**
@@ -47,7 +60,7 @@ class ItemController extends Controller
      */
     public function show(Item $item)
     {
-        //
+        return view('item/show', compact('item'));
     }
 
     /**
@@ -58,7 +71,8 @@ class ItemController extends Controller
      */
     public function edit(Item $item)
     {
-        //
+        $brands = Brand::all();
+        return view('item/edit', compact('item', 'brands'));
     }
 
     /**
@@ -70,7 +84,16 @@ class ItemController extends Controller
      */
     public function update(Request $request, Item $item)
     {
-        //
+        $item->brand_id = $request->brand_id;
+        $item->article = $request->article;
+        $item->name = $request->name;
+        $item->price = $request->price;
+        $item->stock = $request->stock;
+        $item->save();
+
+        $request->session()->flash('message', 'Товар успешно обновлен!');
+
+        return redirect(route('item.show' , $item->id));
     }
 
     /**
@@ -79,9 +102,15 @@ class ItemController extends Controller
      * @param  \App\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Item $item)
+    public function destroy(Request $request, Item $item)
     {
-        //
+        $name = $item->name;
+
+        $item->delete();
+
+        $request->session()->flash('message', "Товар '{$name}' успешно удален!");
+
+        return redirect(route('item.index'));
     }
 
     public function showPriceUploadForm()
@@ -94,6 +123,7 @@ class ItemController extends Controller
         if (!$request->hasFile('price')) {
             abort(404);
         }
+
         $price = $request->file('price');
 
         /** Create a new Xls Reader  **/
@@ -108,12 +138,6 @@ class ItemController extends Controller
             try {
                 \DB::beginTransaction();
 
-                $article = trim($worksheet->getCellByColumnAndRow(1, $row)->getCalculatedValue());
-                $item = Item::where('article', $article)->first();
-                if ($item) {
-                    continue;
-                }
-
                 $brandName = trim($worksheet->getCellByColumnAndRow(2, $row)->getCalculatedValue());
                 $brand = Brand::where('name', $brandName)->first();
                 if (!$brand) {
@@ -122,20 +146,34 @@ class ItemController extends Controller
                     ]);
                 }
 
-                Item::create([
-                    'brand_id' => $brand->id,
-                    'article' => $article,
-                    'name' => trim($worksheet->getCellByColumnAndRow(3, $row)->getCalculatedValue()),
-                    'price' => trim($worksheet->getCellByColumnAndRow(5, $row)->getCalculatedValue()),
-                    'stock' => trim($worksheet->getCellByColumnAndRow(8, $row)->getCalculatedValue()),
-                ]);
+                $article = trim($worksheet->getCellByColumnAndRow(1, $row)->getCalculatedValue());
+                $item = Item::where('article', $article)->first();
+
+                $name = trim($worksheet->getCellByColumnAndRow(3, $row)->getCalculatedValue());
+                $price = trim($worksheet->getCellByColumnAndRow(5, $row)->getCalculatedValue());
+                $stock = trim($worksheet->getCellByColumnAndRow(8, $row)->getCalculatedValue());
+
+                if ($item) {
+                    $item->brand_id = $brand->id;
+                    $item->name = $name;
+                    $item->price = $price;
+                    $item->stock = $stock;
+                    $item->save();
+                } else {
+                    Item::create([
+                        'brand_id' => $brand->id,
+                        'article' => $article,
+                        'name' => $name,
+                        'price' => $price,
+                        'stock' => $stock,
+                    ]);
+                }
 
                 \DB::commit();
             } catch(PDOException $e) {
                 \DB::rollback();
                 throw $e;
             }
-
         }
 
         $request->session()->flash('message', 'Прайс успешно загружен!');

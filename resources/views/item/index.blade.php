@@ -4,11 +4,53 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <a href="{{ route('item.price_upload_form') }}"><button type="button" class="btn btn-link float-right">Выгрузить</button></a>
-                <a href="{{ route('item.price_upload_form') }}"><button type="button" class="btn btn-link float-right">Згарузить</button></a>
+                <a href="{{ route('item.price_upload_form') }}"><button type="button" class="btn btn-link float-right">Выгрузить прайс</button></a>
+                <a href="{{ route('item.price_upload_form') }}"><button type="button" class="btn btn-link float-right">Згарузить прайс</button></a>
+                <a href="{{ route('item.create') }}"><button type="button" class="btn btn-link float-right">Добавить товар</button></a>
             </div>
         </div>
-        <hr />
-        items
+
+        <table class="table">
+            <thead>
+                <th>Артикул</th>
+                <th>Бренд</th>
+                <th>Название товара</th>
+                <th>Цена</th>
+                <th>Остаток</th>
+                <th class="text-center">Функции</th>
+            </thead>
+            <tbody>
+            @foreach ($items as $item)
+                <tr>
+                    <td class="text-center"> {{ $item->article }}</td>
+                    <td> {{ $item->brand->name }}</td>
+                    <td> {{ $item->name }}</td>
+                    <td class="text-center"> {{ $item->price }}</td>
+                    <td class="text-center"> {{ $item->stock }}</td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            <a href="{{ route('item.show', $item->id) }}" class="btn btn-primary" role="button">
+                                Показать
+                            </a>
+                            <a href="{{ route('item.edit', $item->id) }}" class="btn btn-primary" role="button">
+                                Изменить
+                            </a>
+                        </div>
+                        <form class="d-inline"
+                              action="{{ route('item.destroy', $item->id) }}"
+                              method="POST"
+                              onsubmit="return confirm('Вы уверены что хотите удалить товар?');">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <input type="submit" class="btn btn-danger" value="Удалить"/>
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+
+        {{ $items->links() }}
+
     </div>
 @endsection
