@@ -35,13 +35,13 @@
                     <ul class="navbar-nav mr-auto">
                         @auth
                             <li class="nav-item">
-                                {{--<a class="nav-link" href="{{ route('item.index') }}">Прайс</a>--}}
+                                <a class="nav-link" href="{{ route('item.index') }}">Прайс</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('brand.index') }}">Бренды</a>
                             </li>
                             <li class="nav-item">
-{{--                                <a class="nav-link" href="{{ route('supplier.index') }}">Поставщики</a>--}}
+                                {{--<a class="nav-link" href="{{ route('supplier.index') }}">Поставщики</a>--}}
                             </li>
                         @endauth
                     </ul>

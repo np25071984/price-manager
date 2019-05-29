@@ -19,6 +19,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::resources([
         'brand' => 'BrandController',
+        'item' => 'ItemController',
     ]);
 });
 
