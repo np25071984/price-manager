@@ -3,7 +3,7 @@
 @section('content')
 
     <div class="container">
-        <h1>Новый товар</h1>
+        <h1>Новый поставщик</h1>
         <hr>
         <form action="{{ route('contractor.store') }}" method="POST">
 

@@ -13,9 +13,14 @@ class ItemController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $items = Item::paginate(30);
+        if ($request->has('query')) {
+            $query = $request->input('query');
+            $items = Item::where('name', 'ilike', "%{$query}%")->paginate(30);
+        } else {
+            $items = Item::paginate(30);
+        }
         return view('item/index', compact('items'));
     }
 

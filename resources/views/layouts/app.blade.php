@@ -43,6 +43,11 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('contractor.index') }}">Поставщики</a>
                             </li>
+
+                            <form action="{{ route('item.index') }}" class="form-inline ml-4 my-2 my-lg-0">
+                                <input class="form-control mr-sm-2" type="search" name="query" placeholder="Поиск" value="{{ Request::query('query') }}" aria-label="Поиск">
+                                <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Поиск</button>
+                            </form>
                         @endauth
                     </ul>
 

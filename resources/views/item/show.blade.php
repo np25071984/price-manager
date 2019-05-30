@@ -41,6 +41,24 @@
             <div class="col-8">{{ $item->stock }}</div>
         </div>
 
+        <h2 class="mt-5">Предложения поставщиков</h2>
+
+        <table class="table">
+            <thead>
+            <th>Поставщик</th>
+            <th>Название товара</th>
+            <th class="text-center">Цена</th>
+            </thead>
+            <tbody>
+            @foreach ($item->contractorItems as $contractorItem)
+                <tr>
+                    <td> {{ $contractorItem->contractor->name }}</td>
+                    <td> {{ $contractorItem->name }}</td>
+                    <td class="text-center"> {{ $contractorItem->price }}</td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
 
     </div>
 @endsection

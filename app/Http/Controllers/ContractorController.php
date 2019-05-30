@@ -58,7 +58,7 @@ class ContractorController extends Controller
     public function show(Contractor $contractor)
     {
 
-        $items = ContractorItem::paginate(30);
+        $items = ContractorItem::where(['contractor_id' => $contractor->id])->paginate(30);
 
         return view('contractor/show', compact('contractor', 'items'));
     }

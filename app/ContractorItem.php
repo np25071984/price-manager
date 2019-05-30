@@ -12,4 +12,9 @@ class ContractorItem extends Model
     {
         return $this->belongsToMany('App\Item', 'relations');
     }
+
+    public function contractor()
+    {
+        return $this->hasOne('App\Contractor', 'id', 'contractor_id');
+    }
 }

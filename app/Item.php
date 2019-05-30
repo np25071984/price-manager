@@ -15,4 +15,10 @@ class Item extends Model
         return $this->hasOne('App\Brand', 'id', 'brand_id');
     }
 
+    public function contractorItems()
+    {
+        return $this->belongsToMany('App\ContractorItem', 'relations');
+    }
+
+
 }
