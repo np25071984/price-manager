@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Brand;
 use App\Item;
+use App\ContractorItem;
 use Illuminate\Http\Request;
 
 class ItemController extends Controller
@@ -18,10 +19,19 @@ class ItemController extends Controller
         if ($request->has('query')) {
             $query = $request->input('query');
             $items = Item::where('name', 'ilike', "%{$query}%")->paginate(30);
+
+            $contractorItemsWithoutRelation = \DB::table('contractor_items')
+                ->select('contractor_items.id')
+                ->leftJoin('relations', 'contractor_items.id', '=', 'relations.contractor_item_id')
+                ->where('contractor_items.name', 'ilike', "%{$query}%")
+                ->whereNull('relations.id');
+
+            $contractorItems = ContractorItem::whereIn('id', $contractorItemsWithoutRelation)->limit(30)->get();
         } else {
+            $contractorItems = [];
             $items = Item::paginate(30);
         }
-        return view('item/index', compact('items'));
+        return view('item/index', compact('items', 'contractorItems'));
     }
 
     /**

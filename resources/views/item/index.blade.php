@@ -54,5 +54,34 @@
             {{ $items->links() }}
         </div>
 
+        @if (count($contractorItems))
+        <h2>Похожие не связанные товары</h2>
+        <table class="table">
+            <thead>
+            <th>Поставщик</th>
+            <th>Название товара</th>
+            <th class="text-center">Цена</th>
+            <th class="text-center">Функции</th>
+            </thead>
+            <tbody>
+            @foreach ($contractorItems as $item)
+                <tr>
+                    <td> {{ $item->contractor->name }}</td>
+                    <td> {{ $item->name }}</td>
+                    <td class="text-center"> {{ $item->price }}</td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            <a href="{{ route('contractor.relation_form', [$item->contractor->id, $item->id]) }}" class="btn btn-primary" role="button">
+                                Добавить связь
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+        @endif
+
+
     </div>
 @endsection
