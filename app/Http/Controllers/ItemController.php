@@ -49,7 +49,6 @@ class ItemController extends Controller
         $request->session()->flash('message', 'Новый товар успешно добавлен!');
 
         return redirect(route('item.show' , $item->id));
-
     }
 
     /**

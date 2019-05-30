@@ -20,10 +20,16 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resources([
         'brand' => 'BrandController',
         'item' => 'ItemController',
+        'contractor' => 'ContractorController',
     ]);
 
+    // upload own price list
     Route::get('/price_upload', 'ItemController@showPriceUploadForm')->name('item.price_upload_form');
     Route::post('/price_upload', 'ItemController@priceUpload')->name('item.price_upload');
+
+    // upload contractor`s price list
+    Route::get('/contractor/{contractor}/price_upload', 'ContractorController@showPriceUploadForm')->name('contractor.price_upload_form');
+    Route::post('/contractor/{contractor}/price_upload', 'ContractorController@priceUpload')->name('contractor.price_upload');
 
 });
 

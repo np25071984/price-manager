@@ -26,7 +26,6 @@ class CreateItemsTable extends Migration
             $table->unsignedBigInteger('brand_id')->nullable()->after('id');
             $table->foreign('brand_id')->references('id')->on('brands')->onUpdate('cascade')->onDelete('cascade');
         });
-
     }
 
     /**

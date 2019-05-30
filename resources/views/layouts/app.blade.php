@@ -41,7 +41,7 @@
                                 <a class="nav-link" href="{{ route('brand.index') }}">Бренды</a>
                             </li>
                             <li class="nav-item">
-                                {{--<a class="nav-link" href="{{ route('supplier.index') }}">Поставщики</a>--}}
+                                <a class="nav-link" href="{{ route('contractor.index') }}">Поставщики</a>
                             </li>
                         @endauth
                     </ul>
