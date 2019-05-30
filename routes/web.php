@@ -30,6 +30,7 @@ Route::group(['middleware' => 'auth'], function () {
     // upload contractor`s price list
     Route::get('/contractor/{contractor}/price_upload', 'ContractorController@showPriceUploadForm')->name('contractor.price_upload_form');
     Route::post('/contractor/{contractor}/price_upload', 'ContractorController@priceUpload')->name('contractor.price_upload');
-
+    Route::get('/contractor/{contractor}/{contractorItem}/relation', 'ContractorController@showReationForm')->name('contractor.relation_form');
+    Route::post('/contractor/{contractor}/{contractorItem}/relation', 'ContractorController@updateRelation')->name('contractor.relation_update');
 });
 

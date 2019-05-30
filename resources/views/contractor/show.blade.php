@@ -33,7 +33,7 @@
                     <td class="text-center"> {{ $item->price }}</td>
                     <td class="text-center">
                         <div class="btn-group" role="group">
-                            <a href="{{ route('item.show', $item->id) }}" class="btn btn-primary" role="button">
+                            <a href="{{ route('contractor.relation_form', [$contractor->id, $item->id]) }}" class="btn btn-primary" role="button">
                                 Изменить связь
                             </a>
                         </div>

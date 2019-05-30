@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
+use App\Item;
+use App\Relation;
 use App\Contractor;
 use App\ContractorItem;
 use Illuminate\Http\Request;
@@ -160,6 +162,36 @@ class ContractorController extends Controller
         }
 
         $request->session()->flash('message', 'Прайс поставщика успешно загружен!');
+
+        return redirect(route('contractor.show', $contractor->id));
+    }
+
+    public function showReationForm(Contractor $contractor, ContractorItem $contractorItem)
+    {
+
+        $items = Item::paginate(30);
+
+        return view('contractor/relation_form', compact('contractor', 'contractorItem', 'items'));
+    }
+
+    public function updateRelation(Request $request, Contractor $contractor, ContractorItem $contractorItem)
+    {
+        $item = $contractorItem->relatedItem->first();
+        if ($item) {
+            $relation = Relation::where([
+                'item_id' => $item->id,
+                'contractor_item_id' => $contractorItem->id,
+            ])->first();
+            $relation->item_id = $request->item;
+            $relation->save();
+        } else {
+            Relation::create([
+                'item_id' => $request->item,
+                'contractor_item_id' => $contractorItem->id,
+            ]);
+        }
+
+        $request->session()->flash('message', 'Связь успешно обновлена!');
 
         return redirect(route('contractor.show', $contractor->id));
     }
