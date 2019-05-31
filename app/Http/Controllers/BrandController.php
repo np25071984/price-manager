@@ -14,7 +14,9 @@ class BrandController extends Controller
      */
     public function index()
     {
-        return view('brand/index');
+        $brands = Brand::paginate(30);
+
+        return view('brand/index', compact('brands'));
     }
 
     /**
@@ -24,7 +26,7 @@ class BrandController extends Controller
      */
     public function create()
     {
-        //
+        return view('brand/create' );
     }
 
     /**
@@ -35,7 +37,13 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $brand = Brand::create([
+            'name' => $request->name,
+        ]);
+
+        $request->session()->flash('message', 'Новый бренд успешно добавлен!');
+
+        return redirect(route('brand.show' , $brand->id));
     }
 
     /**
@@ -46,7 +54,7 @@ class BrandController extends Controller
      */
     public function show(Brand $brand)
     {
-        //
+        return view('brand/show', compact('brand'));
     }
 
     /**
@@ -57,7 +65,7 @@ class BrandController extends Controller
      */
     public function edit(Brand $brand)
     {
-        //
+        return view('brand/edit', compact('brand'));
     }
 
     /**
@@ -69,7 +77,12 @@ class BrandController extends Controller
      */
     public function update(Request $request, Brand $brand)
     {
-        //
+        $brand->name = $request->name;
+        $brand->save();
+
+        $request->session()->flash('message', 'Бренд успешно обновлен!');
+
+        return redirect(route('brand.show' , $brand->id));
     }
 
     /**

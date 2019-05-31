@@ -40,7 +40,9 @@
             </tbody>
         </table>
 
-        {{ $contractors->links() }}
+        <div class="row justify-content-center">
+            {{ $contractors->links() }}
+        </div>
 
     </div>
 @endsection
