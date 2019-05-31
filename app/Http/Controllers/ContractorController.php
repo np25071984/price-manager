@@ -58,7 +58,7 @@ class ContractorController extends Controller
      */
     public function show(Contractor $contractor)
     {
-        if ($contractor->job) {
+        if ($contractor->job && !$contractor->job->hasError()) {
             return view('price_processing_placeholder', [
                 'job' => $contractor->job,
                 'owner' => $contractor->name,

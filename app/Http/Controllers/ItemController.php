@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Filesystem\Filesystem;
+
 use App\JobStatus;
 use App\Brand;
 use App\Item;
 use App\Jobs\ParsePrice;
+use App\Jobs\GeneratePrice;
 use App\ContractorItem;
 use Illuminate\Http\Request;
 
@@ -19,12 +22,24 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         $job = JobStatus::where(['contractor_id' => null])->first();
-        if ($job && ($job->status_id !== 3)) {
+        if ($job && !$job->hasError()) {
             return view('price_processing_placeholder', [
                 'job' => $job,
                 'owner' => 'прайсом',
             ]);
         } else {
+            $path = storage_path('price/' . \Auth::id());
+            $files = glob($path . '/*.xlsx');
+
+            if (isset($files[0])) {
+                $filesystem = new Filesystem;
+                $pathinfo = pathinfo($files[0]);
+
+                $price = sprintf("%s (%s Кб)", $pathinfo['basename'], ceil($filesystem->size($files[0])/1024));
+            } else {
+                $price = null;
+            }
+
             if ($request->has('query')) {
                 $query = $request->input('query');
                 $items = Item::where('name', 'ilike', "%{$query}%")->paginate(30);
@@ -41,7 +56,7 @@ class ItemController extends Controller
                 $items = Item::paginate(30);
             }
 
-            return view('item/index', compact('items', 'contractorItems', 'job'));
+            return view('item/index', compact('items', 'contractorItems', 'job', 'price'));
         }
     }
 
@@ -172,45 +187,34 @@ class ItemController extends Controller
 
     public function priceDownload()
     {
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+        $path = storage_path('price/' . \Auth::id());
 
-        $sheet->setCellValue('A1', 'Артикул');
-        $sheet->getColumnDimension('A')->setWidth(10);
-        $sheet->setCellValue('B1', 'Бренд');
-        $sheet->getColumnDimension('B')->setWidth(25);
-        $sheet->setCellValue('C1', 'Наименование');
-        $sheet->getColumnDimension('C')->setWidth(40);
-        $sheet->setCellValue('D1', 'Мин.цена');
-        $sheet->getColumnDimension('D')->setWidth(14);
-        $sheet->setCellValue('E1', 'Цена');
-        $sheet->getColumnDimension('E')->setWidth(14);
-        $sheet->setCellValue('F1', 'Остаток');
-        $sheet->getColumnDimension('F')->setWidth(14);
+        $files = glob($path . '/*.xlsx');
 
-        $sheet->getStyle('1:1')->getFont()->setBold(true);
-        $sheet->getStyle('1:1')->getAlignment()->setHorizontal('center');
-        $sheet->getStyle('A')->getAlignment()->setHorizontal('center');
-        $sheet->getStyle('D:F')->getAlignment()->setHorizontal('center');
-
-        foreach (Item::all() as $key => $item) {
-            $row = $key + 2;
-
-            $sheet->setCellValue('A' . $row, $item->article);
-            $sheet->setCellValue('B' . $row, $item->brand->name);
-            $sheet->setCellValue('C' . $row, $item->name);
-            $sheet->setCellValue(
-                'D' . $row,
-                $item->contractorItems()->orderBy('price')->first()
-                        ? $item->contractorItems()->orderBy('price')->first()->price
-                        : ''
-            );
-            $sheet->setCellValue('E' . $row, $item->price);
-            $sheet->setCellValue('F' . $row, $item->stock);
+        if (!isset($files[0])) {
+            abort(404);
         }
 
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('price.xlsx');
-        return response()->download('price.xlsx')->deleteFileAfterSend();
+        return response()->download($files[0]);
+    }
+
+    public function priceGenerate(Request $request)
+    {
+        $path = storage_path('price/' . \Auth::id());
+
+        $filesystem = new Filesystem;
+        if ($filesystem->exists($path)) {
+            $filesystem->cleanDirectory($path);
+        } else {
+            $filesystem->makeDirectory($path);
+        }
+
+        $name = date("d-m-Y") . '-vozduhi.xlsx';
+
+        GeneratePrice::dispatch($path . '/' . $name);
+
+        $request->session()->flash('message', 'Запущен процесс генерации нового прайса!');
+
+        return redirect(route('item.index'));
     }
 }

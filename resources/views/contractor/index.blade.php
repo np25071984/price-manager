@@ -2,12 +2,6 @@
 
 @section('content')
     <div class="container">
-        @if($job && $job->hasError())
-            <div class="alert alert-danger" role="alert">
-                <p>В процессе обработки прайса прозошла <strong>ошибка</strong>!</p>
-            </div>
-        @endif
-
         <div class="row">
             <div class="col-12">
                 <a href="{{ route('contractor.create') }}"><button type="button" class="btn btn-link float-right">Добавить поставщика</button></a>

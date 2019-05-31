@@ -4,7 +4,7 @@
     <div class="container">
         <h1>Загрзука прайса поставщика</h1>
         <hr>
-        <form action="{{ route('contractor.price_upload', $contractor->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('contractor.upload', $contractor->id) }}" method="POST" enctype="multipart/form-data">
 
             {{ csrf_field() }}
 

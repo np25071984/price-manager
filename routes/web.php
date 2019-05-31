@@ -24,15 +24,16 @@ Route::group(['middleware' => 'auth'], function () {
     ]);
 
     // upload own price list
-    Route::get('/price_upload', 'ItemController@showPriceUploadForm')->name('item.price_upload_form');
-    Route::post('/price_upload', 'ItemController@priceUpload')->name('item.price_upload');
+    Route::get('/upload', 'ItemController@showPriceUploadForm')->name('item.upload_form');
+    Route::post('/upload', 'ItemController@priceUpload')->name('item.upload');
 
     // download own price list
-    Route::get('/price_download', 'ItemController@priceDownload')->name('item.price_download');
+    Route::get('/generate', 'ItemController@priceGenerate')->name('item.generate');
+    Route::get('/download', 'ItemController@priceDownload')->name('item.download');
 
     // upload contractor`s price list
-    Route::get('/contractor/{contractor}/price_upload', 'ContractorController@showPriceUploadForm')->name('contractor.price_upload_form');
-    Route::post('/contractor/{contractor}/price_upload', 'ContractorController@priceUpload')->name('contractor.price_upload');
+    Route::get('/contractor/{contractor}/upload', 'ContractorController@showPriceUploadForm')->name('contractor.upload_form');
+    Route::post('/contractor/{contractor}/upload', 'ContractorController@priceUpload')->name('contractor.upload');
     Route::get('/contractor/{contractor}/{contractorItem}/relation', 'ContractorController@showReationForm')->name('contractor.relation_form');
     Route::post('/contractor/{contractor}/{contractorItem}/relation', 'ContractorController@updateRelation')->name('contractor.relation_update');
 

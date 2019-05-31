@@ -4,7 +4,7 @@
     <div class="container">
         <h1>Загрзука собственного прайса</h1>
         <hr>
-        <form action="{{ route('item.price_upload') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('item.upload') }}" method="POST" enctype="multipart/form-data">
 
             {{ csrf_field() }}
 

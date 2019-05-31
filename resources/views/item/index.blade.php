@@ -9,9 +9,16 @@
         @endif
 
         <div class="row">
-            <div class="col-12">
-                <a target="_blank" href="{{ route('item.price_download') }}"><button type="button" class="btn btn-link float-right">Выгрузить прайс</button></a>
-                <a href="{{ route('item.price_upload_form') }}"><button type="button" class="btn btn-link float-right">Згарузить прайс</button></a>
+            <div class="col-6">
+                @if ($price)
+                    <a target="_blank" href="{{ route('item.download') }}">{{ $price }}</a>
+                @else
+                    Прайс не сгенерирован
+                @endif
+            </div>
+            <div class="col-6">
+                <a href="{{ route('item.generate') }}"><button type="button" class="btn btn-link float-right">Сгенерировать новый прайс</button></a>
+                <a href="{{ route('item.upload_form') }}"><button type="button" class="btn btn-link float-right">Згарузить прайс</button></a>
                 <a href="{{ route('item.create') }}"><button type="button" class="btn btn-link float-right">Добавить товар</button></a>
             </div>
         </div>
