@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\JobStatus;
 use App\Brand;
 use App\Item;
-use App\Jobs\ParseItemPrice;
+use App\Jobs\ParsePrice;
 use App\ContractorItem;
 use Illuminate\Http\Request;
 
@@ -19,7 +19,7 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         $job = JobStatus::where(['contractor_id' => null])->first();
-        if ($job) {
+        if ($job && ($job->status_id !== 3)) {
             return view('price_processing_placeholder', [
                 'job' => $job,
                 'owner' => 'прайсом',
@@ -155,7 +155,7 @@ class ItemController extends Controller
         $tmpName   = time() . '.' . $price->getClientOriginalExtension();
         $price->move(storage_path('tmp'), $tmpName);
 
-        ParseItemPrice::dispatch(storage_path('tmp') . '/' . $tmpName);
+        ParsePrice::dispatch(null, storage_path('tmp') . '/' . $tmpName);
 
         JobStatus::updateOrCreate(
             ['contractor_id' => null],

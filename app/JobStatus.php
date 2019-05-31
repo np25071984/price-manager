@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Jobs\ParsePrice;
 use Illuminate\Database\Eloquent\Model;
 
 class JobStatus extends Model
@@ -21,4 +22,9 @@ class JobStatus extends Model
     public $timestamps = false;
 
     protected $fillable = ['contractor_id', 'status_id', 'message'];
+
+    public function hasError()
+    {
+        return $this->status_id === ParsePrice::ERROR;
+    }
 }

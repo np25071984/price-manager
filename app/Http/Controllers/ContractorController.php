@@ -8,7 +8,7 @@ use App\Relation;
 use App\Contractor;
 use App\ContractorItem;
 use Illuminate\Http\Request;
-use App\Jobs\ParseContrctorPrice;
+use App\Jobs\ParsePrice;
 
 class ContractorController extends Controller
 {
@@ -131,7 +131,7 @@ class ContractorController extends Controller
         $tmpName   = time() . '.' . $price->getClientOriginalExtension();
         $price->move(storage_path('tmp'), $tmpName);
 
-        ParseContrctorPrice::dispatch($contractor->id, storage_path('tmp') . '/' . $tmpName);
+        ParsePrice::dispatch($contractor->id, storage_path('tmp') . '/' . $tmpName);
 
         JobStatus::updateOrCreate(
             ['contractor_id' => $contractor->id],
