@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <a href="{{ route('item.price_upload_form') }}"><button type="button" class="btn btn-link float-right">Выгрузить прайс</button></a>
+                <a target="_blank" href="{{ route('item.price_download') }}"><button type="button" class="btn btn-link float-right">Выгрузить прайс</button></a>
                 <a href="{{ route('item.price_upload_form') }}"><button type="button" class="btn btn-link float-right">Згарузить прайс</button></a>
                 <a href="{{ route('item.create') }}"><button type="button" class="btn btn-link float-right">Добавить товар</button></a>
             </div>

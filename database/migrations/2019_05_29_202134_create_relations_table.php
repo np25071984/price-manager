@@ -19,10 +19,18 @@ class CreateRelationsTable extends Migration
         });
 
         Schema::table('relations', function (Blueprint $table) {
-            $table->unsignedBigInteger('item_id')->nullable()->after('id');
-            $table->foreign('item_id')->references('id')->on('items')->onUpdate('cascade')->onDelete('cascade');
-            $table->unsignedBigInteger('contractor_item_id')->nullable()->after('item_id');
-            $table->foreign('contractor_item_id')->references('id')->on('contractor_items')->onUpdate('cascade')->onDelete('cascade');
+            $table->unsignedBigInteger('item_id')->after('id');
+            $table->foreign('item_id')
+                ->references('id')
+                ->on('items')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->unsignedBigInteger('contractor_item_id')->unique()->after('item_id');
+            $table->foreign('contractor_item_id')
+                ->references('id')
+                ->on('contractor_items')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
         });
     }
 

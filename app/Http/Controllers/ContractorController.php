@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Str;
+use App\JobStatus;
 use App\Item;
 use App\Relation;
 use App\Contractor;
 use App\ContractorItem;
 use Illuminate\Http\Request;
+use App\Jobs\ParseContrctorPrice;
 
 class ContractorController extends Controller
 {
@@ -57,10 +58,17 @@ class ContractorController extends Controller
      */
     public function show(Contractor $contractor)
     {
+        if ($contractor->job) {
+            return view('price_processing_placeholder', [
+                'job' => $contractor->job,
+                'owner' => $contractor->name,
+            ]);
+        } else {
+            $items = ContractorItem::where(['contractor_id' => $contractor->id])->paginate(30);
 
-        $items = ContractorItem::where(['contractor_id' => $contractor->id])->paginate(30);
+            return view('contractor/show', compact('contractor', 'items'));
+        }
 
-        return view('contractor/show', compact('contractor', 'items'));
     }
 
     /**
@@ -120,50 +128,22 @@ class ContractorController extends Controller
         }
 
         $price = $request->file('price');
+        $tmpName   = time() . '.' . $price->getClientOriginalExtension();
+        $price->move(storage_path('tmp'), $tmpName);
 
-        /** Create a new Xls Reader  **/
-        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
+        ParseContrctorPrice::dispatch($contractor->id, storage_path('tmp') . '/' . $tmpName);
 
-        $spreadsheet = $reader->load($price->getPathname());
-        $worksheet = $spreadsheet->getActiveSheet();
-        $highestRow = $worksheet->getHighestRow();
-
-        for ($row = 2; $row <= $highestRow; $row++) {
-
-            try {
-                \DB::beginTransaction();
-
-                $name = trim($worksheet->getCellByColumnAndRow(2, $row)->getCalculatedValue());
-                $price = trim($worksheet->getCellByColumnAndRow(3, $row)->getCalculatedValue());
-
-                $contractorItem = ContractorItem::where([
-                    'contractor_id' => $contractor->id,
-                    'name' => $name,
-                ])->first();
-
-                if ($contractorItem) {
-                    $contractorItem->contractor_id = $contractor->id;
-                    $contractorItem->name = $name;
-                    $contractorItem->price = $price;
-                    $contractorItem->save();
-                } else {
-                    ContractorItem::create([
-                        'contractor_id' => $contractor->id,
-                        'name' => $name,
-                        'price' => $price,
-                    ]);
-                }
-
-                \DB::commit();
-            } catch(PDOException $e) {
-                \DB::rollback();
-                throw $e;
-            }
-        }
+        JobStatus::updateOrCreate(
+            ['contractor_id' => $contractor->id],
+            [
+                'status_id' => 1,
+                'message' => 'Прайс успешно загружен',
+            ]
+        );
 
         $request->session()->flash('message', 'Прайс поставщика успешно загружен!');
 
-        return redirect(route('contractor.show', $contractor->id));
+        return redirect(route('contractor.index'));
     }
 
     public function showReationForm(Contractor $contractor, ContractorItem $contractorItem)

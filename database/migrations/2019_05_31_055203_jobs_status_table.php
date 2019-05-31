@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateContractorItemsTable extends Migration
+class JobsStatusTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,14 @@ class CreateContractorItemsTable extends Migration
      */
     public function up()
     {
-        Schema::create('contractor_items', function (Blueprint $table) {
+        Schema::create('jobs_status', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name');
-            $table->float('price');
-            $table->timestamps();
+            $table->integer('status_id');
+            $table->string('message');
         });
 
-        Schema::table('contractor_items', function (Blueprint $table) {
-            $table->unsignedBigInteger('contractor_id')->after('id');
+        Schema::table('jobs_status', function (Blueprint $table) {
+            $table->unsignedBigInteger('contractor_id')->nullable()->after('id');
             $table->foreign('contractor_id')->references('id')->on('contractors')->onUpdate('cascade')->onDelete('cascade');
         });
     }
@@ -33,10 +32,10 @@ class CreateContractorItemsTable extends Migration
      */
     public function down()
     {
-        Schema::table('contractor_items', function (Blueprint $table) {
+        Schema::table('jobs_status', function (Blueprint $table) {
             $table->dropForeign(['contractor_id']);
         });
 
-        Schema::dropIfExists('contractor_items');
+        Schema::dropIfExists('jobs_status');
     }
 }

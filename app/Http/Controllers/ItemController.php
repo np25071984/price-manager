@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\JobStatus;
 use App\Brand;
 use App\Item;
+use App\Jobs\ParseItemPrice;
 use App\ContractorItem;
 use Illuminate\Http\Request;
 
@@ -16,22 +18,31 @@ class ItemController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->has('query')) {
-            $query = $request->input('query');
-            $items = Item::where('name', 'ilike', "%{$query}%")->paginate(30);
-
-            $contractorItemsWithoutRelation = \DB::table('contractor_items')
-                ->select('contractor_items.id')
-                ->leftJoin('relations', 'contractor_items.id', '=', 'relations.contractor_item_id')
-                ->where('contractor_items.name', 'ilike', "%{$query}%")
-                ->whereNull('relations.id');
-
-            $contractorItems = ContractorItem::whereIn('id', $contractorItemsWithoutRelation)->limit(30)->get();
+        $job = JobStatus::where(['contractor_id' => null])->first();
+        if ($job) {
+            return view('price_processing_placeholder', [
+                'job' => $job,
+                'owner' => 'прайсом',
+            ]);
         } else {
-            $contractorItems = [];
-            $items = Item::paginate(30);
+            if ($request->has('query')) {
+                $query = $request->input('query');
+                $items = Item::where('name', 'ilike', "%{$query}%")->paginate(30);
+
+                $contractorItemsWithoutRelation = \DB::table('contractor_items')
+                    ->select('contractor_items.id')
+                    ->leftJoin('relations', 'contractor_items.id', '=', 'relations.contractor_item_id')
+                    ->where('contractor_items.name', 'ilike', "%{$query}%")
+                    ->whereNull('relations.id');
+
+                $contractorItems = ContractorItem::whereIn('id', $contractorItemsWithoutRelation)->limit(30)->get();
+            } else {
+                $contractorItems = [];
+                $items = Item::paginate(30);
+            }
+
+            return view('item/index', compact('items', 'contractorItems', 'job'));
         }
-        return view('item/index', compact('items', 'contractorItems'));
     }
 
     /**
@@ -135,63 +146,71 @@ class ItemController extends Controller
     public function priceUpload(Request $request)
     {
         if (!$request->hasFile('price')) {
-            abort(404);
+            $request->session()->flash('message', 'Не выбран файл для загрузки!');
+
+            return redirect(route('item.index'));
         }
 
         $price = $request->file('price');
+        $tmpName   = time() . '.' . $price->getClientOriginalExtension();
+        $price->move(storage_path('tmp'), $tmpName);
 
-        /** Create a new Xls Reader  **/
-        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
+        ParseItemPrice::dispatch(storage_path('tmp') . '/' . $tmpName);
 
-        $spreadsheet = $reader->load($price->getPathname());
-        $worksheet = $spreadsheet->getActiveSheet();
-        $highestRow = $worksheet->getHighestRow();
+        JobStatus::updateOrCreate(
+            ['contractor_id' => null],
+            [
+                'status_id' => 1,
+                'message' => 'Прайс успешно загружен',
+            ]
+        );
 
-        for ($row = 2; $row <= $highestRow; $row++) {
+        $request->session()->flash('message', 'Прайс отправлен на обработку!');
 
-            try {
-                \DB::beginTransaction();
+        return redirect(route('main'));
+    }
 
-                $brandName = trim($worksheet->getCellByColumnAndRow(2, $row)->getCalculatedValue());
-                $brand = Brand::where('name', $brandName)->first();
-                if (!$brand) {
-                    $brand = Brand::create([
-                        'name' => $brandName
-                    ]);
-                }
+    public function priceDownload()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
 
-                $article = trim($worksheet->getCellByColumnAndRow(1, $row)->getCalculatedValue());
-                $item = Item::where('article', $article)->first();
+        $sheet->setCellValue('A1', 'Артикул');
+        $sheet->getColumnDimension('A')->setWidth(10);
+        $sheet->setCellValue('B1', 'Бренд');
+        $sheet->getColumnDimension('B')->setWidth(25);
+        $sheet->setCellValue('C1', 'Наименование');
+        $sheet->getColumnDimension('C')->setWidth(40);
+        $sheet->setCellValue('D1', 'Мин.цена');
+        $sheet->getColumnDimension('D')->setWidth(14);
+        $sheet->setCellValue('E1', 'Цена');
+        $sheet->getColumnDimension('E')->setWidth(14);
+        $sheet->setCellValue('F1', 'Остаток');
+        $sheet->getColumnDimension('F')->setWidth(14);
 
-                $name = trim($worksheet->getCellByColumnAndRow(3, $row)->getCalculatedValue());
-                $price = trim($worksheet->getCellByColumnAndRow(5, $row)->getCalculatedValue());
-                $stock = trim($worksheet->getCellByColumnAndRow(8, $row)->getCalculatedValue());
+        $sheet->getStyle('1:1')->getFont()->setBold(true);
+        $sheet->getStyle('1:1')->getAlignment()->setHorizontal('center');
+        $sheet->getStyle('A')->getAlignment()->setHorizontal('center');
+        $sheet->getStyle('D:F')->getAlignment()->setHorizontal('center');
 
-                if ($item) {
-                    $item->brand_id = $brand->id;
-                    $item->name = $name;
-                    $item->price = $price;
-                    $item->stock = $stock;
-                    $item->save();
-                } else {
-                    Item::create([
-                        'brand_id' => $brand->id,
-                        'article' => $article,
-                        'name' => $name,
-                        'price' => $price,
-                        'stock' => $stock,
-                    ]);
-                }
+        foreach (Item::all() as $key => $item) {
+            $row = $key + 2;
 
-                \DB::commit();
-            } catch(PDOException $e) {
-                \DB::rollback();
-                throw $e;
-            }
+            $sheet->setCellValue('A' . $row, $item->article);
+            $sheet->setCellValue('B' . $row, $item->brand->name);
+            $sheet->setCellValue('C' . $row, $item->name);
+            $sheet->setCellValue(
+                'D' . $row,
+                $item->contractorItems()->orderBy('price')->first()
+                        ? $item->contractorItems()->orderBy('price')->first()->price
+                        : ''
+            );
+            $sheet->setCellValue('E' . $row, $item->price);
+            $sheet->setCellValue('F' . $row, $item->stock);
         }
 
-        $request->session()->flash('message', 'Прайс успешно загружен!');
-
-        return redirect(route('item.index'));
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('price.xlsx');
+        return response()->download('price.xlsx')->deleteFileAfterSend();
     }
 }

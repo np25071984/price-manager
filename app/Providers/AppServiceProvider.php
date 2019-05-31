@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
+use App\JobStatus;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +27,30 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Queue::before(function (JobProcessing $event) {
+            $payload = $event->job->payload();
+            $job = unserialize($payload['data']['command']);
+
+            JobStatus::updateOrCreate(
+                ['contractor_id' => $job->getContractorId()],
+                [
+                    'status_id' => 2,
+                    'message' => 'Прайс в процессе обработки',
+                ]
+            );
+        });
+
+        Queue::after(function (JobProcessed $event) {
+            $payload = $event->job->payload();
+            $job = unserialize($payload['data']['command']);
+
+            JobStatus::where(['contractor_id' => $job->getContractorId()])->delete();
+        });
+
+        Queue::looping(function () {
+            while (\DB::transactionLevel() > 0) {
+                \DB::rollBack();
+            }
+        });
     }
 }
