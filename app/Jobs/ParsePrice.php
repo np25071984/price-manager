@@ -42,8 +42,9 @@ class ParsePrice implements ShouldQueue
      */
     public function handle()
     {
-        /** Create a new Xls Reader  **/
-        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
+        $extension = strtolower(pathinfo($this->price)['extension']);
+        $readerClass = sprintf("\PhpOffice\PhpSpreadsheet\Reader\%s" ,ucfirst($extension));
+        $reader = new $readerClass;
 
         $spreadsheet = $reader->load($this->price);
         $worksheet = $spreadsheet->getActiveSheet();
@@ -60,13 +61,12 @@ class ParsePrice implements ShouldQueue
         }
 
         \DB::beginTransaction();
-        for ($row = 0; $row <= $highestRow; $row++) {
+        for ($row = 1; $row <= $highestRow; $row++) {
             if ($worksheet->getCellByColumnAndRow($columnName, $row)->isInMergeRange()
                 || $worksheet->getCellByColumnAndRow($columnPrice, $row)->isInMergeRange()) {
                 continue;
             }
 
-            var_dump($contractor->config);
             $name = trim($worksheet->getCellByColumnAndRow($columnName, $row)->getCalculatedValue());
             if ($name === '') {
                 continue;
@@ -79,13 +79,13 @@ class ParsePrice implements ShouldQueue
                     trim($worksheet->getCellByColumnAndRow($columnPrice, $row)->getCalculatedValue())
                 )
             );
-            if ($price === floatval(0)) {
-                continue;
-            }
 
             try {
-
                 if ($contractor) {
+                    if ($price === floatval(0)) {
+                        continue;
+                    }
+
                     $contractorItem = $contractor->items()->where(['name' => $name])->first();
 
                     if ($contractorItem) {
@@ -104,7 +104,7 @@ class ParsePrice implements ShouldQueue
                     if ($item) {
                         Relation::firstOrCreate([
                             'item_id' => $item->id,
-                            'contractor_item_id' => $contractor->id,
+                            'contractor_item_id' => $contractorItem->id,
                         ]);
                     }
                 } else {

@@ -41,8 +41,13 @@ class ContractorController extends Controller
      */
     public function store(Request $request)
     {
+        $config = [
+            'col_name' => $request->col_name,
+            'col_price' => $request->col_price,
+        ];
         $contractor = Contractor::create([
             'name' => $request->name,
+            'config' => $config,
         ]);
 
         $request->session()->flash('message', 'Новый поставщик успешно добавлен!');
