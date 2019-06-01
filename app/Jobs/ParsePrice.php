@@ -54,14 +54,16 @@ class ParsePrice implements ShouldQueue
             $contractor = Contractor::findOrFail($this->contractorId);
             $columnName = $contractor->config['col_name'];
             $columnPrice = $contractor->config['col_price'];
+            $startRow = 1;
         } else {
             $contractor = null;
             $columnName = 3;
             $columnPrice = 5;
+            $startRow = 2;
         }
 
         \DB::beginTransaction();
-        for ($row = 1; $row <= $highestRow; $row++) {
+        for ($row = $startRow; $row <= $highestRow; $row++) {
             if ($worksheet->getCellByColumnAndRow($columnName, $row)->isInMergeRange()
                 || $worksheet->getCellByColumnAndRow($columnPrice, $row)->isInMergeRange()) {
                 continue;
@@ -119,7 +121,7 @@ class ParsePrice implements ShouldQueue
                     $article = trim($worksheet->getCellByColumnAndRow(1, $row)->getCalculatedValue());
                     $item = Item::where('article', $article)->first();
 
-                    $stock = trim($worksheet->getCellByColumnAndRow(8, $row)->getCalculatedValue());
+                    $stock = intval(trim($worksheet->getCellByColumnAndRow(8, $row)->getCalculatedValue()));
 
                     if ($item) {
                         $item->brand_id = $brand->id;

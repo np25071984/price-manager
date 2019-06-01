@@ -26,12 +26,12 @@
             <th class="text-center">Функции</th>
             </thead>
             <tbody>
-            @foreach ($items as $item)
+            @foreach ($contractorItems as $item)
                 <tr>
                     <td> {{ $item->name }}</td>
                     <td>
-                        @if ($item->relatedItem->first())
-                            {{ $item->relatedItem->first()->name }}
+                        @if ($item->relatedItem)
+                            {{ $item->relatedItem->name }}
                         @else
                             не связана
                         @endif
@@ -50,7 +50,7 @@
         </table>
 
         <div class="row justify-content-center">
-            {{ $items->links() }}
+            {{ $contractorItems->links() }}
         </div>
     </div>
 @endsection

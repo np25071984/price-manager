@@ -17,10 +17,10 @@
 
             <div class="row">
                 <div class="col-4 text-right">
-                    <strong>Название в собственном складе</strong>
+                    <strong>Название на собственном складе</strong>
                 </div>
-                <div class="col-8" id="own_item">{{ $contractorItem->relatedItem->first() ? $contractorItem->relatedItem->first()->name : null }}</div>
-                <input type="hidden" name="item" value="{{ $contractorItem->relatedItem->first() ? $contractorItem->relatedItem->first()->id : null }}" />
+                <div class="col-8" id="own_item">{{ $contractorItem->relatedItem ? $contractorItem->relatedItem->name : null }}</div>
+                <input type="hidden" name="item" value="{{ $contractorItem->relatedItem ? $contractorItem->relatedItem->id : null }}" />
             </div>
 
             <div class="row mb-3">

@@ -10,7 +10,7 @@ class ContractorItem extends Model
 
     public function relatedItem()
     {
-        return $this->belongsToMany('App\Item', 'relations');
+        return $this->hasOneThrough('App\Item', 'App\Relation', 'contractor_item_id', 'id', 'id', 'item_id');
     }
 
     public function contractor()

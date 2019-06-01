@@ -25,6 +25,7 @@ class CreateRelationsTable extends Migration
                 ->on('items')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+
             $table->unsignedBigInteger('contractor_item_id')->unique()->after('item_id');
             $table->foreign('contractor_item_id')
                 ->references('id')

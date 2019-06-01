@@ -70,16 +70,11 @@ class AppServiceProvider extends ServiceProvider
                     ['contractor_id' => $job->getContractorId()],
                     [
                         'status_id' => 3,
-                        'message' => 'При обработке прайса произошла ошибка!',
+                        'message' => mb_substr($event->exception->getMessage(), 0, 1024),
                     ]
                 );
             }
         });
 
-        Queue::looping(function () {
-            while (\DB::transactionLevel() > 0) {
-                \DB::rollBack();
-            }
-        });
     }
 }

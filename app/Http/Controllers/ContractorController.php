@@ -69,9 +69,9 @@ class ContractorController extends Controller
                 'owner' => $contractor->name,
             ]);
         } else {
-            $items = ContractorItem::where(['contractor_id' => $contractor->id])->paginate(30);
+            $contractorItems = $contractor->items()->with('relatedItem')->paginate(30);
 
-            return view('contractor/show', compact('contractor', 'items'));
+            return view('contractor/show', compact('contractor', 'contractorItems'));
         }
 
     }
@@ -166,7 +166,8 @@ class ContractorController extends Controller
 
     public function updateRelation(Request $request, Contractor $contractor, ContractorItem $contractorItem)
     {
-        $item = $contractorItem->relatedItem->first();
+        $item = $contractorItem->relatedItem;
+
         if ($item) {
             $relation = Relation::where([
                 'item_id' => $item->id,
@@ -175,7 +176,7 @@ class ContractorController extends Controller
             $relation->item_id = $request->item;
             $relation->save();
         } else {
-            Relation::create([
+            $r = Relation::create([
                 'item_id' => $request->item,
                 'contractor_item_id' => $contractorItem->id,
             ]);

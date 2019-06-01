@@ -16,7 +16,7 @@ class JobsStatusTable extends Migration
         Schema::create('jobs_status', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('status_id');
-            $table->string('message');
+            $table->string('message', 1024);
         });
 
         Schema::table('jobs_status', function (Blueprint $table) {
