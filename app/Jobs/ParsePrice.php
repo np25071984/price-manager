@@ -11,6 +11,7 @@ use App\Item;
 use App\Brand;
 use App\Relation;
 use App\ContractorItem;
+use App\Contractor;
 
 class ParsePrice implements ShouldQueue
 {
@@ -48,103 +49,101 @@ class ParsePrice implements ShouldQueue
         $worksheet = $spreadsheet->getActiveSheet();
         $highestRow = $worksheet->getHighestRow();
 
-
-        if ($this->contractorId == 1) {
-            $startRow = 11;
+        if ($this->contractorId) {
+            $contractor = Contractor::findOrFail($this->contractorId);
+            $columnName = $contractor->config['col_name'];
+            $columnPrice = $contractor->config['col_price'];
         } else {
-            $startRow = 2;
+            $contractor = null;
+            $columnName = 3;
+            $columnPrice = 5;
         }
 
-        for ($row = $startRow; $row <= $highestRow; $row++) {
-            if ($worksheet->getCellByColumnAndRow(2, $row)->isInMergeRange()) {
+        \DB::beginTransaction();
+        for ($row = 0; $row <= $highestRow; $row++) {
+            if ($worksheet->getCellByColumnAndRow($columnName, $row)->isInMergeRange()
+                || $worksheet->getCellByColumnAndRow($columnPrice, $row)->isInMergeRange()) {
+                continue;
+            }
+
+            var_dump($contractor->config);
+            $name = trim($worksheet->getCellByColumnAndRow($columnName, $row)->getCalculatedValue());
+            if ($name === '') {
+                continue;
+            }
+
+            $price = floatval(
+                str_replace(
+                    ',',
+                    '.',
+                    trim($worksheet->getCellByColumnAndRow($columnPrice, $row)->getCalculatedValue())
+                )
+            );
+            if ($price === floatval(0)) {
                 continue;
             }
 
             try {
-                \DB::beginTransaction();
 
-                switch ($this->contractorId) {
-                    case 1:
-                        $name = trim($worksheet->getCellByColumnAndRow(2, $row)->getCalculatedValue());
-                        $price = floatval(
-                            str_replace(
-                                ',',
-                                '.',
-                                trim($worksheet->getCellByColumnAndRow(3, $row)->getCalculatedValue())
-                            )
-                        );
+                if ($contractor) {
+                    $contractorItem = $contractor->items()->where(['name' => $name])->first();
 
-                        $contractorItem = ContractorItem::where([
-                            'contractor_id' => $this->contractorId,
+                    if ($contractorItem) {
+                        $contractorItem->name = $name;
+                        $contractorItem->price = $price;
+                        $contractorItem->save();
+                    } else {
+                        $contractorItem = ContractorItem::create([
+                            'contractor_id' => $contractor->id,
                             'name' => $name,
-                        ])->first();
+                            'price' => $price,
+                        ]);
+                    }
 
-                        if ($contractorItem) {
-                            $contractorItem->contractor_id = $this->contractorId;
-                            $contractorItem->name = $name;
-                            $contractorItem->price = $price;
-                            $contractorItem->save();
-                        } else {
-                            $contractorItem = ContractorItem::create([
-                                'contractor_id' => $this->contractorId,
-                                'name' => $name,
-                                'price' => $price,
-                            ]);
-                        }
+                    $item = Item::where(['name' => $name])->first();
+                    if ($item) {
+                        Relation::firstOrCreate([
+                            'item_id' => $item->id,
+                            'contractor_item_id' => $contractor->id,
+                        ]);
+                    }
+                } else {
+                    $brandName = trim($worksheet->getCellByColumnAndRow(2, $row)->getCalculatedValue());
+                    $brand = Brand::where('name', $brandName)->first();
+                    if (!$brand) {
+                        $brand = Brand::create([
+                            'name' => $brandName
+                        ]);
+                    }
 
-                        $item = Item::where(['name' => $name])->first();
-                        if ($item) {
-                            Relation::firstOrCreate([
-                                'item_id' => $item->id,
-                                'contractor_item_id' => $contractorItem->id,
-                            ]);
-                        }
-                        break;
-                    default:
-                        $brandName = trim($worksheet->getCellByColumnAndRow(2, $row)->getCalculatedValue());
-                        $brand = Brand::where('name', $brandName)->first();
-                        if (!$brand) {
-                            $brand = Brand::create([
-                                'name' => $brandName
-                            ]);
-                        }
+                    $article = trim($worksheet->getCellByColumnAndRow(1, $row)->getCalculatedValue());
+                    $item = Item::where('article', $article)->first();
 
-                        $article = trim($worksheet->getCellByColumnAndRow(1, $row)->getCalculatedValue());
-                        $item = Item::where('article', $article)->first();
+                    $stock = trim($worksheet->getCellByColumnAndRow(8, $row)->getCalculatedValue());
 
-                        $name = trim($worksheet->getCellByColumnAndRow(3, $row)->getCalculatedValue());
-                        $price = floatval(
-                            str_replace(
-                                ',',
-                                '.',
-                                trim($worksheet->getCellByColumnAndRow(5, $row)->getCalculatedValue())
-                            )
-                        );
-                        $stock = trim($worksheet->getCellByColumnAndRow(8, $row)->getCalculatedValue());
-
-                        if ($item) {
-                            $item->brand_id = $brand->id;
-                            $item->name = $name;
-                            $item->price = $price;
-                            $item->stock = $stock;
-                            $item->save();
-                        } else {
-                            Item::create([
-                                'brand_id' => $brand->id,
-                                'article' => $article,
-                                'name' => $name,
-                                'price' => $price,
-                                'stock' => $stock,
-                            ]);
-                        }
+                    if ($item) {
+                        $item->brand_id = $brand->id;
+                        $item->name = $name;
+                        $item->price = $price;
+                        $item->stock = $stock;
+                        $item->save();
+                    } else {
+                        Item::create([
+                            'brand_id' => $brand->id,
+                            'article' => $article,
+                            'name' => $name,
+                            'price' => $price,
+                            'stock' => $stock,
+                        ]);
+                    }
                 }
 
-                \DB::commit();
-            } catch(PDOException $e) {
+            } catch(\Exception $e) {
                 \DB::rollback();
                 throw $e;
             }
         }
+        \DB::commit();
 
     }
 

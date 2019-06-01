@@ -92,6 +92,11 @@ class ContractorController extends Controller
     public function update(Request $request, Contractor $contractor)
     {
         $contractor->name = $request->name;
+        $config = [
+            'col_name' => $request->col_name,
+            'col_price' => $request->col_price,
+        ];
+        $contractor->config = $config;
         $contractor->save();
 
         $request->session()->flash('message', 'Поставщик успешно обновлен!');

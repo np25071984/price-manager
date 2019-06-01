@@ -28,7 +28,7 @@ class ItemController extends Controller
                 'owner' => 'прайсом',
             ]);
         } else {
-            $path = storage_path('price/' . \Auth::id());
+            $path = storage_path('prices/' . \Auth::id());
             $files = glob($path . '/*.xlsx');
 
             if (isset($files[0])) {
@@ -187,7 +187,7 @@ class ItemController extends Controller
 
     public function priceDownload()
     {
-        $path = storage_path('price/' . \Auth::id());
+        $path = storage_path('prices/' . \Auth::id());
 
         $files = glob($path . '/*.xlsx');
 
@@ -200,7 +200,7 @@ class ItemController extends Controller
 
     public function priceGenerate(Request $request)
     {
-        $path = storage_path('price/' . \Auth::id());
+        $path = storage_path('prices/' . \Auth::id());
 
         $filesystem = new Filesystem;
         if ($filesystem->exists($path)) {
