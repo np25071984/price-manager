@@ -50,7 +50,6 @@ class BindItems extends Command
 
         $contractor = Contractor::findOrFail($contractorId);
 
-//        dd($file);
         $spreadsheet = $reader->load($file);
         $worksheet = $spreadsheet->getActiveSheet();
         $highestRow = $worksheet->getHighestRow();
@@ -71,11 +70,19 @@ class BindItems extends Command
 
             $contractorItem = $contractor->items()->where(['name' => $contractorName])->first();
             if ($contractorItem) {
-                Relation::firstOrCreate([
+                $relation = Relation::where([
                     'item_id' => $item->id,
-                    'contractor_item_id' => $contractorItem->id,
-                ]);
-                $this->info(sprintf("Добавлена связь '%s' - '%s'", $item->article, $contractor->name));
+                    'contractor_id' => $contractor->id,
+                ])->exists();
+                if ($relation) {
+                    $this->line(sprintf("Для товара '%s' уже найдена связь товаром поставщика '%s'", $item->name, $contractor->name));
+                } else {
+                    Relation::firstOrCreate([
+                        'item_id' => $item->id,
+                        'contractor_id' => $contractor->id,
+                        'contractor_item_id' => $contractorItem->id,
+                    ]);
+                }
             } else {
                 $this->line(sprintf("Для поставщика '%s' не найден товар с названием '%s'", $contractor->name, $name));
             }

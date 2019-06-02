@@ -42,7 +42,12 @@ class ItemController extends Controller
 
             if ($request->has('query')) {
                 $query = $request->input('query');
-                $items = Item::where('name', 'ilike', "%{$query}%")->paginate(30);
+                $items = Item::where('name', 'ilike', "%{$query}%")->with('brand')
+                    ->orWhere('article', 'ilike', "%{$query}%")
+                    ->orWhereHas('brand', function ($mainQuery) use ($query) {
+                        $mainQuery->where('name', 'ilike', "%{$query}%");
+                    })
+                    ->paginate(30);
 
                 $contractorItemsWithoutRelation = \DB::table('contractor_items')
                     ->select('contractor_items.id')
@@ -52,10 +57,23 @@ class ItemController extends Controller
 
                 $contractorItems = ContractorItem::whereIn('id', $contractorItemsWithoutRelation)->limit(30)->get();
             } else {
-                $contractorItems = [];
-                $items = Item::paginate(30);
+                $contractorItemsWithoutRelation = \DB::table('contractor_items')
+                    ->select('contractor_items.id')
+                    ->leftJoin('relations', 'contractor_items.id', '=', 'relations.contractor_item_id')
+                    ->whereNull('relations.id');
+
+                $contractorItems = ContractorItem::whereIn('id', $contractorItemsWithoutRelation)->paginate(30, ['*'], 'citem-page');
+
+                $items = Item::paginate(30, ['*'], 'item-page');
             }
 
+            if ($items instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                $items->appends(request()->input())->appends(['active-tab' => 1]);
+            }
+
+            if ($contractorItems instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                $contractorItems->appends(request()->input())->appends(['active-tab' => 2]);
+            }
             return view('item/index', compact('items', 'contractorItems', 'job', 'price'));
         }
     }

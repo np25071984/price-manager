@@ -6,6 +6,7 @@
         @if($contractor->job && $contractor->job->hasError())
             <div class="alert alert-danger" role="alert">
                 <p>В процессе обработки прайса прозошла <strong>ошибка</strong>!</p>
+                <code>{{ $contractor->job->message }}</code>
             </div>
         @endif
 

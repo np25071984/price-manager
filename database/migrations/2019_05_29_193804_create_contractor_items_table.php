@@ -23,6 +23,8 @@ class CreateContractorItemsTable extends Migration
         Schema::table('contractor_items', function (Blueprint $table) {
             $table->unsignedBigInteger('contractor_id')->after('id');
             $table->foreign('contractor_id')->references('id')->on('contractors')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->unique(['contractor_id', 'name']);
         });
     }
 

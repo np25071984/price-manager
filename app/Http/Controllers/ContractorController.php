@@ -167,17 +167,48 @@ class ContractorController extends Controller
     public function updateRelation(Request $request, Contractor $contractor, ContractorItem $contractorItem)
     {
         $item = $contractorItem->relatedItem;
+        if ($item) {
+            if ($item->id === (int)$request->item) {
+                $request->session()->flash('message', sprintf("Связь '%s' => '%s' для поставщика '%s' уже установлена!",
+                    $item->article,
+                    $contractorItem->name,
+                    $contractor->name
+                ));
+
+                return redirect(route('contractor.show', $contractor->id));
+            }
+        }
+
+        $relationAlreadyExists = Relation::where([
+            'item_id' => $request->item,
+            'contractor_id' => $contractor->id,
+        ])->exists();
+
+        if ($relationAlreadyExists) {
+            $item = Item::find($request->item);
+            $request->session()->flash('message', sprintf("Связь для товара с артикулом '%s' "
+                    . "для поставщика '%s' уже существует!<br />"
+                    . "Нельзя связать товар с одинм поставщиком дважды!",
+                    $item->article,
+                    $contractor->name
+                )
+            );
+
+            return redirect(route('contractor.show', $contractor->id));
+        }
 
         if ($item) {
             $relation = Relation::where([
                 'item_id' => $item->id,
                 'contractor_item_id' => $contractorItem->id,
             ])->first();
+
             $relation->item_id = $request->item;
             $relation->save();
         } else {
-            $r = Relation::create([
+            Relation::create([
                 'item_id' => $request->item,
+                'contractor_id' => $contractor->id,
                 'contractor_item_id' => $contractorItem->id,
             ]);
         }

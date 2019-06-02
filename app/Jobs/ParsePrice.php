@@ -91,7 +91,6 @@ class ParsePrice implements ShouldQueue
                     $contractorItem = $contractor->items()->where(['name' => $name])->first();
 
                     if ($contractorItem) {
-                        $contractorItem->name = $name;
                         $contractorItem->price = $price;
                         $contractorItem->save();
                     } else {
@@ -106,22 +105,23 @@ class ParsePrice implements ShouldQueue
                     if ($item) {
                         Relation::firstOrCreate([
                             'item_id' => $item->id,
+                            'contractor_id' => $contractor->id,
                             'contractor_item_id' => $contractorItem->id,
                         ]);
                     }
                 } else {
                     $brandName = trim($worksheet->getCellByColumnAndRow(2, $row)->getCalculatedValue());
-                    $brand = Brand::where('name', $brandName)->first();
-                    if (!$brand) {
-                        $brand = Brand::create([
-                            'name' => $brandName
-                        ]);
-                    }
+                    $brand = Brand::firstOrCreate(['name' => $brandName]);
 
                     $article = trim($worksheet->getCellByColumnAndRow(1, $row)->getCalculatedValue());
                     $item = Item::where('article', $article)->first();
 
                     $stock = intval(trim($worksheet->getCellByColumnAndRow(8, $row)->getCalculatedValue()));
+
+                    if (Item::where(['name' => $name])->first()) {
+                        throw new \Exception(sprintf("В процессе разбора прайса, обнаружено дублирование товара с названием '%s'.<br />"
+                            . "Все названия должны быть уникальны! Исправьте ошибку и повторите процесс загрузки прайса заново.", $name));
+                    }
 
                     if ($item) {
                         $item->brand_id = $brand->id;
