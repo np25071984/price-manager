@@ -12,6 +12,15 @@ class Contractor extends Model
         'config' => 'array'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (Contractor $contractor) {
+            $contractor->items()->delete();
+        });
+    }
+
     public function job()
     {
         return $this->hasOne('App\JobStatus');
