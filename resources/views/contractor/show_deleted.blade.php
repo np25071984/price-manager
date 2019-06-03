@@ -11,12 +11,8 @@
         @endif
 
         <div class="row">
-            <div class="col-6">
-                <h1>{{ $contractor->name }}</h1>
-            </div>
-            <div class="col-6">
-                <a href="{{ route('contractor.upload_form', $contractor->id) }}"><button type="button" class="btn btn-link float-right">Згарузить прайс поставщика</button></a>
-                <a href="{{ route('contractor.deleted_items', $contractor->id) }}"><button type="button" class="btn btn-link float-right">Удаленные товары</button></a>
+            <div class="col-12">
+                <h1>Удаленные товары поставщика {{ $contractor->name }}</h1>
             </div>
         </div>
 
@@ -25,7 +21,6 @@
             <th>Название товара</th>
             <th>Связь</th>
             <th>Цена</th>
-            <th class="text-center">Функции</th>
             </thead>
             <tbody>
             @foreach ($contractorItems as $item)
@@ -39,13 +34,6 @@
                         @endif
                     </td>
                     <td class="text-center"> {{ $item->price }}</td>
-                    <td class="text-center">
-                        <div class="btn-group" role="group">
-                            <a href="{{ route('contractor.relation_form', [$contractor->id, $item->id]) }}" class="btn btn-primary" role="button">
-                                Изменить связь
-                            </a>
-                        </div>
-                    </td>
                 </tr>
             @endforeach
             </tbody>

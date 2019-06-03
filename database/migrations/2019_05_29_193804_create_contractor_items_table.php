@@ -18,6 +18,7 @@ class CreateContractorItemsTable extends Migration
             $table->string('name');
             $table->float('price');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::table('contractor_items', function (Blueprint $table) {

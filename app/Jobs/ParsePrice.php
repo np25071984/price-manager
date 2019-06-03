@@ -50,11 +50,21 @@ class ParsePrice implements ShouldQueue
         $worksheet = $spreadsheet->getActiveSheet();
         $highestRow = $worksheet->getHighestRow();
 
+        \DB::beginTransaction();
         if ($this->contractorId) {
             $contractor = Contractor::findOrFail($this->contractorId);
             $columnName = $contractor->config['col_name'];
             $columnPrice = $contractor->config['col_price'];
             $startRow = 1;
+
+            // Truly delete all SoftDeleted items (don't use bunch deleting due to relations)
+            $deleted = $contractor->items()->onlyTrashed();
+            foreach ($deleted as $delItem) {
+                $delItem->forceDelete();
+            }
+
+            // SoftDelete all remain contractor's items
+            $contractor->items()->delete();
         } else {
             $contractor = null;
             $columnName = 3;
@@ -62,7 +72,6 @@ class ParsePrice implements ShouldQueue
             $startRow = 2;
         }
 
-        \DB::beginTransaction();
         for ($row = $startRow; $row <= $highestRow; $row++) {
             if ($worksheet->getCellByColumnAndRow($columnName, $row)->isInMergeRange()
                 || $worksheet->getCellByColumnAndRow($columnPrice, $row)->isInMergeRange()) {
@@ -88,9 +97,10 @@ class ParsePrice implements ShouldQueue
                         continue;
                     }
 
-                    $contractorItem = $contractor->items()->where(['name' => $name])->first();
+                    $contractorItem = $contractor->items()->withTrashed()->where(['name' => $name])->first();
 
                     if ($contractorItem) {
+                        $contractorItem->restore();
                         $contractorItem->price = $price;
                         $contractorItem->save();
                     } else {
@@ -145,6 +155,7 @@ class ParsePrice implements ShouldQueue
                 throw $e;
             }
         }
+
         \DB::commit();
 
     }

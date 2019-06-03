@@ -73,7 +73,6 @@ class ContractorController extends Controller
 
             return view('contractor/show', compact('contractor', 'contractorItems'));
         }
-
     }
 
     /**
@@ -216,5 +215,20 @@ class ContractorController extends Controller
         $request->session()->flash('message', 'Связь успешно обновлена!');
 
         return redirect(route('contractor.show', $contractor->id));
+    }
+
+    public function deletedItems(Contractor $contractor)
+    {
+        if ($contractor->job && !$contractor->job->hasError()) {
+            return view('price_processing_placeholder', [
+                'job' => $contractor->job,
+                'owner' => $contractor->name,
+            ]);
+        } else {
+            $contractorItems = $contractor->items()->onlyTrashed()->with('relatedItem')->paginate(30);
+
+            return view('contractor/show_deleted', compact('contractor', 'contractorItems'));
+        }
+
     }
 }

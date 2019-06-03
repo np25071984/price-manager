@@ -4,9 +4,12 @@ namespace App;
 
 use App\Relation;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ContractorItem extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = ['contractor_id', 'name', 'price'];
 
     protected static function boot()
