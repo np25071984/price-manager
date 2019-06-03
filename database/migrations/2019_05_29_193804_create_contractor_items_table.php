@@ -15,17 +15,19 @@ class CreateContractorItemsTable extends Migration
     {
         Schema::create('contractor_items', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('article', 32)->nullable();
             $table->string('name');
             $table->float('price');
             $table->timestamps();
             $table->softDeletes();
+            $table->index('article', 'name');
         });
 
         Schema::table('contractor_items', function (Blueprint $table) {
             $table->unsignedBigInteger('contractor_id')->after('id');
             $table->foreign('contractor_id')->references('id')->on('contractors')->onUpdate('cascade')->onDelete('cascade');
 
-            $table->unique(['contractor_id', 'name']);
+            $table->unique(['contractor_id', 'article']);
         });
     }
 

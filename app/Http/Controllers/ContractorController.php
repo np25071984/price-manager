@@ -30,7 +30,7 @@ class ContractorController extends Controller
      */
     public function create()
     {
-        return view('contractor/create' );
+        return view('contractor/create');
     }
 
     /**
@@ -42,6 +42,7 @@ class ContractorController extends Controller
     public function store(Request $request)
     {
         $config = [
+            'col_article' => $request->col_article,
             'col_name' => $request->col_name,
             'col_price' => $request->col_price,
         ];
@@ -97,6 +98,7 @@ class ContractorController extends Controller
     {
         $contractor->name = $request->name;
         $config = [
+            'col_article' => $request->col_article,
             'col_name' => $request->col_name,
             'col_price' => $request->col_price,
         ];

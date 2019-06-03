@@ -10,7 +10,7 @@ class ContractorItem extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['contractor_id', 'name', 'price'];
+    protected $fillable = ['contractor_id', 'article', 'name', 'price'];
 
     protected static function boot()
     {

@@ -26,6 +26,18 @@
                 <legend>Конфигурация прайса</legend>
 
                 <div class="form-group row">
+                    <label for="col_article" class="col-4 col-form-label">Номер колонки с артикулом</label>
+                    <div class="col-8">
+                        <input type="text"
+                               class="form-control{{ $errors->has('col_article') ? ' is-invalid' : '' }}"
+                               name="col_article"
+                               value="{{ $contractor->config['col_article'] }}">
+
+                        <div class="invalid-feedback">{{ $errors->first('col_article') }}</div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
                     <label for="col_name" class="col-4 col-form-label">Номер колонки с названием товара</label>
                     <div class="col-8">
                         <input type="text"

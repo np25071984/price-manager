@@ -53,20 +53,19 @@ class ParsePrice implements ShouldQueue
         \DB::beginTransaction();
         if ($this->contractorId) {
             $contractor = Contractor::findOrFail($this->contractorId);
+            $columnArticle = isset($contractor->config['col_article']) ? $contractor->config['col_article'] : null;
             $columnName = $contractor->config['col_name'];
             $columnPrice = $contractor->config['col_price'];
             $startRow = 1;
 
-            // Truly delete all SoftDeleted items (don't use bunch deleting due to relations)
-            $deleted = $contractor->items()->onlyTrashed();
-            foreach ($deleted as $delItem) {
-                $delItem->forceDelete();
-            }
+            // Truly delete all SoftDeleted items (bunch deleting doesn't support the Events!)
+            $contractor->items()->onlyTrashed()->forceDelete();
 
             // SoftDelete all remain contractor's items
             $contractor->items()->delete();
         } else {
             $contractor = null;
+            $columnArticle = 1;
             $columnName = 3;
             $columnPrice = 5;
             $startRow = 2;
@@ -80,6 +79,15 @@ class ParsePrice implements ShouldQueue
 
             $name = trim($worksheet->getCellByColumnAndRow($columnName, $row)->getCalculatedValue());
             if ($name === '') {
+                continue;
+            }
+
+            if ($columnArticle) {
+                $article = trim($worksheet->getCellByColumnAndRow($columnArticle, $row)->getCalculatedValue());
+            } else {
+                $article = md5($name);
+            }
+            if ($article === '') {
                 continue;
             }
 
@@ -97,15 +105,17 @@ class ParsePrice implements ShouldQueue
                         continue;
                     }
 
-                    $contractorItem = $contractor->items()->withTrashed()->where(['name' => $name])->first();
+                    $contractorItem = $contractor->items()->withTrashed()->where(['article' => $article])->first();
 
                     if ($contractorItem) {
                         $contractorItem->restore();
+                        $contractorItem->name = $name;
                         $contractorItem->price = $price;
                         $contractorItem->save();
                     } else {
                         $contractorItem = ContractorItem::create([
                             'contractor_id' => $contractor->id,
+                            'article' => $article,
                             'name' => $name,
                             'price' => $price,
                         ]);
@@ -123,14 +133,13 @@ class ParsePrice implements ShouldQueue
                     $brandName = trim($worksheet->getCellByColumnAndRow(2, $row)->getCalculatedValue());
                     $brand = Brand::firstOrCreate(['name' => $brandName]);
 
-                    $article = trim($worksheet->getCellByColumnAndRow(1, $row)->getCalculatedValue());
+                    $article = trim($worksheet->getCellByColumnAndRow($columnArticle, $row)->getCalculatedValue());
                     $item = Item::where('article', $article)->first();
 
                     $stock = intval(trim($worksheet->getCellByColumnAndRow(8, $row)->getCalculatedValue()));
 
                     if (Item::where(['name' => $name])->first()) {
-                        throw new \Exception(sprintf("В процессе разбора прайса, обнаружено дублирование товара с названием '%s'.<br />"
-                            . "Все названия должны быть уникальны! Исправьте ошибку и повторите процесс загрузки прайса заново.", $name));
+                        \Log::warning(sprintf("Item name duplication: %s", $name));
                     }
 
                     if ($item) {

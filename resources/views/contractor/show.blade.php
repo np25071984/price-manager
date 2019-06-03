@@ -22,6 +22,7 @@
 
         <table class="table">
             <thead>
+            <th>Артикул</th>
             <th>Название товара</th>
             <th>Связь</th>
             <th>Цена</th>
@@ -30,7 +31,12 @@
             <tbody>
             @foreach ($contractorItems as $item)
                 <tr>
-                    <td> {{ $item->name }}</td>
+                    <td>
+                        @if ($contractor->config['col_article'])
+                            {{ $item->article }}
+                        @endif
+                    </td>
+                    <td>{{ $item->name }}</td>
                     <td>
                         @if ($item->relatedItem)
                             {{ $item->relatedItem->name }}
