@@ -41,6 +41,7 @@
                     <input type="text"
                            class="form-control{{ $errors->has('col_name') ? ' is-invalid' : '' }}"
                            name="col_name"
+                           required
                            value="{{ old('col_name') }}">
 
                     <div class="invalid-feedback">{{ $errors->first('col_name') }}</div>
@@ -53,6 +54,7 @@
                     <input type="text"
                            class="form-control{{ $errors->has('col_price') ? ' is-invalid' : '' }}"
                            name="col_price"
+                           required
                            value="{{ old('col_price') }}">
 
                     <div class="invalid-feedback">{{ $errors->first('col_price') }}</div>

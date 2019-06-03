@@ -6,3 +6,8 @@
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
+
+.form-group.required label:after {
+  content: "*";
+  color: red;
+}
