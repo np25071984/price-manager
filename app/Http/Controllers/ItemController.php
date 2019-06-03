@@ -42,20 +42,82 @@ class ItemController extends Controller
 
             if ($request->has('query')) {
                 $query = $request->input('query');
-                $items = Item::where('name', 'ilike', "%{$query}%")->with('brand')
-                    ->orWhere('article', 'ilike', "%{$query}%")
-                    ->orWhereHas('brand', function ($mainQuery) use ($query) {
-                        $mainQuery->where('name', 'ilike', "%{$query}%");
-                    })
-                    ->paginate(30);
 
-                $contractorItemsWithoutRelation = \DB::table('contractor_items')
-                    ->select('contractor_items.id')
-                    ->leftJoin('relations', 'contractor_items.id', '=', 'relations.contractor_item_id')
-                    ->where('contractor_items.name', 'ilike', "%{$query}%")
-                    ->whereNull('relations.id');
+                if (is_numeric($query)) {
+                    /** reckon query string is an item article */
+                    $items = Item::where(['article' => $query])->with('brand')->get();
 
-                $contractorItems = ContractorItem::whereIn('id', $contractorItemsWithoutRelation)->limit(30)->get();
+                    $contractorItemsWithoutRelation = \DB::table('contractor_items')
+                        ->select('contractor_items.id')
+                        ->leftJoin('relations', 'contractor_items.id', '=', 'relations.contractor_item_id')
+                        ->where(['contractor_items.article' => $query])
+                        ->whereNull('relations.id');
+
+                    $contractorItems = ContractorItem::whereIn('id', $contractorItemsWithoutRelation)->get();
+                } else {
+                    /** extract digits from the query */
+                    preg_match_all('/\d+/', $query, $matches);
+                    $numbers = $matches[0];
+                    $query = trim(preg_replace('/\d+/', '', $query));
+
+                    /** extract russian words */
+                    preg_match_all('/[А-Яа-яЁё]+/u', $query, $matches);
+                    $russian = $matches[0];
+                    $query = trim(preg_replace('/[А-Яа-яЁё]+/u', '', $query));
+
+                    $russianQuery = null;
+                    if (count($russian)) {
+                        foreach ($russian as $key => $word) {
+                            $russian[$key] = $word . ':*';
+                        }
+                        $russianQuery = implode(' & ', $russian);
+                        unset($russian);
+                    }
+
+                    /** extract english words */
+                    $english = preg_split('/\s+/', $query, -1, PREG_SPLIT_NO_EMPTY);
+
+                    $englishQuery = null;
+                    if (count($english)) {
+                        foreach ($english as $key => $word) {
+                            $english[$key] = $word . ':*';
+                        }
+                        $englishQuery = implode(' & ', $english);
+                        unset($english);
+                    }
+
+                    $items = Item::query();
+                    foreach ($numbers as $number) {
+                        $items->where('name', 'like', "%{$number}%");
+                    }
+                    if ($russianQuery) {
+                        $items->whereRaw("to_tsvector('russian', name) @@ to_tsquery('russian', ?)", [$russianQuery]);
+                    }
+                    if ($englishQuery) {
+                        $items->whereRaw("to_tsvector('english', name) @@ to_tsquery('english', ?)", [$englishQuery]);
+                    }
+                    $items = $items->paginate(30, ['*'], 'item-page');
+
+                    /** Select only unbinded ContractorItem models */
+                    $contractorItemsWithoutRelation = \DB::table('contractor_items')
+                        ->select('contractor_items.id')
+                        ->leftJoin('relations', 'contractor_items.id', '=', 'relations.contractor_item_id')
+                        ->whereNull('relations.id');
+
+                    $contractorItems = ContractorItem::query();
+                    foreach ($numbers as $number) {
+                        $contractorItems->where('name', 'like', "%{$number}%");
+                    }
+                    if ($englishQuery) {
+                        $contractorItems->whereRaw("to_tsvector('english', name) @@ to_tsquery('english', ?)", [$englishQuery]);
+                    }
+                    if ($russianQuery) {
+                        $contractorItems->whereRaw("to_tsvector('russian', name) @@ to_tsquery('russian', ?)", [$russianQuery]);
+                    }
+                    $contractorItems = $contractorItems
+                        ->whereIn('id', $contractorItemsWithoutRelation)
+                        ->paginate(30, ['*'], 'citem-page');
+                }
             } else {
                 $contractorItemsWithoutRelation = \DB::table('contractor_items')
                     ->select('contractor_items.id')

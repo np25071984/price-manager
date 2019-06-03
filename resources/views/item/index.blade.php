@@ -77,7 +77,7 @@
                 </table>
 
                 <div class="row justify-content-center">
-                    @if ($contractorItems instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                    @if ($items instanceof \Illuminate\Pagination\LengthAwarePaginator)
                         {{ $items->links() }}
                     @endif
                 </div>
@@ -87,6 +87,7 @@
                 <table class="table">
                     <thead>
                     <th>Поставщик</th>
+                    <th>Артикул</th>
                     <th>Название товара</th>
                     <th class="text-center">Цена</th>
                     <th class="text-center">Функции</th>
@@ -94,8 +95,13 @@
                     <tbody>
                     @foreach ($contractorItems as $item)
                         <tr>
-                            <td> {{ $item->contractor->name }}</td>
-                            <td> {{ $item->name }}</td>
+                            <td>{{ $item->contractor->name }}</td>
+                            <td>
+                                @if ($item->contractor->config['col_article'])
+                                    {{ $item->article }}
+                                @endif
+                            </td>
+                            <td>{{ $item->name }}</td>
                             <td class="text-center"> {{ $item->price }}</td>
                             <td class="text-center">
                                 <div class="btn-group" role="group">
