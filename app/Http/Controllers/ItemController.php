@@ -91,11 +91,17 @@ class ItemController extends Controller
                         $items->where('name', 'like', "%{$number}%");
                     }
                     if ($russianQuery) {
-                        $items->whereRaw("to_tsvector('russian', name) @@ to_tsquery('russian', ?)", [$russianQuery]);
+                        $items->whereRaw("tsvector_token @@ to_tsquery('russian', ?)", [$russianQuery]);
                     }
                     if ($englishQuery) {
-                        $items->whereRaw("to_tsvector('english', name) @@ to_tsquery('english', ?)", [$englishQuery]);
+                        $items->whereRaw("tsvector_token @@ to_tsquery('english', ?)", [$englishQuery]);
                     }
+                    $items->orderByRaw("(ts_rank("
+                            . "tsvector_token, to_tsquery('english', coalesce(?, ''))) "
+                            . "+ ts_rank(tsvector_token, to_tsquery('russian', coalesce(?, '')))) DESC",
+                        [$englishQuery, $russianQuery]
+                    );
+
                     $items = $items->paginate(30, ['*'], 'item-page');
 
                     /** Select only unbinded ContractorItem models */
