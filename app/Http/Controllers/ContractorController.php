@@ -160,18 +160,23 @@ class ContractorController extends Controller
     public function showReationForm(Contractor $contractor, ContractorItem $contractorItem)
     {
 
-        $items = Item::paginate(30);
+        $itemsWithoutRelation = \DB::table('items')
+            ->select('items.id')
+            ->leftJoin('relations', 'items.id', '=', 'relations.item_id')
+            ->whereNull('relations.id');
+
+        $items = Item::wherein('id', $itemsWithoutRelation)->paginate(30);
 
         return view('contractor/relation_form', compact('contractor', 'contractorItem', 'items'));
     }
 
     public function updateRelation(Request $request, Contractor $contractor, ContractorItem $contractorItem)
     {
-        $item = $contractorItem->relatedItem;
-        if ($item) {
-            if ($item->id === (int)$request->item) {
+        $itemOrig = $contractorItem->relatedItem;
+        if ($itemOrig) {
+            if ($itemOrig->article === (int)$request->article) {
                 $request->session()->flash('message', sprintf("Связь '%s' => '%s' для поставщика '%s' уже установлена!",
-                    $item->article,
+                    $itemOrig->article,
                     $contractorItem->name,
                     $contractor->name
                 ));
@@ -180,13 +185,21 @@ class ContractorController extends Controller
             }
         }
 
+        $item = Item::where(['article' => $request->article])->first();
+        if (!$item) {
+            $request->session()->flash('message', sprintf("Собственный товар с артикулом '%s' не найден!",
+                $request->article
+            ));
+
+            return redirect(route('contractor.show', $contractor->id));
+        }
+
         $relationAlreadyExists = Relation::where([
-            'item_id' => $request->item,
+            'item_id' => $item->id,
             'contractor_id' => $contractor->id,
         ])->exists();
 
         if ($relationAlreadyExists) {
-            $item = Item::find($request->item);
             $request->session()->flash('message', sprintf("Связь для товара с артикулом '%s' "
                     . "для поставщика '%s' уже существует!<br />"
                     . "Нельзя связать товар с одинм поставщиком дважды!",
@@ -198,17 +211,17 @@ class ContractorController extends Controller
             return redirect(route('contractor.show', $contractor->id));
         }
 
-        if ($item) {
+        if ($itemOrig) {
             $relation = Relation::where([
-                'item_id' => $item->id,
+                'item_id' => $itemOrig->id,
                 'contractor_item_id' => $contractorItem->id,
             ])->first();
 
-            $relation->item_id = $request->item;
+            $relation->item_id = $item->id;
             $relation->save();
         } else {
             Relation::create([
-                'item_id' => $request->item,
+                'item_id' => $item->id,
                 'contractor_id' => $contractor->id,
                 'contractor_item_id' => $contractorItem->id,
             ]);
@@ -232,5 +245,15 @@ class ContractorController extends Controller
             return view('contractor/show_deleted', compact('contractor', 'contractorItems'));
         }
 
+    }
+
+    public function destroyRelation(Item $item, ContractorItem $contractorItem)
+    {
+        Relation::where([
+            'item_id' => $item->id,
+            'contractor_item_id' => $contractorItem->id,
+        ])->delete();
+
+        return redirect(route('contractor.show', $contractorItem->contractor->id));
     }
 }

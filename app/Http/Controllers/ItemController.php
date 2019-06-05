@@ -90,11 +90,14 @@ class ItemController extends Controller
                         unset($english);
                     }
 
-                    $tsvItems = Item::query()->select(['*', \DB::raw("(ts_rank(tsvector_token, "
-                        . "ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
-                        . "+ ts_rank(tsvector_token, "
-                        . "ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))"
-                        . ") as rank")])->setBindings([$englishQuery, $russianQuery]);
+                    $tsvItems = Item::query()->select([
+                        '*',
+                        \DB::raw("(ts_rank(tsvector_token, "
+                            . "ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
+                            . "+ ts_rank(tsvector_token, "
+                            . "ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))"
+                            . ") as rank")]
+                    )->setBindings([$englishQuery, $russianQuery]);
                     foreach ($numbers as $number) {
                         $tsvItems->where('name', 'like', "%{$number}%");
                     }
@@ -105,7 +108,9 @@ class ItemController extends Controller
                         $tsvItems->whereRaw("tsvector_token @@ ts_rewrite(to_tsquery('english', ?), 'SELECT t, s FROM aliases')", [$englishQuery]);
                     }
 
-                    $trgItems = Item::query()->select(['*', \DB::raw("similarity(name, ?) as rank")])->setBindings([$queryOrig]);
+                    $trgItems = Item::query()
+                        ->select(['*', \DB::raw("similarity(name, ?) as rank")])
+                        ->setBindings([$queryOrig]);
                     $trgItems->whereRaw('name % ?', [$queryOrig]);
 
                     $items = $tsvItems->union($trgItems)
@@ -118,11 +123,14 @@ class ItemController extends Controller
                         ->leftJoin('relations', 'contractor_items.id', '=', 'relations.contractor_item_id')
                         ->whereNull('relations.id');
 
-                    $tsvContractorItems = ContractorItem::query()->select(['*', \DB::raw("(ts_rank(tsvector_token, "
+                    $tsvContractorItems = ContractorItem::query()->select([
+                        '*',
+                        \DB::raw("(ts_rank(tsvector_token, "
                         . "ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
                         . "+ ts_rank(tsvector_token, "
                         . "ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))"
-                        . ") as rank")])->setBindings([$englishQuery, $russianQuery]);;
+                        . ") as rank")]
+                    )->setBindings([$englishQuery, $russianQuery]);;
                     foreach ($numbers as $number) {
                         $tsvContractorItems->where('name', 'like', "%{$number}%");
                     }

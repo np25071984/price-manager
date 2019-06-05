@@ -2,25 +2,72 @@
 
 @section('content')
     <div class="container">
-        <h1>Установка связи с товаром поставщика {{ $contractor->name }}</h1>
+        <h1>Установка связи между товарами</h1>
         <hr>
         <form action="{{ route('contractor.relation_update', [$contractor->id, $contractorItem->id]) }}" method="POST">
 
             {{ csrf_field() }}
 
+            <h2>Товар поставщика:</h2>
             <div class="row">
                 <div class="col-4 text-right">
-                    <strong>Название товара у поставщика</strong>
+                    <strong>Поставщик</strong>
+                </div>
+                <div class="col-8">{{ $contractor->name }}</div>
+            </div>
+
+            <div class="row">
+                <div class="col-4 text-right">
+                    <strong>Артикул</strong>
+                </div>
+                <div class="col-8">
+                    @if ($contractor->config['col_article'])
+                        {{ $contractorItem->article }}
+                    @endif
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-4 text-right">
+                    <strong>Название</strong>
                 </div>
                 <div class="col-8">{{ $contractorItem->name }}</div>
             </div>
 
             <div class="row">
                 <div class="col-4 text-right">
-                    <strong>Название на собственном складе</strong>
+                    <strong>Цена</strong>
                 </div>
-                <div class="col-8" id="own_item">{{ $contractorItem->relatedItem ? $contractorItem->relatedItem->name : null }}</div>
-                <input type="hidden" name="item" value="{{ $contractorItem->relatedItem ? $contractorItem->relatedItem->id : null }}" />
+                <div class="col-8">{{ $contractorItem->price }}</div>
+            </div>
+
+            <h2>Собственный товар:</h2>
+
+            <div class="form-group row">
+                <label for="article" class="col-4 col-form-label text-right">Артикул</label>
+                <div class="col-8">
+                    <input type="text"
+                           class="form-control{{ $errors->has('article') ? ' is-invalid' : '' }}"
+                           id="article"
+                           name="article"
+                           value="{{ $contractorItem->relatedItem ? $contractorItem->relatedItem->article : null }}">
+
+                    <div class="invalid-feedback">{{ $errors->first('article') }}</div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="article" class="col-4 col-form-label text-right">Название</label>
+                <div class="col-8">
+                    <input type="text"
+                           class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}"
+                           name="name"
+                           id="name"
+                           disabled
+                           value="{{ $contractorItem->relatedItem ? $contractorItem->relatedItem->name : null }}">
+
+                    <div class="invalid-feedback">{{ $errors->first('name') }}</div>
+                </div>
             </div>
 
             <div class="row mb-3">
@@ -42,8 +89,8 @@
                         <td class="text-center">{{ $item->article }}</td>
                         <td>{{ $item->brand->name }}</td>
                         <td><a href="#" onclick="
-                                    document.getElementById('own_item').innerText = this.innerText;
-                                    document.getElementsByName('item')[0].value = {{ $item->id }};">
+                                    document.getElementById('name').value = this.innerText;
+                                    document.getElementById('article').value = {{ $item->article }};">
                                 {{ $item->name }}
                             </a>
                         </td>

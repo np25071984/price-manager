@@ -30,4 +30,5 @@ class ContractorItem extends Model
     {
         return $this->hasOne('App\Contractor', 'id', 'contractor_id');
     }
+
 }

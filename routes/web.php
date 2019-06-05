@@ -37,6 +37,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/contractor/{contractor}/upload', 'ContractorController@priceUpload')->name('contractor.upload');
     Route::get('/contractor/{contractor}/{contractorItem}/relation', 'ContractorController@showReationForm')->name('contractor.relation_form');
     Route::post('/contractor/{contractor}/{contractorItem}/relation', 'ContractorController@updateRelation')->name('contractor.relation_update');
+    Route::delete('/contractor/{item}/{contractorItem}/', 'ContractorController@destroyRelation')->name('relation.destroy');
 
 });
 
