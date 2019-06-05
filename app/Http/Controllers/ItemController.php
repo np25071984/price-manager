@@ -56,12 +56,13 @@ class ItemController extends Controller
 
                     $contractorItems = ContractorItem::whereIn('id', $contractorItemsWithoutRelation)->get();
                 } else {
-                    $query = str_replace(['(', ')', '|', '&', '*'], '', $query);
+                    $query = trim(str_replace(['(', ')', '|', '&', '*'], ' ', $query));
+                    $queryOrig = preg_replace('/\s+/u', ' ', $query);
 
                     /** extract digits from the query */
-                    preg_match_all('/\d+/', $query, $matches);
+                    preg_match_all('/\d+/', $queryOrig, $matches);
                     $numbers = $matches[0];
-                    $query = trim(preg_replace('/\d+/', '', $query));
+                    $query = trim(preg_replace('/\d+/', '', $queryOrig));
 
                     /** extract russian words */
                     preg_match_all('/[А-Яа-яЁё]+/u', $query, $matches);
@@ -89,23 +90,27 @@ class ItemController extends Controller
                         unset($english);
                     }
 
-                    $items = Item::query();
+                    $tsvItems = Item::query()->select(['*', \DB::raw("(ts_rank(tsvector_token, "
+                        . "ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
+                        . "+ ts_rank(tsvector_token, "
+                        . "ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))"
+                        . ") as rank")])->setBindings([$englishQuery, $russianQuery]);
                     foreach ($numbers as $number) {
-                        $items->where('name', 'like', "%{$number}%");
+                        $tsvItems->where('name', 'like', "%{$number}%");
                     }
                     if ($russianQuery) {
-                        $items->whereRaw("tsvector_token @@ ts_rewrite(to_tsquery('russian', ?), 'SELECT t, s FROM aliases')", [$russianQuery]);
+                        $tsvItems->whereRaw("tsvector_token @@ ts_rewrite(to_tsquery('russian', ?), 'SELECT t, s FROM aliases')", [$russianQuery]);
                     }
                     if ($englishQuery) {
-                        $items->whereRaw("tsvector_token @@ ts_rewrite(to_tsquery('english', ?), 'SELECT t, s FROM aliases')", [$englishQuery]);
+                        $tsvItems->whereRaw("tsvector_token @@ ts_rewrite(to_tsquery('english', ?), 'SELECT t, s FROM aliases')", [$englishQuery]);
                     }
-                    $items->orderByRaw("(ts_rank("
-                            . "tsvector_token, ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
-                            . "+ ts_rank(tsvector_token, ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))) DESC",
-                        [$englishQuery, $russianQuery]
-                    );
 
-                    $items = $items->paginate(30, ['*'], 'item-page');
+                    $trgItems = Item::query()->select(['*', \DB::raw("similarity(name, ?) as rank")])->setBindings([$queryOrig]);
+                    $trgItems->whereRaw('name % ?', [$queryOrig]);
+
+                    $items = $tsvItems->union($trgItems)
+                        ->orderBy('rank', 'desc')
+                        ->paginate(30, ['*'], 'item-page');
 
                     /** Select only unbinded ContractorItem models */
                     $contractorItemsWithoutRelation = \DB::table('contractor_items')
@@ -113,23 +118,27 @@ class ItemController extends Controller
                         ->leftJoin('relations', 'contractor_items.id', '=', 'relations.contractor_item_id')
                         ->whereNull('relations.id');
 
-                    $contractorItems = ContractorItem::query();
+                    $tsvContractorItems = ContractorItem::query()->select(['*', \DB::raw("(ts_rank(tsvector_token, "
+                        . "ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
+                        . "+ ts_rank(tsvector_token, "
+                        . "ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))"
+                        . ") as rank")])->setBindings([$englishQuery, $russianQuery]);;
                     foreach ($numbers as $number) {
-                        $contractorItems->where('name', 'like', "%{$number}%");
+                        $tsvContractorItems->where('name', 'like', "%{$number}%");
                     }
                     if ($englishQuery) {
-                        $contractorItems->whereRaw("to_tsvector('english', name) @@ ts_rewrite(to_tsquery('english', ?), 'SELECT t, s FROM aliases')", [$englishQuery]);
+                        $tsvContractorItems->whereRaw("to_tsvector('english', name) @@ ts_rewrite(to_tsquery('english', ?), 'SELECT t, s FROM aliases')", [$englishQuery]);
                     }
                     if ($russianQuery) {
-                        $contractorItems->whereRaw("to_tsvector('russian', name) @@ ts_rewrite(to_tsquery('russian', ?), 'SELECT t, s FROM aliases')", [$russianQuery]);
+                        $tsvContractorItems->whereRaw("to_tsvector('russian', name) @@ ts_rewrite(to_tsquery('russian', ?), 'SELECT t, s FROM aliases')", [$russianQuery]);
                     }
-                    $contractorItems->orderByRaw("(ts_rank("
-                        . "tsvector_token, ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
-                        . "+ ts_rank(tsvector_token, ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))) DESC",
-                        [$englishQuery, $russianQuery]
-                    );
-                    $contractorItems = $contractorItems
+
+                    $trgContractItems = ContractorItem::query()->select(['*', \DB::raw("similarity(name, ?) as rank")])->setBindings([$queryOrig]);
+                    $trgContractItems->whereRaw('name % ?', [$queryOrig]);
+
+                    $contractorItems = $tsvContractorItems->union($trgContractItems)
                         ->whereIn('id', $contractorItemsWithoutRelation)
+                        ->orderBy('rank', 'desc')
                         ->paginate(30, ['*'], 'citem-page');
                 }
             } else {
