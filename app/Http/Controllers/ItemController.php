@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 
 class ItemController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -55,6 +56,8 @@ class ItemController extends Controller
 
                     $contractorItems = ContractorItem::whereIn('id', $contractorItemsWithoutRelation)->get();
                 } else {
+                    $query = str_replace(['(', ')', '|', '&', '*'], '', $query);
+
                     /** extract digits from the query */
                     preg_match_all('/\d+/', $query, $matches);
                     $numbers = $matches[0];
@@ -91,14 +94,14 @@ class ItemController extends Controller
                         $items->where('name', 'like', "%{$number}%");
                     }
                     if ($russianQuery) {
-                        $items->whereRaw("tsvector_token @@ to_tsquery('russian', ?)", [$russianQuery]);
+                        $items->whereRaw("tsvector_token @@ ts_rewrite(to_tsquery('russian', ?), 'SELECT t, s FROM aliases')", [$russianQuery]);
                     }
                     if ($englishQuery) {
-                        $items->whereRaw("tsvector_token @@ to_tsquery('english', ?)", [$englishQuery]);
+                        $items->whereRaw("tsvector_token @@ ts_rewrite(to_tsquery('english', ?), 'SELECT t, s FROM aliases')", [$englishQuery]);
                     }
                     $items->orderByRaw("(ts_rank("
-                            . "tsvector_token, to_tsquery('english', coalesce(?, ''))) "
-                            . "+ ts_rank(tsvector_token, to_tsquery('russian', coalesce(?, '')))) DESC",
+                            . "tsvector_token, ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
+                            . "+ ts_rank(tsvector_token, ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))) DESC",
                         [$englishQuery, $russianQuery]
                     );
 
@@ -115,11 +118,16 @@ class ItemController extends Controller
                         $contractorItems->where('name', 'like', "%{$number}%");
                     }
                     if ($englishQuery) {
-                        $contractorItems->whereRaw("to_tsvector('english', name) @@ to_tsquery('english', ?)", [$englishQuery]);
+                        $contractorItems->whereRaw("to_tsvector('english', name) @@ ts_rewrite(to_tsquery('english', ?), 'SELECT t, s FROM aliases')", [$englishQuery]);
                     }
                     if ($russianQuery) {
-                        $contractorItems->whereRaw("to_tsvector('russian', name) @@ to_tsquery('russian', ?)", [$russianQuery]);
+                        $contractorItems->whereRaw("to_tsvector('russian', name) @@ ts_rewrite(to_tsquery('russian', ?), 'SELECT t, s FROM aliases')", [$russianQuery]);
                     }
+                    $contractorItems->orderByRaw("(ts_rank("
+                        . "tsvector_token, ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
+                        . "+ ts_rank(tsvector_token, ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))) DESC",
+                        [$englishQuery, $russianQuery]
+                    );
                     $contractorItems = $contractorItems
                         ->whereIn('id', $contractorItemsWithoutRelation)
                         ->paginate(30, ['*'], 'citem-page');
