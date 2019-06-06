@@ -16,7 +16,24 @@ class BrandController extends Controller
      */
     public function index(Request $request)
     {
-        $brands = new BrandResourceCollection(Brand::paginate(30, ['*'], 'page', $request->page));
+        $column = $request->input('column', 'name');
+        if (!in_array($column, ['name'])) {
+            $column = null;
+        }
+        $order = $request->input('order', 'asc');
+        if (!in_array($order, ['asc', 'desc'])) {
+            $order = null;
+        }
+        $query = $request->input('q', null);
+
+        $brands = Brand::query();
+        if ($query) {
+            $brands->where('name', 'ilike', "%{$query}%");
+        }
+        if ($column && $order) {
+            $brands->orderby($column, $order);
+        }
+        $brands = new BrandResourceCollection($brands->paginate(30, ['*'], 'page', $request->page));
 
         return $brands;
     }

@@ -1,9 +1,19 @@
 <template>
     <div>
+
+        <input v-model.trim="searchQuery" @input="searchQueryChange" class="form-control" type="text" placeholder="Поиск" />
+
         <p v-if="isLoading">Loading...</p>
         <table v-else class="table">
             <thead>
-                <th v-for="column in columns" :class="column.class">{{ column.title }}</th>
+                <th v-for="column in columns" :class="column.class">
+                    <a v-if="column.sort" href="#" @click.prevent="sortColumn(column.code, column.sort === 'asc' ? 'desc' : 'asc')">
+                        {{ column.title }}
+                        <i v-if="column.sort === 'asc'" class="fa fa-sort-up"></i>
+                        <i v-else-if="column.sort === 'desc'" class="fa fa-sort-down"></i>
+                    </a>
+                    <span v-else>{{ column.title }}</span>
+                </th>
             </thead>
             <tbody>
                 <tr v-for="item in items">
@@ -49,6 +59,7 @@
         },
         data() {
             return {
+                searchQuery: '',
                 showLink: {
                     type: String,
                 },
@@ -65,6 +76,8 @@
                 paginationShowDiasbled: false,
                 isLoading: true,
                 data: {},
+                sortColCode: null,
+                sortOrder: null,
             };
         },
         methods: {
@@ -80,28 +93,17 @@
                         })
                 }
             },
-            deleteItem(brandId) {
-                if (confirm('Вы уверены что хотите удалить бренд?')) {
-                    this.isLoading = true;
-                    axios.delete(this.deleteLink.replace('brand_id_ph', brandId))
-                        .then(resp => {
-                            this.getResults(this.data.current_page);
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        })
-                }
-            },
-            getLink(type, brandId) {
-                return this[type +'Link'].replace('brand_id_ph', brandId);
+            sortColumn(colCode, order) {
+                this.sortColCode = colCode;
+                this.sortOrder = order;
+                this.getResults(1);
             },
             getResults(page) {
-                this.isLoading = true;
                 if (typeof page === 'undefined') {
                     page = 1;
                 }
-                const url = this.apiLink + '?page=' + page;
-                axios.get(url)
+                this.isLoading = true;
+                axios.get(this.urlWithParams(page))
                     .then(response => {
                         this.items = response.data.data;
                         delete response.data.data;
@@ -118,12 +120,29 @@
                         this.data = response.data;
                         this.isLoading = false;
                     });
-            }
+            },
+            urlWithParams(page) {
+                const params = [];
+                params.push('page=' + encodeURIComponent(page));
+
+                const colCode = this.sortColCode ? this.sortColCode : null;
+                const sortOrder = this.sortOrder ? this.sortOrder : null;
+                if (colCode && sortOrder) {
+                    params.push('column=' + encodeURIComponent(colCode));
+                    params.push('order=' + encodeURIComponent(sortOrder));
+                }
+                if (this.searchQuery) {
+                    params.push('q=' + encodeURIComponent(this.searchQuery));
+                }
+                return this.apiLink + '?' + params.join('&');
+            },
         },
-        computed: {
-            showButtons: function() {
-                return this.controlButtons instanceof Object;
-            }
+        created () {
+            this.searchQueryChange = _.debounce(() => {
+                if (this.searchQuery === '' || this.searchQuery.length > 2) {
+                    this.getResults()
+                }
+            }, 500)
         },
         mounted() {
             this.getResults();

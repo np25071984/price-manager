@@ -14,20 +14,21 @@ class BrandResourceCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-
+        $column = $request->input('column', 'name');
+        $order = $request->input('order', 'asc');
         return [
             'data' => $this->collection,
             'columns' => [
                 [
                     'class' => '',
-                    'sort' => null,
+                    'sort' => ($column === 'name') ? $order : false,
                     'type' => 'text',
                     'code' => 'name',
                     'title' => 'Наименование поставщика'
                 ],
                 [
                     'class' => 'text-center',
-                    'sort' => null,
+                    'sort' => false,
                     'type' => 'component',
                     'code' => 'func',
                     'title' => 'Функции',

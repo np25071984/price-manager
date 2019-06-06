@@ -1849,6 +1849,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
@@ -1858,6 +1868,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
+      searchQuery: '',
       showLink: {
         type: String
       },
@@ -1873,7 +1884,9 @@ __webpack_require__.r(__webpack_exports__);
       paginationLimit: 5,
       paginationShowDiasbled: false,
       isLoading: true,
-      data: {}
+      data: {},
+      sortColCode: null,
+      sortOrder: null
     };
   },
   methods: {
@@ -1889,49 +1902,58 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
-    deleteItem: function deleteItem(brandId) {
-      var _this2 = this;
-
-      if (confirm('Вы уверены что хотите удалить бренд?')) {
-        this.isLoading = true;
-        axios__WEBPACK_IMPORTED_MODULE_0___default.a["delete"](this.deleteLink.replace('brand_id_ph', brandId)).then(function (resp) {
-          _this2.getResults(_this2.data.current_page);
-        })["catch"](function (error) {
-          console.log(error);
-        });
-      }
-    },
-    getLink: function getLink(type, brandId) {
-      return this[type + 'Link'].replace('brand_id_ph', brandId);
+    sortColumn: function sortColumn(colCode, order) {
+      this.sortColCode = colCode;
+      this.sortOrder = order;
+      this.getResults(1);
     },
     getResults: function getResults(page) {
-      var _this3 = this;
-
-      this.isLoading = true;
+      var _this2 = this;
 
       if (typeof page === 'undefined') {
         page = 1;
       }
 
-      var url = this.apiLink + '?page=' + page;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get(url).then(function (response) {
-        _this3.items = response.data.data;
+      this.isLoading = true;
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get(this.urlWithParams(page)).then(function (response) {
+        _this2.items = response.data.data;
         delete response.data.data;
-        _this3.columns = response.data.columns;
+        _this2.columns = response.data.columns;
         delete response.data.columns;
-        _this3.showLink = response.data.links.show;
-        _this3.editLink = response.data.links.edit;
-        _this3.deleteLink = response.data.links["delete"];
-        _this3.controlButtons = response.data.buttons;
-        _this3.data = response.data;
-        _this3.isLoading = false;
+        _this2.showLink = response.data.links.show;
+        _this2.editLink = response.data.links.edit;
+        _this2.deleteLink = response.data.links["delete"];
+        _this2.controlButtons = response.data.buttons;
+        _this2.data = response.data;
+        _this2.isLoading = false;
       });
+    },
+    urlWithParams: function urlWithParams(page) {
+      var params = [];
+      params.push('page=' + encodeURIComponent(page));
+      var colCode = this.sortColCode ? this.sortColCode : null;
+      var sortOrder = this.sortOrder ? this.sortOrder : null;
+
+      if (colCode && sortOrder) {
+        params.push('column=' + encodeURIComponent(colCode));
+        params.push('order=' + encodeURIComponent(sortOrder));
+      }
+
+      if (this.searchQuery) {
+        params.push('q=' + encodeURIComponent(this.searchQuery));
+      }
+
+      return this.apiLink + '?' + params.join('&');
     }
   },
-  computed: {
-    showButtons: function showButtons() {
-      return this.controlButtons instanceof Object;
-    }
+  created: function created() {
+    var _this3 = this;
+
+    this.searchQueryChange = _.debounce(function () {
+      if (_this3.searchQuery === '' || _this3.searchQuery.length > 2) {
+        _this3.getResults();
+      }
+    }, 500);
   },
   mounted: function mounted() {
     this.getResults();
@@ -38664,6 +38686,35 @@ var render = function() {
   return _c(
     "div",
     [
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model.trim",
+            value: _vm.searchQuery,
+            expression: "searchQuery",
+            modifiers: { trim: true }
+          }
+        ],
+        staticClass: "form-control",
+        attrs: { type: "text", placeholder: "Поиск" },
+        domProps: { value: _vm.searchQuery },
+        on: {
+          input: [
+            function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.searchQuery = $event.target.value.trim()
+            },
+            _vm.searchQueryChange
+          ],
+          blur: function($event) {
+            return _vm.$forceUpdate()
+          }
+        }
+      }),
+      _vm._v(" "),
       _vm.isLoading
         ? _c("p", [_vm._v("Loading...")])
         : _c("table", { staticClass: "table" }, [
@@ -38671,7 +38722,35 @@ var render = function() {
               "thead",
               _vm._l(_vm.columns, function(column) {
                 return _c("th", { class: column.class }, [
-                  _vm._v(_vm._s(column.title))
+                  column.sort
+                    ? _c(
+                        "a",
+                        {
+                          attrs: { href: "#" },
+                          on: {
+                            click: function($event) {
+                              $event.preventDefault()
+                              return _vm.sortColumn(
+                                column.code,
+                                column.sort === "asc" ? "desc" : "asc"
+                              )
+                            }
+                          }
+                        },
+                        [
+                          _vm._v(
+                            "\n                    " +
+                              _vm._s(column.title) +
+                              "\n                    "
+                          ),
+                          column.sort === "asc"
+                            ? _c("i", { staticClass: "fa fa-sort-up" })
+                            : column.sort === "desc"
+                            ? _c("i", { staticClass: "fa fa-sort-down" })
+                            : _vm._e()
+                        ]
+                      )
+                    : _c("span", [_vm._v(_vm._s(column.title))])
                 ])
               }),
               0
