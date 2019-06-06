@@ -14,9 +14,7 @@ class BrandController extends Controller
      */
     public function index()
     {
-        $brands = Brand::orderBy('name', 'asc')->paginate(30);
-
-        return view('brand/index', compact('brands'));
+        return view('brand/index');
     }
 
     /**
@@ -85,14 +83,4 @@ class BrandController extends Controller
         return redirect(route('brand.show' , $brand->id));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Brand  $brand
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Brand $brand)
-    {
-        //
-    }
 }

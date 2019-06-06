@@ -17,8 +17,9 @@ Auth::routes();
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', 'MainController@index')->name('main');
 
+    Route::resource('brand', 'BrandController')->except(['destroy']);
+
     Route::resources([
-        'brand' => 'BrandController',
         'item' => 'ItemController',
         'contractor' => 'ContractorController',
     ]);
