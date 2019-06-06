@@ -56,7 +56,7 @@ class ItemController extends Controller
 
                     $contractorItems = ContractorItem::whereIn('id', $contractorItemsWithoutRelation)->get();
                 } else {
-                    $query = trim(str_replace(['(', ')', '|', '&', '*'], ' ', $query));
+                    $query = preg_replace('/\W/u', ' ', $query);
                     $queryOrig = preg_replace('/\s+/u', ' ', $query);
 
                     /** extract digits from the query */
