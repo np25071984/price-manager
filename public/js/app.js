@@ -1862,6 +1862,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
@@ -38692,6 +38697,16 @@ var render = function() {
         attrs: { type: "text", placeholder: "Поиск" },
         domProps: { value: _vm.searchQuery },
         on: {
+          keydown: function($event) {
+            if (
+              !$event.type.indexOf("key") &&
+              _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+            ) {
+              return null
+            }
+            $event.preventDefault()
+            $event.stopPropagation()
+          },
           input: [
             function($event) {
               if ($event.target.composing) {

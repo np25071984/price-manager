@@ -19,7 +19,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-//
 Route::group(['middleware' => 'auth'], function () {
     Route::get('brand', 'Api\BrandController@index')->name('api.brand.index');
     Route::delete('brand/{brand}', 'Api\BrandController@destroy')->name('api.brand.destroy');

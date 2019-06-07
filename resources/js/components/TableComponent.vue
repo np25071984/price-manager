@@ -1,7 +1,12 @@
 <template>
     <div>
 
-        <input v-model.trim="searchQuery" @input="searchQueryChange" class="form-control mb-1" type="text" placeholder="Поиск" />
+        <input v-model.trim="searchQuery"
+               v-on:keydown.enter.prevent.stop
+               @input="searchQueryChange"
+               class="form-control mb-1"
+               type="text"
+               placeholder="Поиск" />
 
         <p v-if="isLoading">Loading...</p>
         <table v-else class="table">
