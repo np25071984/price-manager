@@ -21,3 +21,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('brand', 'Api\BrandController@index')->name('api.brand.index');
 Route::delete('brand/{brand}', 'Api\BrandController@destroy')->name('api.brand.destroy');
+
+Route::get('item', 'Api\ItemController@index')->name('api.item.index');

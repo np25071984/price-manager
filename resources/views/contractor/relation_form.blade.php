@@ -48,8 +48,9 @@
                 <div class="col-8">
                     <input type="text"
                            class="form-control{{ $errors->has('article') ? ' is-invalid' : '' }}"
-                           id="article"
                            name="article"
+                           id="article"
+                           disabled
                            value="{{ $contractorItem->relatedItem ? $contractorItem->relatedItem->article : null }}">
 
                     <div class="invalid-feedback">{{ $errors->first('article') }}</div>
@@ -76,33 +77,7 @@
                 </div>
             </div>
 
-            <table class="table">
-                <thead>
-                <th>Артикул</th>
-                <th>Бренд</th>
-                <th>Название товара</th>
-                <th>Цена</th>
-                </thead>
-                <tbody>
-                @foreach ($items as $item)
-                    <tr>
-                        <td class="text-center">{{ $item->article }}</td>
-                        <td>{{ $item->brand->name }}</td>
-                        <td><a href="#" onclick="
-                                    document.getElementById('name').value = this.innerText;
-                                    document.getElementById('article').value = {{ $item->article }};">
-                                {{ $item->name }}
-                            </a>
-                        </td>
-                        <td class="text-center"> {{ $item->price }}</td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-
-            <div class="row justify-content-center">
-                {{ $items->links() }}
-            </div>
+            <table-component api-link="{{ $apiLink }}"></table-component>
 
         </form>
     </div>

@@ -160,14 +160,9 @@ class ContractorController extends Controller
     public function showReationForm(Contractor $contractor, ContractorItem $contractorItem)
     {
 
-        $itemsWithoutRelation = \DB::table('items')
-            ->select('items.id')
-            ->leftJoin('relations', 'items.id', '=', 'relations.item_id')
-            ->whereNull('relations.id');
+        $apiLink = route('api.item.index');
 
-        $items = Item::wherein('id', $itemsWithoutRelation)->paginate(30);
-
-        return view('contractor/relation_form', compact('contractor', 'contractorItem', 'items'));
+        return view('contractor/relation_form', compact('contractor', 'contractorItem', 'apiLink'));
     }
 
     public function updateRelation(Request $request, Contractor $contractor, ContractorItem $contractorItem)

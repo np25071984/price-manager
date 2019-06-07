@@ -14,7 +14,8 @@ class BrandController extends Controller
      */
     public function index()
     {
-        return view('brand/index');
+        $apiLink = route('api.brand.index');
+        return view('brand/index', compact('apiLink'));
     }
 
     /**

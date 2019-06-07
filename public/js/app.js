@@ -1859,32 +1859,28 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
+    initQuerySearch: {
+      type: String
+    },
     apiLink: {
       type: String
     }
   },
   data: function data() {
     return {
-      searchQuery: '',
-      showLink: {
-        type: String
-      },
-      editLink: {
-        type: String
-      },
-      deleteLink: {
-        type: String
-      },
+      searchQuery: this.initQuerySearch,
       items: [],
       columns: [],
-      controlButtons: [],
+      data: {},
       paginationLimit: 5,
       paginationShowDiasbled: false,
       isLoading: true,
-      data: {},
       sortColCode: null,
       sortOrder: null
     };
@@ -1920,10 +1916,6 @@ __webpack_require__.r(__webpack_exports__);
         delete response.data.data;
         _this2.columns = response.data.columns;
         delete response.data.columns;
-        _this2.showLink = response.data.links.show;
-        _this2.editLink = response.data.links.edit;
-        _this2.deleteLink = response.data.links["delete"];
-        _this2.controlButtons = response.data.buttons;
         _this2.data = response.data;
         _this2.isLoading = false;
       });
@@ -38696,7 +38688,7 @@ var render = function() {
             modifiers: { trim: true }
           }
         ],
-        staticClass: "form-control",
+        staticClass: "form-control mb-1",
         attrs: { type: "text", placeholder: "Поиск" },
         domProps: { value: _vm.searchQuery },
         on: {
@@ -38722,7 +38714,7 @@ var render = function() {
               "thead",
               _vm._l(_vm.columns, function(column) {
                 return _c("th", { class: column.class }, [
-                  column.sort
+                  column.sortable
                     ? _c(
                         "a",
                         {
@@ -50991,6 +50983,12 @@ Vue.component('pagination', __webpack_require__(/*! laravel-vue-pagination */ ".
 var app = new Vue({
   el: '#app'
 });
+
+window.setRelation = function (article, obj) {
+  var name = obj.closest('TR').getElementsByTagName('td')[2].innerText;
+  document.getElementById('article').value = article;
+  document.getElementById('name').value = name;
+};
 
 /***/ }),
 

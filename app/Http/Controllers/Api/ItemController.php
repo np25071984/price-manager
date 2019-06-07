@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Brand;
+use App\Item;
+use App\Http\Resources\ItemResouceCollection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\BrandResourceCollection;
 
-class BrandController extends Controller
+class ItemController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,29 +16,42 @@ class BrandController extends Controller
      */
     public function index(Request $request)
     {
-        $brands = Brand::query();
-
-        $query = $request->input('q', null);
-        if ($query) {
-            $brands->where('name', 'ilike', "%{$query}%");
+        $column = $request->input('column');
+        if (!in_array($column, ['article', 'brand_name', 'item_name', 'price'])) {
+            $column = 'item_name';
         }
-
-        $column = $request->input('column', 'name');
-        if (!in_array($column, ['name'])) {
-            $column = 'name';
-        }
-
-        $order = $request->input('order', 'asc');
+        $order = $request->input('order');
         if (!in_array($order, ['asc', 'desc'])) {
             $order = 'asc';
         }
 
-        $brands->orderby($column, $order);
+        $itemsWithoutRelation = \DB::table('items')
+            ->select('items.id')
+            ->leftJoin('relations', 'items.id', '=', 'relations.item_id')
+            ->whereNull('relations.id');
+
+        $items = Item::query()
+            ->select([
+                'items.id as item_id',
+                'article',
+                'brands.name as brand_name',
+                'items.name as item_name',
+                'price',
+            ])
+            ->leftJoin('brands', 'items.brand_id', '=', 'brands.id')
+            ->wherein('items.id', $itemsWithoutRelation)
+            ->orderBy($column, $order);
+
+        $query = $request->input('q', null);
+        if ($query) {
+            $items->where('items.name', 'ilike', "%{$query}%");
+        }
+
         $page = $request->input('page', 1);
 
-        $brands = $brands->paginate(30, ['*'], 'page', $page);
+        $items = $items->paginate(30, ['*'], 'page', $page);
 
-        return new BrandResourceCollection($brands);
+        return new ItemResouceCollection($items);
     }
 
     /**
@@ -81,10 +94,8 @@ class BrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Brand $brand)
+    public function destroy($id)
     {
-        $brand->delete();
-
-        return response()->json(null, 204);
+        //
     }
 }

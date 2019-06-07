@@ -33,3 +33,9 @@ Vue.component('pagination', require('laravel-vue-pagination'));
 const app = new Vue({
     el: '#app',
 });
+
+window.setRelation = function (article, obj) {
+    const name = obj.closest('TR').getElementsByTagName('td')[2].innerText;
+    document.getElementById('article').value = article;
+    document.getElementById('name').value = name;
+}

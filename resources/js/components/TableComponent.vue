@@ -1,13 +1,14 @@
 <template>
     <div>
 
-        <input v-model.trim="searchQuery" @input="searchQueryChange" class="form-control" type="text" placeholder="Поиск" />
+        <input v-model.trim="searchQuery" @input="searchQueryChange" class="form-control mb-1" type="text" placeholder="Поиск" />
 
         <p v-if="isLoading">Loading...</p>
         <table v-else class="table">
             <thead>
                 <th v-for="column in columns" :class="column.class">
-                    <a v-if="column.sort" href="#" @click.prevent="sortColumn(column.code, column.sort === 'asc' ? 'desc' : 'asc')">
+                    <a v-if="column.sortable" href="#"
+                            @click.prevent="sortColumn(column.code, column.sort === 'asc' ? 'desc' : 'asc')">
                         {{ column.title }}
                         <i v-if="column.sort === 'asc'" class="fa fa-sort-up"></i>
                         <i v-else-if="column.sort === 'desc'" class="fa fa-sort-down"></i>
@@ -18,9 +19,10 @@
             <tbody>
                 <tr v-for="item in items">
                     <td v-for="column in columns" :class="column.class">
-                        <span v-if="column.type === 'html'" v-html="item[column.code]"></span>
-                        <span v-else-if="column.type === 'component'">
 
+                        <span v-if="column.type === 'html'" v-html="item[column.code]"></span>
+
+                        <span v-else-if="column.type === 'component'">
                             <component v-for="(component, key) in item[column.code]"
                                        v-on:click="clickHandler"
                                        :is="component.name"
@@ -29,9 +31,10 @@
                                        :title="component.title"
                                        :click-event="component.clickevent"
                                        :key="key"></component>
-
                         </span>
+
                         <span v-else-if="column.type === 'text'">{{ item[column.code] }}</span>
+
                     </td>
                 </tr>
             </tbody>
@@ -53,29 +56,26 @@
 
     export default {
         props: {
+            initQuerySearch: {
+                type: String,
+            },
             apiLink: {
                 type: String,
             },
         },
         data() {
             return {
-                searchQuery: '',
-                showLink: {
-                    type: String,
-                },
-                editLink: {
-                    type: String,
-                },
-                deleteLink: {
-                    type: String,
-                },
+                searchQuery: this.initQuerySearch,
+
                 items: [],
                 columns: [],
-                controlButtons: [],
+                data: {},
+
                 paginationLimit: 5,
                 paginationShowDiasbled: false,
+
                 isLoading: true,
-                data: {},
+
                 sortColCode: null,
                 sortOrder: null,
             };
@@ -110,12 +110,6 @@
 
                         this.columns = response.data.columns;
                         delete response.data.columns;
-
-                        this.showLink = response.data.links.show;
-                        this.editLink = response.data.links.edit;
-                        this.deleteLink = response.data.links.delete;
-
-                        this.controlButtons = response.data.buttons;
 
                         this.data = response.data;
                         this.isLoading = false;
