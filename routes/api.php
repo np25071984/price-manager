@@ -24,4 +24,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::delete('brand/{brand}', 'Api\BrandController@destroy')->name('api.brand.destroy');
 
     Route::get('item', 'Api\ItemController@index')->name('api.item.index');
+    Route::delete('item/{item}', 'Api\ItemController@destroy')->name('api.item.destroy');
+
+    Route::get('item-unrelated', 'Api\ItemController@indexUnrelated')->name('api.item.unrelated');
+
+    Route::get('contractor-item', 'Api\ItemContractorController@contractorsItemsUnrelatedList')
+        ->name('api.contractors-items.unrelated.index');
 });

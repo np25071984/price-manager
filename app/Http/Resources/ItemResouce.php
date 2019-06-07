@@ -14,10 +14,31 @@ class ItemResouce extends JsonResource
      */
     public function toArray($request)
     {
-        $controls = sprintf("<a href='#' onclick='window.setRelation(\"%s\", this);'>"
-                . "<i class='fa fa-lg fa-link m-1'></i></a>",
-            $this->article
-        );
+        $controls = [];
+        $controls[] = [
+            'name' => 'button-component',
+            'class' => ['fa', 'fa-lg', 'fa-eye', 'm-1'],
+            'title' => 'Просмотр товара',
+            'href' => route('item.show', [$this->id]),
+            'clickevent' => null,
+        ];
+        $controls[] = [
+            'name' => 'button-component',
+            'class' => ['fa', 'fa-lg', 'fa-edit', 'm-1'],
+            'title' => 'Редактировать товара',
+            'href' => route('item.edit', [$this->id]),
+            'clickevent' => null,
+        ];
+        $controls[] = [
+            'name' => 'button-component',
+            'class' => ['fa', 'fa-lg', 'fa-trash', 'm-1'],
+            'title' => 'Удалить товар',
+            'href' => null,
+            'clickevent' => [
+                'text' => 'Вы уверены что хотите удалить товар?',
+                'link' => route('api.item.destroy', [$this->id]),
+            ],
+        ];
 
         return [
             'id' => $this->id,
@@ -25,6 +46,7 @@ class ItemResouce extends JsonResource
             'brand_name' => $this->brand_name,
             'item_name' => $this->item_name,
             'price' => $this->price,
+            'stock' => $this->stock,
             'func' => $controls,
         ];
     }

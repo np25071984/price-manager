@@ -1,7 +1,8 @@
 <template>
     <div>
 
-        <input v-model.trim="searchQuery"
+        <input v-if="showSearch"
+               v-model.trim="searchQuery"
                v-on:keydown.enter.prevent.stop
                @input="searchQueryChange"
                class="form-control mb-1"
@@ -67,6 +68,10 @@
             apiLink: {
                 type: String,
             },
+            showSearch: {
+                type: Boolean,
+                default: true,
+            }
         },
         data() {
             return {

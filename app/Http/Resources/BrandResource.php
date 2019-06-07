@@ -19,13 +19,15 @@ class BrandResource extends JsonResource
             'name' => 'button-component',
             'class' => ['fa', 'fa-lg', 'fa-eye', 'm-1'],
             'title' => 'Просмотр бренда',
-            'href' => route('brand.show', [$this->id])
+            'href' => route('brand.show', [$this->id]),
+            'clickevent' => null,
         ];
         $controls[] = [
             'name' => 'button-component',
             'class' => ['fa', 'fa-lg', 'fa-edit', 'm-1'],
             'title' => 'Редактировать бренд',
-            'href' => route('brand.edit', [$this->id])
+            'href' => route('brand.edit', [$this->id]),
+            'clickevent' => null,
         ];
         $controls[] = [
             'name' => 'button-component',

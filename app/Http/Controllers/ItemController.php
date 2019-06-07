@@ -41,6 +41,9 @@ class ItemController extends Controller
                 $price = null;
             }
 
+            $itemApiLink = route('api.item.index');
+            $contractorApiLink = route('api.contractors-items.unrelated.index');
+
             if ($request->has('query')) {
                 $query = $request->input('query');
 
@@ -167,7 +170,7 @@ class ItemController extends Controller
             if ($contractorItems instanceof \Illuminate\Pagination\LengthAwarePaginator) {
                 $contractorItems->appends(request()->input())->appends(['active-tab' => 2]);
             }
-            return view('item/index', compact('items', 'contractorItems', 'job', 'price'));
+            return view('item/index', compact('items', 'contractorItems', 'job', 'price', 'itemApiLink', 'contractorApiLink'));
         }
     }
 
@@ -245,23 +248,6 @@ class ItemController extends Controller
         $request->session()->flash('message', 'Товар успешно обновлен!');
 
         return redirect(route('item.show' , $item->id));
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Item  $item
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Request $request, Item $item)
-    {
-        $name = $item->name;
-
-        $item->delete();
-
-        $request->session()->flash('message', "Товар '{$name}' успешно удален!");
-
-        return redirect(route('item.index'));
     }
 
     public function showPriceUploadForm()

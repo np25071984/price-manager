@@ -159,8 +159,7 @@ class ContractorController extends Controller
 
     public function showReationForm(Contractor $contractor, ContractorItem $contractorItem)
     {
-
-        $apiLink = route('api.item.index');
+        $apiLink = route('api.item.unrelated');
 
         return view('contractor/relation_form', compact('contractor', 'contractorItem', 'apiLink'));
     }

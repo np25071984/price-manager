@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class ItemResouceCollection extends ResourceCollection
+class ItemContractorUnrelatedResourceCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -15,7 +15,7 @@ class ItemResouceCollection extends ResourceCollection
     public function toArray($request)
     {
         $column = $request->input('column');
-        if ($column && !in_array($column, ['article', 'brand_name', 'item_name', 'price', 'stock'])) {
+        if ($column && !in_array($column, ['contractor_name', 'real_article', 'item_name', 'price', 'stock'])) {
             $column = null;
         }
 
@@ -30,18 +30,18 @@ class ItemResouceCollection extends ResourceCollection
                 [
                     'class' => ['text-center'],
                     'sortable' => true,
-                    'sort' => ($column === 'article') ? $order : false,
+                    'sort' => ($column === 'contractor_name') ? $order : false,
                     'type' => 'text',
-                    'code' => 'article',
-                    'title' => 'Артикул'
+                    'code' => 'contractor_name',
+                    'title' => 'Наименование поставщика'
                 ],
                 [
                     'class' => ['text-center'],
                     'sortable' => true,
-                    'sort' => ($column === 'brand_name') ? $order : false,
+                    'sort' => ($column === 'article') ? $order : false,
                     'type' => 'text',
-                    'code' => 'brand_name',
-                    'title' => 'Бренд'
+                    'code' => 'real_article',
+                    'title' => 'Артикул'
                 ],
                 [
                     'class' => '',
@@ -58,14 +58,6 @@ class ItemResouceCollection extends ResourceCollection
                     'type' => 'text',
                     'code' => 'price',
                     'title' => 'Цена'
-                ],
-                [
-                    'class' => ['text-center'],
-                    'sortable' => true,
-                    'sort' => ($column === 'stock') ? $order : false,
-                    'type' => 'text',
-                    'code' => 'stock',
-                    'title' => 'Остаток'
                 ],
                 [
                     'class' => ['text-center'],

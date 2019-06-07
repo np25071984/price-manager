@@ -22,6 +22,7 @@ window.Vue = require('vue');
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('table-component', require('./components/TableComponent.vue').default);
 Vue.component('button-component', require('./components/ButtonComponent.vue').default);
+Vue.component('tab-component', require('./components/TabComponent.vue').default);
 Vue.component('pagination', require('laravel-vue-pagination'));
 
 /**
