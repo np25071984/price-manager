@@ -13,7 +13,6 @@
 
 Auth::routes();
 
-
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', 'MainController@index')->name('main');
 
@@ -40,4 +39,3 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/contractor/{contractor}/{contractorItem}/relation', 'ContractorController@updateRelation')->name('contractor.relation_update');
     Route::delete('/contractor/{item}/{contractorItem}/', 'ContractorController@destroyRelation')->name('relation.destroy');
 });
-
