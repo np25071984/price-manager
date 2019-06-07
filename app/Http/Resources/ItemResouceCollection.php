@@ -16,7 +16,7 @@ class ItemResouceCollection extends ResourceCollection
     {
         $column = $request->input('column');
         if (!in_array($column, ['article', 'brand_name', 'item_name', 'price'])) {
-            $column = 'item_name';
+            $column = null;
         }
 
         $order = $request->input('order');

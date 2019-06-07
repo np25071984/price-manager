@@ -14,7 +14,8 @@ class ItemResouce extends JsonResource
      */
     public function toArray($request)
     {
-        $controls = sprintf("<a href='#' onclick='window.setRelation(\"%s\", this);'><i class='fa fa-lg fa-link m-1'></i></a>",
+        $controls = sprintf("<a href='#' onclick='window.setRelation(\"%s\", this);'>"
+                . "<i class='fa fa-lg fa-link m-1'></i></a>",
             $this->article
         );
 

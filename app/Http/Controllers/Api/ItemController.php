@@ -18,33 +18,27 @@ class ItemController extends Controller
     {
         $column = $request->input('column');
         if (!in_array($column, ['article', 'brand_name', 'item_name', 'price'])) {
-            $column = 'item_name';
+            $column = null;
         }
         $order = $request->input('order');
         if (!in_array($order, ['asc', 'desc'])) {
             $order = 'asc';
         }
 
-        $itemsWithoutRelation = \DB::table('items')
-            ->select('items.id')
-            ->leftJoin('relations', 'items.id', '=', 'relations.item_id')
-            ->whereNull('relations.id');
-
-        $items = Item::query()
+        $query = $request->input('q', null);
+        $items = Item::smartSearch($query)
             ->select([
-                'items.id as item_id',
+                'search_result.id as id',
                 'article',
                 'brands.name as brand_name',
-                'items.name as item_name',
+                'search_result.name as item_name',
                 'price',
             ])
-            ->leftJoin('brands', 'items.brand_id', '=', 'brands.id')
-            ->wherein('items.id', $itemsWithoutRelation)
-            ->orderBy($column, $order);
+            ->leftJoin('brands', 'search_result.brand_id', '=', 'brands.id')
+            ->unrelated('search_result');
 
-        $query = $request->input('q', null);
-        if ($query) {
-            $items->where('items.name', 'ilike', "%{$query}%");
+        if ($column) {
+            $items->orderBy($column, $order);
         }
 
         $page = $request->input('page', 1);

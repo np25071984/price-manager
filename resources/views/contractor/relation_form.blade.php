@@ -50,7 +50,7 @@
                            class="form-control{{ $errors->has('article') ? ' is-invalid' : '' }}"
                            name="article"
                            id="article"
-                           disabled
+                           readonly="readonly"
                            value="{{ $contractorItem->relatedItem ? $contractorItem->relatedItem->article : null }}">
 
                     <div class="invalid-feedback">{{ $errors->first('article') }}</div>
@@ -64,7 +64,7 @@
                            class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}"
                            name="name"
                            id="name"
-                           disabled
+                           readonly="readonly"
                            value="{{ $contractorItem->relatedItem ? $contractorItem->relatedItem->name : null }}">
 
                     <div class="invalid-feedback">{{ $errors->first('name') }}</div>
