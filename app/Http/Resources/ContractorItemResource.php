@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ItemContractorUnrelatedResource extends JsonResource
+class ContractorItemResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -22,12 +22,24 @@ class ItemContractorUnrelatedResource extends JsonResource
             'href' => route('contractor.relation_form', [$this->contractor_id, $this->id]),
             'clickevent' => null,
         ];
+        if ($this->relation_id) {
+            $controls[] = [
+                'name' => 'button-component',
+                'class' => ['fa', 'fa-lg', 'fa-trash', 'm-1'],
+                'title' => 'Удалить связь',
+                'href' => null,
+                'clickevent' => [
+                    'text' => 'Вы уверены что хотите удалить связь?',
+                    'link' => route('api.relation.destroy', [$this->item_id, $this->id]),
+                ],
+            ];
+        }
 
         return [
             'id' => $this->id,
             'real_article' => $this->real_article,
-            'contractor_name' => $this->contractor_name,
             'item_name' => $this->item_name,
+            'relation_name' => $this->relation_name,
             'price' => $this->price,
             'func' => $controls,
         ];

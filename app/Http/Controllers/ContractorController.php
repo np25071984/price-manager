@@ -19,8 +19,8 @@ class ContractorController extends Controller
      */
     public function index()
     {
-        $contractors = Contractor::paginate(30);
-        return view('contractor/index', compact('contractors'));
+        $apiLink = route('api.contractor.index');
+        return view('contractor/index', compact( 'apiLink'));
     }
 
     /**
@@ -70,9 +70,15 @@ class ContractorController extends Controller
                 'owner' => $contractor->name,
             ]);
         } else {
-            $contractorItems = $contractor->items()->with('relatedItem')->paginate(30);
 
-            return view('contractor/show', compact('contractor', 'contractorItems'));
+            $apiLink = route('api.contractor-item.index', [$contractor->id]);
+
+            $contractorItems = $contractor
+                ->items()
+                ->with('relatedItem')
+                ->paginate(30);
+
+            return view('contractor/show', compact('contractor', 'contractorItems', 'apiLink'));
         }
     }
 
@@ -108,23 +114,6 @@ class ContractorController extends Controller
         $request->session()->flash('message', 'Поставщик успешно обновлен!');
 
         return redirect(route('contractor.show' , $contractor->id));
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Contractor  $contractor
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Request $request, Contractor $contractor)
-    {
-        $name = $contractor->name;
-
-        $contractor->delete();
-
-        $request->session()->flash('message', "Поставщик '{$name}' успешно удален!");
-
-        return redirect(route('contractor.index'));
     }
 
     public function showPriceUploadForm(Contractor $contractor)
@@ -241,13 +230,4 @@ class ContractorController extends Controller
 
     }
 
-    public function destroyRelation(Item $item, ContractorItem $contractorItem)
-    {
-        Relation::where([
-            'item_id' => $item->id,
-            'contractor_item_id' => $contractorItem->id,
-        ])->delete();
-
-        return redirect(route('contractor.show', $contractorItem->contractor->id));
-    }
 }

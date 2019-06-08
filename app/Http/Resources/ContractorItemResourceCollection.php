@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class ItemContractorUnrelatedResourceCollection extends ResourceCollection
+class ContractorItemResourceCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -15,8 +15,8 @@ class ItemContractorUnrelatedResourceCollection extends ResourceCollection
     public function toArray($request)
     {
         $column = $request->input('column');
-        if ($column && !in_array($column, ['contractor_name', 'real_article', 'item_name', 'price'])) {
-            $column = null;
+        if ($column && !in_array($column, ['real_article', 'item_name', 'relation_name', 'price'])) {
+            $column = 'name';
         }
 
         $order = $request->input('order');
@@ -27,14 +27,6 @@ class ItemContractorUnrelatedResourceCollection extends ResourceCollection
         return [
             'data' => $this->collection,
             'columns' => [
-                [
-                    'class' => ['text-center'],
-                    'sortable' => true,
-                    'sort' => ($column === 'contractor_name') ? $order : false,
-                    'type' => 'text',
-                    'code' => 'contractor_name',
-                    'title' => 'Наименование поставщика'
-                ],
                 [
                     'class' => ['text-center'],
                     'sortable' => true,
@@ -50,6 +42,14 @@ class ItemContractorUnrelatedResourceCollection extends ResourceCollection
                     'type' => 'text',
                     'code' => 'item_name',
                     'title' => 'Наименование товара'
+                ],
+                [
+                    'class' => '',
+                    'sortable' => true,
+                    'sort' => ($column === 'relation_name') ? $order : false,
+                    'type' => 'text',
+                    'code' => 'relation_name',
+                    'title' => 'Связь'
                 ],
                 [
                     'class' => ['text-center'],

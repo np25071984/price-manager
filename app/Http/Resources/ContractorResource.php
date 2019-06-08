@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ItemResouce extends JsonResource
+class ContractorResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,35 +18,31 @@ class ItemResouce extends JsonResource
         $controls[] = [
             'name' => 'button-component',
             'class' => ['fa', 'fa-lg', 'fa-eye', 'm-1'],
-            'title' => 'Просмотр товара',
-            'href' => route('item.show', [$this->id]),
+            'title' => 'Просмотр поставщика',
+            'href' => route('contractor.show', [$this->id]),
             'clickevent' => null,
         ];
         $controls[] = [
             'name' => 'button-component',
             'class' => ['fa', 'fa-lg', 'fa-edit', 'm-1'],
-            'title' => 'Редактировать товар',
-            'href' => route('item.edit', [$this->id]),
+            'title' => 'Редактировать поставщика',
+            'href' => route('contractor.edit', [$this->id]),
             'clickevent' => null,
         ];
         $controls[] = [
             'name' => 'button-component',
             'class' => ['fa', 'fa-lg', 'fa-trash', 'm-1'],
-            'title' => 'Удалить товар',
+            'title' => 'Удалить поставщика',
             'href' => null,
             'clickevent' => [
-                'text' => 'Вы уверены что хотите удалить товар?',
-                'link' => route('api.item.destroy', [$this->id]),
+                'text' => 'Вы уверены что хотите удалить поставщика? Это повлечет удаление всех его товаров',
+                'link' => route('api.contractor.destroy', [$this->id]),
             ],
         ];
 
         return [
             'id' => $this->id,
-            'article' => $this->article,
-            'brand_name' => $this->brand_name,
-            'item_name' => $this->item_name,
-            'price' => $this->price,
-            'stock' => $this->stock,
+            'name' => $this->name,
             'func' => $controls,
         ];
     }

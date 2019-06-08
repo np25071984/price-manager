@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ContractorItem extends Model
 {
-    use SoftDeletes;
+//    use SoftDeletes;
 
     protected $fillable = ['contractor_id', 'article', 'name', 'price'];
 
@@ -40,13 +40,20 @@ class ContractorItem extends Model
         return $query->wherein("{$colName}.id", $contractorItemsWithoutRelation);
     }
 
-    public static function smartSearch($searchString)
+    public static function smartSearch($searchString, $contractorId = null)
     {
         if (trim($searchString) === '') {
             $items = ContractorItem::from('contractor_items as search_result');
+            if ($contractorId) {
+                $items->where(['search_result.contractor_id' => $contractorId]);
+            }
         } elseif (is_numeric($searchString)) {
             /** reckon query string is an item article */
-            $items = ContractorItem::from('contractor_items as search_result')->where(['article' => $searchString]);
+            $items = ContractorItem::from('contractor_items as search_result')
+                ->where(['search_result.article' => $searchString]);
+            if ($contractorId) {
+                $items->where(['search_result.contractor_id' => $contractorId]);
+            }
         } else {
             $searchString = preg_replace('/\W/u', ' ', $searchString);
             $searchStringOrig = trim(preg_replace('/\s+/u', ' ', $searchString));
@@ -83,8 +90,8 @@ class ContractorItem extends Model
             }
 
             $tsvItems = ContractorItem::query()
-                ->withTrashed() // turn off SoftDelete dut to the alias issue
-                ->whereNull('deleted_at') // and add SF-restrictions manually
+//                ->withTrashed() // turn off SoftDelete dut to the alias issue
+//                ->whereNull('deleted_at') // and add SF-restrictions manually
                 ->select([
                     '*',
                     \DB::raw("(ts_rank(tsvector_token, "
@@ -109,23 +116,30 @@ class ContractorItem extends Model
                     [$englishQuery]
                 );
             }
+            if ($contractorId) {
+                $tsvItems->where(['contractor_id' => $contractorId]);
+            }
 
             // pg_trgm make no sense in current case due to short search query and too long data string in DB
             $trgItems = ContractorItem::query()
-                ->withTrashed() // turn off SoftDelete dut to the alias issue
-                ->whereNull('deleted_at') // and add SF-restrictions manually
+//                ->withTrashed() // turn off SoftDelete dut to the alias issue
+//                ->whereNull('deleted_at') // and add SF-restrictions manually
                 ->select(['*', \DB::raw("similarity(name, ?) as rank")])
                 ->setBindings([$searchStringOrig]);
+            if ($contractorId) {
+                $trgItems->where(['contractor_id' => $contractorId]);
+            }
             $trgItems->whereRaw('name % ?', [$searchStringOrig]);
 
-            $items = $tsvItems->union($trgItems)
-                ->orderBy('rank', 'desc');
+
+            $items = $tsvItems->union($trgItems);
 
             $items = ContractorItem::from(\DB::raw("({$items->toSql()}) as search_result"))
                 ->mergeBindings($items->getQuery());
         }
 
         return $items;
+
     }
 
     public function getQualifiedDeletedAtColumn()

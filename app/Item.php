@@ -112,8 +112,7 @@ class Item extends Model
                 ->setBindings([$searchStringOrig]);
             $trgItems->whereRaw('name % ?', [$searchStringOrig]);
 
-            $items = $tsvItems->union($trgItems)
-                ->orderBy('rank', 'desc');
+            $items = $tsvItems->union($trgItems);
 
             $items = Item::from(\DB::raw("({$items->toSql()}) as search_result"))->mergeBindings($items->getQuery());
         }

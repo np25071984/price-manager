@@ -79,8 +79,12 @@ class ItemController extends Controller
             ->leftJoin('brands', 'search_result.brand_id', '=', 'brands.id')
             ->unrelated('search_result');
 
-        if ($column) {
+        if ($query) {
+            $items->orderBy('rank', 'desc');
+        } elseif ($column) {
             $items->orderBy($column, $order);
+        } else {
+            $items->orderBy('search_result.updated_at', 'desc');
         }
 
         $page = $request->input('page', 1);

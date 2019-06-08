@@ -11,7 +11,7 @@
             </div>
         </div>
 
-        <table-component api-link="{{ $apiLink }}" ref='tableComponent'></table-component>
+        <table-component api-link="{{ $apiLink }}"></table-component>
 
     </div>
 @endsection
