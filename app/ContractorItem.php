@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ContractorItem extends Model
 {
-//    use SoftDeletes;
+    use SoftDeletes;
 
     protected $fillable = ['contractor_id', 'article', 'name', 'price'];
 
@@ -82,7 +82,10 @@ class ContractorItem extends Model
                 unset($english);
             }
 
-            $tsvItems = ContractorItem::query()->select([
+            $tsvItems = ContractorItem::query()
+                ->withTrashed() // turn off SoftDelete dut to the alias issue
+                ->whereNull('deleted_at') // and add SF-restrictions manually
+                ->select([
                     '*',
                     \DB::raw("(ts_rank(tsvector_token, "
                         . "ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
@@ -109,6 +112,8 @@ class ContractorItem extends Model
 
             // pg_trgm make no sense in current case due to short search query and too long data string in DB
             $trgItems = ContractorItem::query()
+                ->withTrashed() // turn off SoftDelete dut to the alias issue
+                ->whereNull('deleted_at') // and add SF-restrictions manually
                 ->select(['*', \DB::raw("similarity(name, ?) as rank")])
                 ->setBindings([$searchStringOrig]);
             $trgItems->whereRaw('name % ?', [$searchStringOrig]);
@@ -122,4 +127,10 @@ class ContractorItem extends Model
 
         return $items;
     }
+
+    public function getQualifiedDeletedAtColumn()
+    {
+        return 'search_result.deleted_at';
+    }
+
 }

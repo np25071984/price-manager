@@ -40,6 +40,7 @@ class ItemContractorController extends Controller
                 'contractors.name as contractor_name',
                 'search_result.name as item_name',
                 'price',
+                'deleted_at',
             ])
             ->leftJoin('contractors', 'search_result.contractor_id', '=', 'contractors.id')
             ->unrelated('search_result');
