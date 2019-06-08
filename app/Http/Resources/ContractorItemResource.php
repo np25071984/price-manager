@@ -30,7 +30,7 @@ class ContractorItemResource extends JsonResource
                 'href' => null,
                 'clickevent' => [
                     'text' => 'Вы уверены что хотите удалить связь?',
-                    'link' => route('api.relation.destroy', [$this->item_id, $this->id]),
+                    'link' => route('api.relation.destroy', [$this->relation_id, $this->id]),
                 ],
             ];
         }
@@ -38,7 +38,7 @@ class ContractorItemResource extends JsonResource
         return [
             'id' => $this->id,
             'real_article' => $this->real_article,
-            'item_name' => $this->item_name,
+            'name' => $this->name,
             'relation_name' => $this->relation_name,
             'price' => $this->price,
             'func' => $controls,

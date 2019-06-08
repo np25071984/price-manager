@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class ItemContractorUnrelatedResourceCollection extends ResourceCollection
+class ContractorItemUnrelatedResourceCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -15,7 +15,7 @@ class ItemContractorUnrelatedResourceCollection extends ResourceCollection
     public function toArray($request)
     {
         $column = $request->input('column');
-        if ($column && !in_array($column, ['contractor_name', 'real_article', 'item_name', 'price'])) {
+        if ($column && !in_array($column, ['contractor_name', 'real_article', 'name', 'price'])) {
             $column = null;
         }
 
@@ -38,7 +38,7 @@ class ItemContractorUnrelatedResourceCollection extends ResourceCollection
                 [
                     'class' => ['text-center'],
                     'sortable' => true,
-                    'sort' => ($column === 'article') ? $order : false,
+                    'sort' => ($column === 'real_article') ? $order : false,
                     'type' => 'text',
                     'code' => 'real_article',
                     'title' => 'Артикул'
@@ -46,9 +46,9 @@ class ItemContractorUnrelatedResourceCollection extends ResourceCollection
                 [
                     'class' => '',
                     'sortable' => true,
-                    'sort' => ($column === 'item_name') ? $order : false,
+                    'sort' => ($column === 'name') ? $order : false,
                     'type' => 'text',
-                    'code' => 'item_name',
+                    'code' => 'name',
                     'title' => 'Наименование товара'
                 ],
                 [

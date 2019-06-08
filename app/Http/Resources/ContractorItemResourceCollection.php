@@ -15,7 +15,7 @@ class ContractorItemResourceCollection extends ResourceCollection
     public function toArray($request)
     {
         $column = $request->input('column');
-        if ($column && !in_array($column, ['real_article', 'item_name', 'relation_name', 'price'])) {
+        if ($column && !in_array($column, ['real_article', 'name', 'relation_name', 'price'])) {
             $column = 'name';
         }
 
@@ -30,7 +30,7 @@ class ContractorItemResourceCollection extends ResourceCollection
                 [
                     'class' => ['text-center'],
                     'sortable' => true,
-                    'sort' => ($column === 'article') ? $order : false,
+                    'sort' => ($column === 'real_article') ? $order : false,
                     'type' => 'text',
                     'code' => 'real_article',
                     'title' => 'Артикул'
@@ -38,9 +38,9 @@ class ContractorItemResourceCollection extends ResourceCollection
                 [
                     'class' => '',
                     'sortable' => true,
-                    'sort' => ($column === 'item_name') ? $order : false,
+                    'sort' => ($column === 'name') ? $order : false,
                     'type' => 'text',
-                    'code' => 'item_name',
+                    'code' => 'name',
                     'title' => 'Наименование товара'
                 ],
                 [

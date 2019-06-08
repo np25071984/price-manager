@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ItemContractorUnrelatedResource extends JsonResource
+class ContractorItemUnrelatedResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -27,7 +27,7 @@ class ItemContractorUnrelatedResource extends JsonResource
             'id' => $this->id,
             'real_article' => $this->real_article,
             'contractor_name' => $this->contractor_name,
-            'item_name' => $this->item_name,
+            'name' => $this->name,
             'price' => $this->price,
             'func' => $controls,
         ];
