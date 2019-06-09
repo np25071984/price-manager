@@ -54,7 +54,9 @@ class BrandController extends Controller
      */
     public function show(Brand $brand)
     {
-        return view('brand/show', compact('brand'));
+        $apiLink = route('api.item.brand', [$brand->id]);
+
+        return view('brand/show', compact('brand', 'apiLink'));
     }
 
     /**

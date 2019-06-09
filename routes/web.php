@@ -21,7 +21,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('contractor', 'ContractorController')->except(['destroy']);
 
     // upload own price list
-    Route::get('upload', 'ItemController@showPriceUploadForm')->name('item.upload_form');
+    Route::get('upload', 'ItemController@priceUploadForm')->name('item.upload_form');
     Route::post('upload', 'ItemController@priceUpload')->name('item.upload');
 
     // download own price list

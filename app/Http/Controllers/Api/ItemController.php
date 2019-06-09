@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Item;
+use App\Brand;
 use App\Http\Resources\ItemResouceCollection;
+use App\Http\Resources\ItemBrandResourceCollection;
 use App\Http\Resources\ItemUnrelatedResouceCollection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -95,40 +97,6 @@ class ItemController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
@@ -139,5 +107,36 @@ class ItemController extends Controller
         $item->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function brandItems(Request $request, Brand $brand)
+    {
+        $column = $request->input('column');
+        if (!in_array($column, ['article', 'name', 'price', 'stock'])) {
+            $column = null;
+        }
+        $order = $request->input('order');
+        if (!in_array($order, ['asc', 'desc'])) {
+            $order = 'asc';
+        }
+
+        $items = Item::where(['brand_id' => $brand->id]);
+
+        $query = $request->input('q', null);
+        if ($query) {
+            $items->where('name', 'ilike', "%{$query}%");
+        }
+
+        if ($column) {
+            $items->orderBy($column, $order);
+        } elseif (!$query) {
+            $items->orderBy('items.updated_at', 'desc');
+        }
+
+        $page = $request->input('page', 1);
+
+        $items = $items->paginate(30, ['*'], 'page', $page);
+
+        return new ItemBrandResourceCollection($items);
     }
 }

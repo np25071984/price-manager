@@ -100,7 +100,7 @@ class ItemController extends Controller
      */
     public function edit(Item $item)
     {
-        $brands = Brand::all()->orderBy('name', 'asc');
+        $brands = Brand::orderBy('name', 'asc')->get();
         return view('item/edit', compact('item', 'brands'));
     }
 
@@ -125,7 +125,7 @@ class ItemController extends Controller
         return redirect(route('item.show' , $item->id));
     }
 
-    public function showPriceUploadForm()
+    public function priceUploadForm()
     {
         return view('item/upload_form');
     }
