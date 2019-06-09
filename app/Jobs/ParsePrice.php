@@ -21,6 +21,7 @@ class ParsePrice implements ShouldQueue
     const IN_PROCESS = 2;
     const ERROR = 3;
 
+    protected $userId;
     protected $contractorId;
     protected $price;
 
@@ -29,8 +30,9 @@ class ParsePrice implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($contractorId, $price)
+    public function __construct($userId, $contractorId, $price)
     {
+        $this->userId = $userId;
         $this->contractorId = $contractorId;
         $this->price = $price;
     }
@@ -114,6 +116,7 @@ class ParsePrice implements ShouldQueue
                         $contractorItem->save();
                     } else {
                         $contractorItem = ContractorItem::create([
+                            'user_id' => $this->userId,
                             'contractor_id' => $contractor->id,
                             'article' => $article,
                             'name' => $name,
@@ -150,6 +153,7 @@ class ParsePrice implements ShouldQueue
                         $item->save();
                     } else {
                         Item::create([
+                            'user_id' => $this->userId,
                             'brand_id' => $brand->id,
                             'article' => $article,
                             'name' => $name,

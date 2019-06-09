@@ -29,19 +29,19 @@ class ItemController extends Controller
         $query = $request->input('q', null);
         $items = Item::smartSearch($query)
             ->select([
-                'search_result.id as id',
+                'items.id as id',
                 'article',
                 'brands.name as brand_name',
-                'search_result.name as item_name',
+                'items.name as item_name',
                 'price',
                 'stock',
             ])
-            ->leftJoin('brands', 'search_result.brand_id', '=', 'brands.id');
+            ->leftJoin('brands', 'items.brand_id', '=', 'brands.id');
 
         if ($column) {
             $items->orderBy($column, $order);
         } elseif (!$query) {
-            $items->orderBy('search_result.updated_at', 'desc');
+            $items->orderBy('items.updated_at', 'desc');
         }
 
         $page = $request->input('page', 1);

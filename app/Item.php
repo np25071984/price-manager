@@ -2,16 +2,18 @@
 
 namespace App;
 
-use App\Relation;
+use App\Scopes\UserScope;
 use Illuminate\Database\Eloquent\Model;
 
 class Item extends Model
 {
-    protected $fillable = ['brand_id', 'article', 'name', 'price', 'stock'];
+    protected $fillable = ['user_id', 'brand_id', 'article', 'name', 'price', 'stock'];
 
     protected static function boot()
     {
         parent::boot();
+
+        static::addGlobalScope(new UserScope);
 
         static::deleting(function (Item $item) {
             Relation::where(['item_id' => $item->id])->delete();
@@ -36,7 +38,7 @@ class Item extends Model
             ->leftJoin('relations', 'items.id', '=', 'relations.item_id')
             ->whereNull('relations.id');
 
-        return $query->wherein("items.id", $itemsWithoutRelation);
+        return $query->wherein($this->qualifyColumn("id"), $itemsWithoutRelation);
     }
 
     public static function smartSearch($searchString)
@@ -82,13 +84,13 @@ class Item extends Model
             }
 
             $tsvItems = Item::query()->select([
-                    '*',
-                    \DB::raw("(ts_rank(tsvector_token, "
-                        . "ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
-                        . "+ ts_rank(tsvector_token, "
-                        . "ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))"
-                        . ") as rank")]
-            )->setBindings([$englishQuery, $russianQuery]);
+                '*',
+                \DB::raw("(ts_rank(tsvector_token, "
+                    . "ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
+                    . "+ ts_rank(tsvector_token, "
+                    . "ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))"
+                    . ") as rank")
+            ])->setBindings([$englishQuery, $russianQuery], 'select');
             foreach ($numbers as $number) {
                 $tsvItems->where('name', 'like', "%{$number}%");
             }
@@ -109,12 +111,15 @@ class Item extends Model
             // pg_trgm make no sense in current case due to short search query and too long data string in DB
             $trgItems = Item::query()
                 ->select(['*', \DB::raw("similarity(name, ?) as rank")])
-                ->setBindings([$searchStringOrig]);
-            $trgItems->whereRaw('name % ?', [$searchStringOrig]);
+                ->setBindings([$searchStringOrig], 'select')
+                ->whereRaw('name % ?', [$searchStringOrig]);
 
             $items = $tsvItems->union($trgItems);
 
-            $items = Item::from(\DB::raw("({$items->toSql()}) as items"))->mergeBindings($items->getQuery());
+            $items = Item::query()
+                ->withoutGlobalScope(UserScope::class)
+                ->from(\DB::raw("({$items->toSql()}) as items"))
+                ->setBindings($items->getBindings());
         }
 
         return $items;

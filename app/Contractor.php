@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Scopes\UserScope;
 use Illuminate\Database\Eloquent\Model;
 
 class Contractor extends Model
@@ -15,6 +16,8 @@ class Contractor extends Model
     protected static function boot()
     {
         parent::boot();
+
+        static::addGlobalScope(new UserScope);
 
         static::deleting(function (Contractor $contractor) {
             $contractor->items()->delete();

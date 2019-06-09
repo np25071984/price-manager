@@ -2,7 +2,7 @@
 
 namespace App;
 
-use App\Relation;
+use App\Scopes\UserScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -10,11 +10,13 @@ class ContractorItem extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['contractor_id', 'article', 'name', 'price'];
+    protected $fillable = ['user_id', 'contractor_id', 'article', 'name', 'price'];
 
     protected static function boot()
     {
         parent::boot();
+
+        static::addGlobalScope(new UserScope);
 
         static::deleting(function (ContractorItem $contractorItem) {
             Relation::where(['contractor_item_id' => $contractorItem->id])->delete();
@@ -37,7 +39,7 @@ class ContractorItem extends Model
             ->leftJoin('relations', 'contractor_items.id', '=', 'relations.contractor_item_id')
             ->whereNull('relations.id');
 
-        return $query->wherein("contractor_items.id", $contractorItemsWithoutRelation);
+        return $query->wherein($this->qualifyColumn("id"), $contractorItemsWithoutRelation);
     }
 
     public static function smartSearch($searchString, $contractorId = null)
@@ -97,8 +99,8 @@ class ContractorItem extends Model
                             . "ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
                             . "+ ts_rank(tsvector_token, "
                             . "ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))"
-                            . ") as rank")]
-                )->setBindings([$englishQuery, $russianQuery]);
+                            . ") as rank")
+                ])->setBindings([$englishQuery, $russianQuery], 'select');
             foreach ($numbers as $number) {
                 $tsvItems->where('name', 'like', "%{$number}%");
             }
@@ -122,8 +124,8 @@ class ContractorItem extends Model
             // pg_trgm make no sense in current case due to short search query and too long data string in DB
             $trgItems = ContractorItem::query()
                 ->select(['*', \DB::raw("similarity(name, ?) as rank")])
-                ->setBindings([$searchStringOrig]);
-            $trgItems->whereRaw('name % ?', [$searchStringOrig]);
+                ->setBindings([$searchStringOrig], 'select')
+                ->whereRaw('name % ?', [$searchStringOrig]);
             if ($contractorId) {
                 $trgItems->where(['contractor_items.contractor_id' => $contractorId]);
             }
@@ -131,7 +133,7 @@ class ContractorItem extends Model
             $items = $tsvItems->union($trgItems);
 
             $items = ContractorItem::from(\DB::raw("({$items->toSql()}) as contractor_items"))
-                ->mergeBindings($items->getQuery());
+                ->setBindings($items->getBindings());
         }
 
         return $items;
