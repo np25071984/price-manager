@@ -14,12 +14,16 @@ class AddUserIdToBrandsTable extends Migration
     public function up()
     {
         Schema::table('brands', function (Blueprint $table) {
+            $table->dropUnique(['name']);
+
             $table->unsignedBigInteger('user_id')->after('id');
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+
+            $table->unique(['user_id', 'name']);
         });
     }
 
@@ -31,6 +35,9 @@ class AddUserIdToBrandsTable extends Migration
     public function down()
     {
         Schema::table('brands', function (Blueprint $table) {
+            $table->dropUnique(['user_id', 'name']);
+            $table->unique(['name']);
+
             $table->dropForeign(['user_id']);
             $table->dropColumn('user_id');
         });

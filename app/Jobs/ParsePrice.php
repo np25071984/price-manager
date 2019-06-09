@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Scopes\UserScope;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -54,17 +55,23 @@ class ParsePrice implements ShouldQueue
 
         \DB::beginTransaction();
         if ($this->contractorId) {
-            $contractor = Contractor::findOrFail($this->contractorId);
+            $contractor = Contractor::withoutGlobalScope(UserScope::class)
+                ->where([
+                    'user_id' => $this->userId,
+                    'id' => $this->contractorId,
+                ])
+                ->firstOrFail();
+
             $columnArticle = isset($contractor->config['col_article']) ? $contractor->config['col_article'] : null;
             $columnName = $contractor->config['col_name'];
             $columnPrice = $contractor->config['col_price'];
             $startRow = 1;
 
             // Truly delete all SoftDeleted items (bunch deleting doesn't support the Events!)
-            $contractor->items()->onlyTrashed()->forceDelete();
+            $contractor->items()->withoutGlobalScope(UserScope::class)->onlyTrashed()->forceDelete();
 
             // SoftDelete all remain contractor's items
-            $contractor->items()->delete();
+            $contractor->items()->withoutGlobalScope(UserScope::class)->delete();
         } else {
             $contractor = null;
             $columnArticle = 1;
@@ -107,7 +114,14 @@ class ParsePrice implements ShouldQueue
                         continue;
                     }
 
-                    $contractorItem = $contractor->items()->withTrashed()->where(['article' => $article])->first();
+                    $contractorItem = $contractor
+                        ->items()
+                        ->withoutGlobalScope(UserScope::class)
+                        ->withTrashed()
+                        ->where([
+                            'user_id' => $this->userId,
+                            'article' => $article
+                        ])->first();
 
                     if ($contractorItem) {
                         $contractorItem->restore();
@@ -115,16 +129,21 @@ class ParsePrice implements ShouldQueue
                         $contractorItem->price = $price;
                         $contractorItem->save();
                     } else {
-                        $contractorItem = ContractorItem::create([
-                            'user_id' => $this->userId,
-                            'contractor_id' => $contractor->id,
-                            'article' => $article,
-                            'name' => $name,
-                            'price' => $price,
-                        ]);
+                        $contractorItem = ContractorItem::withoutGlobalScope(UserScope::class)
+                            ->create([
+                                'user_id' => $this->userId,
+                                'contractor_id' => $contractor->id,
+                                'article' => $article,
+                                'name' => $name,
+                                'price' => $price,
+                            ]);
                     }
 
-                    $item = Item::where(['name' => $name])->first();
+                    $item = Item::withoutGlobalScope(UserScope::class)
+                        ->where([
+                            'user_id' => $this->userId,
+                            'name' => $name,
+                        ])->first();
                     if ($item) {
                         Relation::firstOrCreate([
                             'item_id' => $item->id,
@@ -134,14 +153,27 @@ class ParsePrice implements ShouldQueue
                     }
                 } else {
                     $brandName = trim($worksheet->getCellByColumnAndRow(2, $row)->getCalculatedValue());
-                    $brand = Brand::firstOrCreate(['name' => $brandName]);
+                    $brand = Brand::withoutGlobalScope(UserScope::class)
+                        ->firstOrCreate([
+                            'user_id' => $this->userId,
+                            'name' => $brandName,
+                        ]);
 
                     $article = trim($worksheet->getCellByColumnAndRow($columnArticle, $row)->getCalculatedValue());
-                    $item = Item::where('article', $article)->first();
+                    $item = Item::withoutGlobalScope(UserScope::class)
+                        ->where([
+                            'user_id' => $this->userId,
+                            'article' => $article,
+                        ])->first();
 
                     $stock = intval(trim($worksheet->getCellByColumnAndRow(8, $row)->getCalculatedValue()));
 
-                    if (Item::where(['name' => $name])->first()) {
+                    $duplicateItem = Item::withoutGlobalScope(UserScope::class)
+                        ->where([
+                            'user_id' => $this->userId,
+                            'name' => $name
+                        ])->first();
+                    if ($duplicateItem) {
                         \Log::warning(sprintf("Item name duplication: %s", $name));
                     }
 
@@ -162,7 +194,6 @@ class ParsePrice implements ShouldQueue
                         ]);
                     }
                 }
-
             } catch(\Exception $e) {
                 \DB::rollback();
                 throw $e;
@@ -170,7 +201,10 @@ class ParsePrice implements ShouldQueue
         }
 
         \DB::commit();
+    }
 
+    public function getUserId() {
+        return $this->userId;
     }
 
     public function getContractorId() {
