@@ -26,7 +26,13 @@
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name', 'Laravel') }}
                 </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                <button class="navbar-toggler"
+                        type="button"
+                        data-toggle="collapse"
+                        data-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent"
+                        aria-expanded="false"
+                        aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -35,19 +41,17 @@
                     <ul class="navbar-nav mr-auto">
                         @auth
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('item.index') }}">Прайс</a>
+                                <a class="nav-link{{ Route::current()->getName() === 'item.index' ? ' active' : '' }}"
+                                   href="{{ route('item.index') }}">Прайс</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('brand.index') }}">Бренды</a>
+                                <a class="nav-link{{ Route::current()->getName() === 'brand.index' ? ' active' : '' }}"
+                                   href="{{ route('brand.index') }}">Бренды</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('contractor.index') }}">Поставщики</a>
+                                <a class="nav-link{{ Route::current()->getName() === 'contractor.index' ? ' active' : '' }}"
+                                   href="{{ route('contractor.index') }}">Поставщики</a>
                             </li>
-
-                            <form action="{{ route('item.index') }}" class="form-inline ml-4 my-2 my-lg-0">
-                                <input class="form-control mr-sm-2" type="search" name="query" placeholder="Поиск" value="{{ Request::query('query') }}" aria-label="Поиск">
-                                <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Поиск</button>
-                            </form>
                         @endauth
                     </ul>
 
@@ -94,6 +98,13 @@
         <main class="py-4">
             @yield('content')
         </main>
+
+        <footer class="page-footer font-small blue">
+            <div class="m-3 footer-copyright py-3">© {{ date('Y') }} Copyright:
+                <a href="{{ url('/') }}"> {{ config('app.name', 'Laravel') }}</a>
+            </div>
+        </footer>
+
     </div>
 </body>
 </html>

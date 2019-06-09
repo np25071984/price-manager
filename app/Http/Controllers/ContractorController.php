@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ContractorRequest;
 use App\JobStatus;
 use App\Item;
 use App\Relation;
@@ -39,7 +40,7 @@ class ContractorController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ContractorRequest $request)
     {
         $config = [
             'col_article' => $request->col_article,
@@ -101,7 +102,7 @@ class ContractorController extends Controller
      * @param  \App\Contractor  $contractor
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Contractor $contractor)
+    public function update(ContractorRequest $request, Contractor $contractor)
     {
         $contractor->name = $request->name;
         $config = [

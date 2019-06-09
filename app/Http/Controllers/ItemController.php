@@ -11,6 +11,7 @@ use App\Jobs\ParsePrice;
 use App\Jobs\GeneratePrice;
 use App\ContractorItem;
 use Illuminate\Http\Request;
+use App\Http\Requests\ItemRequest;
 
 class ItemController extends Controller
 {
@@ -65,7 +66,7 @@ class ItemController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ItemRequest $request)
     {
         $item = Item::create([
             'user_id' => \Auth::user()->id,
@@ -111,7 +112,7 @@ class ItemController extends Controller
      * @param  \App\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Item $item)
+    public function update(ItemRequest $request, Item $item)
     {
         $item->brand_id = $request->brand_id;
         $item->article = $request->article;

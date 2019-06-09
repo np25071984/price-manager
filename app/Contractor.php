@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Contractor extends Model
 {
-    protected $fillable = ['name', 'config'];
+    protected $fillable = ['user_id', 'name', 'config'];
 
     protected $casts = [
         'config' => 'array'

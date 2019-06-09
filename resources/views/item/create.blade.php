@@ -44,7 +44,7 @@
                 <div class="invalid-feedback">{{ $errors->first('name') }}</div>
             </div>
 
-            <div class="form-group required">
+            <div class="form-group">
                 <label for="name">Цена</label>
                 <input type="text"
                        class="form-control{{ $errors->has('price') ? ' is-invalid' : '' }}"
@@ -54,7 +54,7 @@
                 <div class="invalid-feedback">{{ $errors->first('price') }}</div>
             </div>
 
-            <div class="form-group required">
+            <div class="form-group">
                 <label for="name">Остаток</label>
                 <input type="text"
                        class="form-control{{ $errors->has('stock') ? ' is-invalid' : '' }}"
