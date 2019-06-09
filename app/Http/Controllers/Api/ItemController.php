@@ -70,21 +70,21 @@ class ItemController extends Controller
         $query = $request->input('q', null);
         $items = Item::smartSearch($query)
             ->select([
-                'search_result.id as id',
+                'items.id as id',
                 'article',
                 'brands.name as brand_name',
-                'search_result.name as item_name',
+                'items.name as item_name',
                 'price',
             ])
-            ->leftJoin('brands', 'search_result.brand_id', '=', 'brands.id')
-            ->unrelated('search_result');
+            ->leftJoin('brands', 'items.brand_id', '=', 'brands.id')
+            ->unrelated();
 
-        if ($query) {
+        if ($query && !is_numeric($query)) {
             $items->orderBy('rank', 'desc');
         } elseif ($column) {
             $items->orderBy($column, $order);
         } else {
-            $items->orderBy('search_result.updated_at', 'desc');
+            $items->orderBy('items.updated_at', 'desc');
         }
 
         $page = $request->input('page', 1);

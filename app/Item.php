@@ -30,22 +30,22 @@ class Item extends Model
         return $this->belongsToMany('App\ContractorItem', 'relations');
     }
 
-    public function scopeUnrelated($query, $colName) {
+    public function scopeUnrelated($query) {
         $itemsWithoutRelation = \DB::table('items')
             ->select('items.id')
             ->leftJoin('relations', 'items.id', '=', 'relations.item_id')
             ->whereNull('relations.id');
 
-        return $query->wherein("{$colName}.id", $itemsWithoutRelation);
+        return $query->wherein("items.id", $itemsWithoutRelation);
     }
 
     public static function smartSearch($searchString)
     {
         if (trim($searchString) === '') {
-            $items = Item::from('items as search_result');
+            $items = Item::query();
         } elseif (is_numeric($searchString)) {
             /** reckon query string is an item article */
-            $items = Item::from('items as search_result')->where(['article' => $searchString]);
+            $items = Item::where(['items.article' => $searchString]);
         } else {
             $searchString = preg_replace('/\W/u', ' ', $searchString);
             $searchStringOrig = trim(preg_replace('/\s+/u', ' ', $searchString));
@@ -114,7 +114,7 @@ class Item extends Model
 
             $items = $tsvItems->union($trgItems);
 
-            $items = Item::from(\DB::raw("({$items->toSql()}) as search_result"))->mergeBindings($items->getQuery());
+            $items = Item::from(\DB::raw("({$items->toSql()}) as items"))->mergeBindings($items->getQuery());
         }
 
         return $items;

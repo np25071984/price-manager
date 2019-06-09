@@ -42,7 +42,6 @@ class ContractorItem extends Model
 
     public static function smartSearch($searchString, $contractorId = null)
     {
-
         if (trim($searchString) === '') {
             $items = ContractorItem::query();
             if ($contractorId) {

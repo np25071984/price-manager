@@ -29,7 +29,5 @@ class Contractor extends Model
     public function items()
     {
         return $this->hasMany('App\ContractorItem');
-//            ->withTrashed() // turn off SoftDelete dut to the alias issue
-//            ->whereNull('deleted_at'); // and add SF-restrictions manually
     }
 }
