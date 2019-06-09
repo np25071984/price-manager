@@ -58,6 +58,18 @@ class ContractorItem extends Model
                 );
             }
         } else {
+            /** extract minus words from the query and remove them out*/
+            preg_match_all('/\s+-[^\s]+/u', $searchString, $matches);
+            $searchString = preg_replace('/\s+-[^\s]+/u', '', $searchString);
+            if (isset($matches[0]) && (count($matches[0]) > 0)) {
+                $minuses = [];
+                foreach ($matches[0] as $word) {
+                    $minuses[] = trim($word, ' -');
+                }
+            } else {
+                $minuses = null;
+            }
+
             $searchString = preg_replace('/\W/u', ' ', $searchString);
             $searchStringOrig = trim(preg_replace('/\s+/u', ' ', $searchString));
 
@@ -111,14 +123,22 @@ class ContractorItem extends Model
                     [$russianQuery]
                 );
             }
+
             if ($englishQuery) {
                 $tsvItems->whereRaw(
                     "tsvector_token @@ ts_rewrite(to_tsquery('english', ?), 'SELECT t, s FROM aliases')",
                     [$englishQuery]
                 );
             }
+
             if ($contractorId) {
                 $tsvItems->where(['contractor_items.contractor_id' => $contractorId]);
+            }
+
+            if ($minuses) {
+                foreach($minuses as $minus) {
+                    $tsvItems->where($tsvItems->qualifyColumn('name'), 'not ilike', "%{$minus}%");
+                }
             }
 
             // pg_trgm make no sense in current case due to short search query and too long data string in DB
@@ -128,6 +148,12 @@ class ContractorItem extends Model
                 ->whereRaw('name % ?', [$searchStringOrig]);
             if ($contractorId) {
                 $trgItems->where(['contractor_items.contractor_id' => $contractorId]);
+            }
+
+            if ($minuses) {
+                foreach($minuses as $minus) {
+                    $trgItems->where($trgItems->qualifyColumn('name'), 'not ilike', "%{$minus}%");
+                }
             }
 
             $items = $tsvItems->union($trgItems);
