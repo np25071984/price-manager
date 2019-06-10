@@ -550,7 +550,7 @@ class AliasesTableSeeder extends Seeder
         ]);
         DB::table('aliases')->insert([
             't' => 'ysl',
-            's' => 'ysl | yves | saint | laurent | лоран',
+            's' => 'ysl | (Yves & Saint & Laurent) | (ив & сен & лоран)',
         ]);
     }
 }
