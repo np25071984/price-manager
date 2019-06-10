@@ -225,9 +225,9 @@ class ContractorController extends Controller
                 'owner' => $contractor->name,
             ]);
         } else {
-            $contractorItems = $contractor->items()->onlyTrashed()->with('relatedItem')->paginate(30);
+            $apiLink = route('api.contractor-item.deleted_items', [$contractor->id]);
 
-            return view('contractor/show_deleted', compact('contractor', 'contractorItems'));
+            return view('contractor/show_deleted', compact('contractor', 'apiLink'));
         }
 
     }

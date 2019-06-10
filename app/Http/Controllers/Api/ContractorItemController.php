@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ContractorItemUnrelatedResourceCollection;
 use App\Http\Resources\ContractorItemResourceCollection;
+use App\Http\Resources\ContractorItemDeletedResourceCollection;
 
 class ContractorItemController extends Controller
 {
@@ -96,5 +97,34 @@ class ContractorItemController extends Controller
         $items = $items->paginate(30, ['*'], 'page', $page);
 
         return new ContractorItemUnrelatedResourceCollection($items);
+    }
+
+    public function deletedItems(Request $request, Contractor $contractor)
+    {
+        $items = $contractor
+            ->items()
+            ->onlyTrashed()
+            ->with('relatedItem');
+
+        $column = $request->input('column');
+        if (!in_array($column, ['real_article', 'name', 'relation_name', 'price'])) {
+            $column = 'name';
+        }
+
+        $order = $request->input('order');
+        if (!in_array($order, ['asc', 'desc'])) {
+            $order = 'asc';
+        }
+        $items->orderBy($column, $order);
+
+        $query = $request->input('q', null);
+        if ($query) {
+            $items->where('name', 'ilike', "%{$query}%");
+        }
+
+        $page = $request->input('page', 1);
+        $items = $items->paginate(30, ['*'], 'page', $page);
+
+        return new ContractorItemDeletedResourceCollection($items);
     }
 }

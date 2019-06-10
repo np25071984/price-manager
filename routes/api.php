@@ -38,5 +38,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('contractor-item/{contractor}', 'Api\ContractorItemController@index')
         ->name('api.contractor-item.index');
 
+    Route::get('deleted-item/{contractor}', 'Api\ContractorItemController@deletedItems')
+        ->name('api.contractor-item.deleted_items');
+
     Route::delete('/contractor/{item}/{contractorItem}/', 'Api\ContractorController@destroyRelation')->name('api.relation.destroy');
 });

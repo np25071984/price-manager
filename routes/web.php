@@ -29,7 +29,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('download', 'ItemController@priceDownload')->name('item.download');
 
     // upload contractor`s price list
-    Route::get('contractor/{contractor}/deleted_items', 'ContractorController@deletedItems')->name('contractor.deleted_items');
+    Route::get('contractor/{contractor}/deleted-items', 'ContractorController@deletedItems')->name('contractor.deleted_items');
     Route::get('contractor/{contractor}/upload', 'ContractorController@showPriceUploadForm')->name('contractor.upload_form');
     Route::post('contractor/{contractor}/upload', 'ContractorController@priceUpload')->name('contractor.upload');
     Route::get('contractor/{contractor}/{contractorItem}/relation', 'ContractorController@showReationForm')->name('contractor.relation_form');

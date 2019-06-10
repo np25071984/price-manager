@@ -16,31 +16,7 @@
             </div>
         </div>
 
-        <table class="table">
-            <thead>
-            <th>Название товара</th>
-            <th>Связь</th>
-            <th>Цена</th>
-            </thead>
-            <tbody>
-            @foreach ($contractorItems as $item)
-                <tr>
-                    <td> {{ $item->name }}</td>
-                    <td>
-                        @if ($item->relatedItem)
-                            {{ $item->relatedItem->name }}
-                        @else
-                            не связана
-                        @endif
-                    </td>
-                    <td class="text-center"> {{ $item->price }}</td>
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
+        <table-component api-link="{{ $apiLink }}"></table-component>
 
-        <div class="row justify-content-center">
-            {{ $contractorItems->links() }}
-        </div>
     </div>
 @endsection
