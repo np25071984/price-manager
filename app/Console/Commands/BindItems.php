@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Scopes\UserScope;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use App\Item;
@@ -17,7 +18,10 @@ class BindItems extends Command
      *
      * @var string
      */
-    protected $signature = 'items:bind {contractor_id : The ID of contractor which items will be binded} {file : File name with relations}';
+    protected $signature = 'items:bind '
+        . '{user_id : The ID of user} '
+        . '{contractor_id : The ID of contractor which items will be binded} '
+        . '{file : File name with relations}';
 
     /**
      * The console command description.
@@ -43,12 +47,31 @@ class BindItems extends Command
      */
     public function handle()
     {
+        $userId = (int) $this->argument('user_id');
         $contractorId = (int) $this->argument('contractor_id');
         $file = $this->argument('file');
 
         $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
 
-        $contractor = Contractor::findOrFail($contractorId);
+
+        // TODO: add user_id checking
+
+        $contractor = Contractor::withoutGlobalScope(UserScope::class)
+            ->where([
+                'user_id' => $userId,
+                'id' => $contractorId,
+            ])
+            ->first();
+
+        if (!$contractor) {
+            $this->error(sprintf("contractor_id = %s didn't find!", $contractorId));
+            return;
+        }
+
+        if (!file_exists($file)) {
+            $this->error(sprintf("File %s doesn't exists!", $file));
+            return;
+        }
 
         $spreadsheet = $reader->load($file);
         $worksheet = $spreadsheet->getActiveSheet();
@@ -60,7 +83,11 @@ class BindItems extends Command
                 continue;
             }
 
-            $item = Item::where(['name' => $name])->first();
+            $item = Item::withoutGlobalScope(UserScope::class)
+                ->where([
+                    'user_id' => $userId,
+                    'name' => $name,
+                ])->first();
             if (!$item) {
                 $this->line(sprintf("В прайсе не найден товар с названием '%s'", $name));
                 continue;
@@ -68,7 +95,13 @@ class BindItems extends Command
 
             $contractorName = trim($worksheet->getCellByColumnAndRow(1, $row)->getCalculatedValue());
 
-            $contractorItem = $contractor->items()->where(['name' => $contractorName])->first();
+            $contractorItem = $contractor
+                ->items()
+                ->withoutGlobalScope(UserScope::class)
+                ->where([
+                    'user_id' => $userId,
+                    'name' => $contractorName,
+                ])->first();
             if ($contractorItem) {
                 $relation = Relation::where([
                     'item_id' => $item->id,
