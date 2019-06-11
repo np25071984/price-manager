@@ -81,11 +81,6 @@ class ParsePrice implements ShouldQueue
         }
 
         for ($row = $startRow; $row <= $highestRow; $row++) {
-            if ($worksheet->getCellByColumnAndRow($columnName, $row)->isInMergeRange()
-                || $worksheet->getCellByColumnAndRow($columnPrice, $row)->isInMergeRange()) {
-                continue;
-            }
-
             $name = trim($worksheet->getCellByColumnAndRow($columnName, $row)->getCalculatedValue());
             if ($name === '') {
                 continue;
