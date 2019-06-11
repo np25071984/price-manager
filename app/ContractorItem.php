@@ -58,30 +58,22 @@ class ContractorItem extends Model
                 );
             }
         } else {
-            /** extract minus words from the query and remove them out*/
-            preg_match_all('/\s+-[^\s]+/u', $searchString, $matches);
-            $searchString = preg_replace('/\s+-[^\s]+/u', '', $searchString);
-            if (isset($matches[0]) && (count($matches[0]) > 0)) {
-                $minuses = [];
-                foreach ($matches[0] as $word) {
-                    $minuses[] = trim($word, ' -');
-                }
-            } else {
-                $minuses = null;
-            }
+            $searchStringOrig = $searchString;
+            /** replace special chars by space char */
+            $searchString = preg_replace('/[()&:]/u', ' ', $searchString);
 
-            $searchString = preg_replace('/\W/u', ' ', $searchString);
-            $searchStringOrig = trim(preg_replace('/\s+/u', ' ', $searchString));
+            $searchString = preg_replace('/!+/u', '!', $searchString);
+            $searchString = trim(preg_replace('/![^\w]/u', ' ', $searchString), ' !');
 
-            /** extract digits from the query */
-            preg_match_all('/\d+/', $searchStringOrig, $matches);
-            $numbers = $matches[0];
-            $searchString = trim(preg_replace('/\d+/', '', $searchStringOrig));
+            /** replace all '!' which is not on the first position of a word */
+            $searchString = preg_replace('/(?<=\w)(!+)/u', ' ', $searchString);
+
+            $searchString = trim(preg_replace('/\s+/u', ' ', $searchString));
 
             /** extract russian words */
-            preg_match_all('/[А-Яа-яЁё]+/u', $searchString, $matches);
+            preg_match_all('/!?[А-Яа-яЁё]+/u', $searchString, $matches);
             $russian = $matches[0];
-            $searchString = trim(preg_replace('/[А-Яа-яЁё]+/u', '', $searchString));
+            $searchString = trim(preg_replace('/!?[А-Яа-яЁё]+/u', '', $searchString));
 
             $russianQuery = null;
             if (count($russian)) {
@@ -104,18 +96,14 @@ class ContractorItem extends Model
                 unset($english);
             }
 
-            $tsvItems = ContractorItem::query()
-                ->select([
-                        '*',
-                        \DB::raw("(ts_rank(tsvector_token, "
-                            . "ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
-                            . "+ ts_rank(tsvector_token, "
-                            . "ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))"
-                            . ") as rank")
-                ])->setBindings([$englishQuery, $russianQuery], 'select');
-            foreach ($numbers as $number) {
-                $tsvItems->where('name', 'like', "%{$number}%");
-            }
+            $tsvItems = ContractorItem::query()->select([
+                '*',
+                \DB::raw("(ts_rank(tsvector_token, "
+                    . "ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
+                    . "+ ts_rank(tsvector_token, "
+                    . "ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))"
+                    . ") as rank")
+            ])->setBindings([$englishQuery, $russianQuery], 'select');
 
             if ($russianQuery) {
                 $tsvItems->whereRaw(
@@ -132,34 +120,49 @@ class ContractorItem extends Model
             }
 
             if ($contractorId) {
-                $tsvItems->where(['contractor_items.contractor_id' => $contractorId]);
+                $tsvItems->where([$tsvItems->qualifyColumn('contractor_id') => $contractorId]);
             }
 
-            if ($minuses) {
-                foreach($minuses as $minus) {
-                    $tsvItems->where($tsvItems->qualifyColumn('name'), 'not ilike', "%{$minus}%");
+            /** pg_trgm make no sense with short search queries */
+            if (mb_strlen($searchStringOrig) > 1) {
+                preg_match_all('/\s!\w+/u', $searchStringOrig, $matches);
+                $minuses = (isset($matches[0]) && (count($matches[0]) > 0)) ? $matches[0] : null;
+                $searchString = trim(preg_replace('/\s!\w+/u', '', $searchStringOrig));
+
+                $trgItems = ContractorItem::query()
+                    ->select(['*', \DB::raw("similarity(name, ?) as rank")])
+                    ->setBindings([$searchString], 'select')
+                    ->whereRaw('name % ?', [$searchString]);
+
+                if ($minuses) {
+                    foreach ($minuses as $minus) {
+                        $trgItems->where(
+                            $trgItems->qualifyColumn('name'),
+                            'not ilike',
+                            sprintf("%%%s%%", ltrim($minus, '! '))
+                        );
+                    }
                 }
-            }
 
-            // pg_trgm make no sense in current case due to short search query and too long data string in DB
-            $trgItems = ContractorItem::query()
-                ->select(['*', \DB::raw("similarity(name, ?) as rank")])
-                ->setBindings([$searchStringOrig], 'select')
-                ->whereRaw('name % ?', [$searchStringOrig]);
-            if ($contractorId) {
-                $trgItems->where(['contractor_items.contractor_id' => $contractorId]);
-            }
-
-            if ($minuses) {
-                foreach($minuses as $minus) {
-                    $trgItems->where($trgItems->qualifyColumn('name'), 'not ilike', "%{$minus}%");
+                if ($contractorId) {
+                    $trgItems->where([$tsvItems->qualifyColumn('contractor_id') => $contractorId]);
                 }
+
             }
 
-            $items = $tsvItems->union($trgItems);
+            if (isset($trgItems)) {
+                $items = $tsvItems->union($trgItems);
 
-            $items = ContractorItem::from(\DB::raw("({$items->toSql()}) as contractor_items"))
-                ->setBindings($items->getBindings());
+                $items = ContractorItem::query()
+                    ->withoutGlobalScope(UserScope::class)
+                    ->from(\DB::raw("({$items->toSql()}) as contractor_items"))
+                    ->setBindings($items->getBindings());
+            } else {
+                $items = ContractorItem::query()
+                    ->withoutGlobalScope(UserScope::class)
+                    ->from(\DB::raw("({$tsvItems->toSql()}) as contractor_items"))
+                    ->setBindings($tsvItems->getBindings());
+            }
         }
 
         return $items;

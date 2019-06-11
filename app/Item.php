@@ -111,7 +111,7 @@ class Item extends Model
             }
 
             /** pg_trgm make no sense with short search queries */
-            if (mb_strlen($searchStringOrig) > 1) {
+            if (mb_strlen($searchStringOrig) > 16) {
                 preg_match_all('/\s!\w+/u', $searchStringOrig, $matches);
                 $minuses = (isset($matches[0]) && (count($matches[0]) > 0)) ? $matches[0] : null;
                 $searchString = trim(preg_replace('/\s!\w+/u', '', $searchStringOrig));
@@ -126,7 +126,7 @@ class Item extends Model
                         $trgItems->where(
                             $trgItems->qualifyColumn('name'),
                             'not ilike',
-                            sprintf("%%{%s}%%", ltrim($minus, '!'))
+                            sprintf("%%%s%%", trim($minus, '! '))
                         );
                     }
                 }
