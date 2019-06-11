@@ -184,7 +184,7 @@ class ItemController extends Controller
 
         $name = date("d-m-Y") . '-vozduhi.xlsx';
 
-        GeneratePrice::dispatch($path . '/' . $name);
+        GeneratePrice::dispatch(\Auth::id(), $path . '/' . $name);
 
         $request->session()->flash('message', 'Запущен процесс генерации нового прайса!');
 

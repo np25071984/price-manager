@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Scopes\UserScope;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -10,11 +11,13 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Item;
+use App\Brand;
 
 class GeneratePrice implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected $userId;
     protected $priceName;
 
     /**
@@ -22,8 +25,9 @@ class GeneratePrice implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($priceName)
+    public function __construct($userId, $priceName)
     {
+        $this->userId = $userId;
         $this->priceName = $priceName;
     }
 
@@ -55,19 +59,34 @@ class GeneratePrice implements ShouldQueue
         $sheet->getStyle('A')->getAlignment()->setHorizontal('center');
         $sheet->getStyle('D:F')->getAlignment()->setHorizontal('center');
 
-        foreach (Item::all() as $key => $item) {
+        $items = Item::withoutGlobalScope(UserScope::class)
+            ->where([
+                'user_id' => $this->userId,
+            ])
+            ->get();
+
+        foreach ($items as $key => $item) {
             $row = $key + 2;
 
             $sheet->setCellValue('A' . $row, $item->article);
-            $sheet->setCellValue('B' . $row, $item->brand->name);
+
+            $brand = $item->brand()->withoutGlobalScope(UserScope::class)->first();
+            $sheet->setCellValue('B' . $row, $brand->name);
+
             $sheet->setCellValue('C' . $row, $item->name);
+
+            $bestPriceContractorItem = $item
+                ->contractorItems()
+                ->withoutGlobalScope(UserScope::class)
+                ->orderBy('price')
+                ->first();
             $sheet->setCellValue(
                 'D' . $row,
-                $item->contractorItems()->orderBy('price')->first()
-                    ? $item->contractorItems()->orderBy('price')->first()->price
-                    : ''
+                $bestPriceContractorItem ? $bestPriceContractorItem->price : ''
             );
+
             $sheet->setCellValue('E' . $row, $item->price);
+
             $sheet->setCellValue('F' . $row, $item->stock);
         }
 
