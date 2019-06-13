@@ -4,8 +4,9 @@ namespace App;
 
 use App\Scopes\UserScope;
 use Illuminate\Database\Eloquent\Model;
+use App\SmartSearch;
 
-class Item extends Model
+class Item extends SmartSearch
 {
     protected $fillable = ['user_id', 'brand_id', 'article', 'name', 'price', 'stock'];
 
@@ -44,109 +45,24 @@ class Item extends Model
     public static function smartSearch($searchString)
     {
         if (trim($searchString) === '') {
-            $items = Item::query();
+            $items = self::query();
         } elseif (is_numeric($searchString)) {
             /** reckon query string is an item article */
-            $items = Item::where(['items.article' => $searchString]);
+            $items = self::where(['items.article' => $searchString]);
         } else {
-            $searchStringOrig = $searchString;
-            /** replace special chars by space char */
-            $searchString = preg_replace('/[()&:]/u', ' ', $searchString);
+            $tsvItems = self::getTsvQuery($searchString);
 
-            $searchString = preg_replace('/!+/u', '!', $searchString);
-            $searchString = trim(preg_replace('/![^\w]/u', ' ', $searchString), ' !');
+            $trgmItems = self::getTrgmQuery($searchString);
 
-            /** replace all '!' which is not on the first position of a word */
-            $searchString = preg_replace('/(?<=\w)(!+)/u', ' ', $searchString);
-
-            $searchString = trim(preg_replace('/\s+/u', ' ', $searchString));
-
-            /** extract russian words */
-            preg_match_all('/!?[А-Яа-яЁё]+/u', $searchString, $matches);
-            $russian = $matches[0];
-            $searchString = trim(preg_replace('/!?[А-Яа-яЁё]+/u', '', $searchString));
-
-            $russianQuery = null;
-            if (count($russian)) {
-                foreach ($russian as $key => $word) {
-                    $russian[$key] = $word . ':*';
-                }
-                $russianQuery = implode(' & ', $russian);
-                unset($russian);
-            }
-
-            /** extract english words */
-            $english = preg_split('/\s+/', $searchString, -1, PREG_SPLIT_NO_EMPTY);
-
-            $englishQuery = null;
-            if (count($english)) {
-                foreach ($english as $key => $word) {
-                    $english[$key] = $word . ':*';
-                }
-                $englishQuery = implode(' & ', $english);
-                unset($english);
-            }
-
-            $tsvItems = Item::query()->select([
-                '*',
-                \DB::raw("(ts_rank(tsvector_token, "
-                    . "ts_rewrite(to_tsquery('english', coalesce(?, '')), 'SELECT t, s FROM aliases')) "
-                    . "+ ts_rank(tsvector_token, "
-                    . "ts_rewrite(to_tsquery('russian', coalesce(?, '')), 'SELECT t, s FROM aliases'))"
-                    . ") as rank")
-            ])->setBindings([$englishQuery, $russianQuery], 'select');
-
-            if ($russianQuery) {
-                $tsvItems->whereRaw(
-                    "tsvector_token @@ ts_rewrite(to_tsquery('russian', ?), 'SELECT t, s FROM aliases')",
-                    [$russianQuery]
-                );
-            }
-
-            if ($englishQuery) {
-                $tsvItems->whereRaw(
-                    "tsvector_token @@ ts_rewrite(to_tsquery('english', ?), 'SELECT t, s FROM aliases')",
-                    [$englishQuery]
-                );
-            }
-
-            /** pg_trgm make no sense with short search queries */
-            if (mb_strlen($searchStringOrig) > 16) {
-                preg_match_all('/\s!\w+/u', $searchStringOrig, $matches);
-                $minuses = (isset($matches[0]) && (count($matches[0]) > 0)) ? $matches[0] : null;
-                $searchString = trim(preg_replace('/\s!\w+/u', '', $searchStringOrig));
-
-                $trgItems = Item::query()
-                    ->select(['*', \DB::raw("similarity(name, ?) as rank")])
-                    ->setBindings([$searchString], 'select')
-                    ->whereRaw('name % ?', [$searchString]);
-
-                if ($minuses) {
-                    foreach ($minuses as $minus) {
-                        $trgItems->where(
-                            $trgItems->qualifyColumn('name'),
-                            'not ilike',
-                            sprintf("%%%s%%", trim($minus, '! '))
-                        );
-                    }
-                }
-            }
-
-            if (isset($trgItems)) {
-                $items = $tsvItems->union($trgItems);
-
-                $items = Item::query()
-                    ->withoutGlobalScope(UserScope::class)
-                    ->from(\DB::raw("({$items->toSql()}) as items"))
-                    ->setBindings($items->getBindings());
-            } else {
-                $items = Item::query()
-                    ->withoutGlobalScope(UserScope::class)
-                    ->from(\DB::raw("({$tsvItems->toSql()}) as items"))
-                    ->setBindings($tsvItems->getBindings());
-            }
+            $items = self::getSmartSearchQuery($tsvItems, $trgmItems, 'items');
         }
 
         return $items;
     }
+
+    public static function getTableName()
+    {
+        return (new self())->getTable();
+    }
+
 }
