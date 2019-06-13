@@ -10,6 +10,7 @@ use App\Brand;
 use App\Relation;
 use App\ContractorItem;
 use App\Contractor;
+use App\User;
 
 class BindItems extends Command
 {
@@ -54,7 +55,11 @@ class BindItems extends Command
         $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
 
 
-        // TODO: add user_id checking
+        $user = User::find($userId);
+        if (!$user) {
+            $this->error(sprintf("user_id = %s didn't find!", $userId));
+            return;
+        }
 
         $contractor = Contractor::withoutGlobalScope(UserScope::class)
             ->where([
