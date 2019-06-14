@@ -69,7 +69,7 @@ class ItemController extends Controller
     public function store(ItemRequest $request)
     {
         $item = Item::create([
-            'user_id' => \Auth::user()->id,
+            'user_id' => \Auth::id(),
             'brand_id' => $request->brand_id,
             'article' => $request->article,
             'name' => $request->name,
@@ -143,12 +143,13 @@ class ItemController extends Controller
         $tmpName   = time() . '.' . $price->getClientOriginalExtension();
         $price->move(storage_path('tmp'), $tmpName);
 
-        ParsePrice::dispatch(\Auth::user()->id, null, storage_path('tmp') . '/' . $tmpName);
+        ParsePrice::dispatch(\Auth::id(), null, storage_path('tmp') . '/' . $tmpName);
 
         JobStatus::updateOrCreate(
             ['contractor_id' => null],
             [
                 'status_id' => 1,
+                'user_id' => \Auth::id(),
                 'message' => 'Прайс успешно загружен',
             ]
         );

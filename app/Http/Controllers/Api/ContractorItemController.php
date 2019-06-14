@@ -48,10 +48,12 @@ class ContractorItemController extends Controller
             })
             ->leftJoin('items', 'relations.item_id', '=', 'items.id');
 
-        if ($query && !is_numeric($query)) {
-            $items->orderBy('rank', 'desc');
-        } elseif ($column) {
-            $items->orderBy($column, $order);
+        if (!$query) {
+            if ($column) {
+                $items->orderBy($column, $order);
+            } else {
+                $items->orderBy($items->qualifyColumn('updated_at'), 'desc');
+            }
         }
 
         $page = $request->input('page', 1);
@@ -85,12 +87,12 @@ class ContractorItemController extends Controller
             ->unrelated();
 
 
-        if ($query && !is_numeric($query)) {
-            $items->orderBy('rank', 'desc');
-        } elseif ($column) {
-            $items->orderBy($column, $order);
-        } else {
-            $items->orderBy('contractor_items.updated_at', 'desc');
+        if (!$query) {
+            if ($column) {
+                $items->orderBy($column, $order);
+            } else {
+                $items->orderBy($items->qualifyColumn('updated_at'), 'desc');
+            }
         }
 
         $page = $request->input('page', 1);

@@ -40,10 +40,12 @@ class ItemController extends Controller
             ])
             ->leftJoin('brands', 'items.brand_id', '=', 'brands.id');
 
-        if ($column) {
-            $items->orderBy($column, $order);
-        } elseif (!$query) {
-            $items->orderBy('items.updated_at', 'desc');
+        if (!$query) {
+            if ($column) {
+                $items->orderBy($column, $order);
+            } else {
+                $items->orderBy('items.updated_at', 'desc');
+            }
         }
 
         $page = $request->input('page', 1);
@@ -81,12 +83,12 @@ class ItemController extends Controller
             ->leftJoin('brands', 'items.brand_id', '=', 'brands.id')
             ->unrelated();
 
-        if ($query && !is_numeric($query)) {
-            $items->orderBy('rank', 'desc');
-        } elseif ($column) {
-            $items->orderBy($column, $order);
-        } else {
-            $items->orderBy('items.updated_at', 'desc');
+        if (!$query) {
+            if ($column) {
+                $items->orderBy($column, $order);
+            } else {
+                $items->orderBy('items.updated_at', 'desc');
+            }
         }
 
         $page = $request->input('page', 1);
@@ -127,10 +129,12 @@ class ItemController extends Controller
             $items->where('name', 'ilike', "%{$query}%");
         }
 
-        if ($column) {
-            $items->orderBy($column, $order);
-        } elseif (!$query) {
-            $items->orderBy('items.updated_at', 'desc');
+        if (!$query) {
+            if ($column) {
+                $items->orderBy($column, $order);
+            } else {
+                $items->orderBy('updated_at', 'desc');
+            }
         }
 
         $page = $request->input('page', 1);

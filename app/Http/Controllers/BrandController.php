@@ -38,7 +38,7 @@ class BrandController extends Controller
     public function store(BrandRequest $request)
     {
         $brand = Brand::create([
-            'user_id' => \Auth::user()->id,
+            'user_id' => \Auth::id(),
             'name' => $request->name,
         ]);
 

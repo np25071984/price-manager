@@ -48,7 +48,7 @@ class ContractorController extends Controller
             'col_price' => $request->col_price,
         ];
         $contractor = Contractor::create([
-            'user_id' => \Auth::user()->id,
+            'user_id' => \Auth::id(),
             'name' => $request->name,
             'config' => $config,
         ]);
@@ -133,7 +133,7 @@ class ContractorController extends Controller
         $tmpName   = time() . '.' . $price->getClientOriginalExtension();
         $price->move(storage_path('tmp'), $tmpName);
 
-        ParsePrice::dispatch(\Auth::user()->id, $contractor->id, storage_path('tmp') . '/' . $tmpName);
+        ParsePrice::dispatch(\Auth::id(), $contractor->id, storage_path('tmp') . '/' . $tmpName);
 
         JobStatus::updateOrCreate(
             ['contractor_id' => $contractor->id],

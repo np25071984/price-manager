@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Scopes\UserScope;
 use App\Jobs\ParsePrice;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,7 +22,14 @@ class JobStatus extends Model
      */
     public $timestamps = false;
 
-    protected $fillable = ['contractor_id', 'status_id', 'message'];
+    protected $fillable = ['user_id', 'contractor_id', 'status_id', 'message'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(new UserScope);
+    }
 
     public function hasError()
     {
