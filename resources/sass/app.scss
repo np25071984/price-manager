@@ -16,3 +16,7 @@
   content: "*";
   color: red;
 }
+
+main {
+  min-height: calc(100vh - 142px);
+}

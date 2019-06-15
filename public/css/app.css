@@ -16520,3 +16520,7 @@ readers do not read off random characters that represent icons */
   color: red;
 }
 
+main {
+  min-height: calc(100vh - 142px);
+}
+

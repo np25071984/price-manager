@@ -99,8 +99,8 @@
             @yield('content')
         </main>
 
-        <footer class="page-footer font-small blue">
-            <div class="m-3 footer-copyright py-3">© {{ date('Y') }} Copyright:
+        <footer class="font-small">
+            <div class="m-3 py-3">© {{ date('Y') }} Copyright:
                 <a href="{{ url('/') }}"> {{ config('app.name', 'Laravel') }}</a>
             </div>
         </footer>
