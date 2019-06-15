@@ -143,7 +143,8 @@ class ItemController extends Controller
         $tmpName   = time() . '.' . $price->getClientOriginalExtension();
         $price->move(storage_path('tmp'), $tmpName);
 
-        ParsePrice::dispatch(\Auth::id(), null, storage_path('tmp') . '/' . $tmpName);
+        ParsePrice::dispatch(\Auth::id(), null, storage_path('tmp') . '/' . $tmpName)
+            ->onQueue('price_list');
 
         JobStatus::updateOrCreate(
             ['contractor_id' => null],

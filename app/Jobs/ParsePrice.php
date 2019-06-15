@@ -167,9 +167,11 @@ class ParsePrice implements ShouldQueue
                         ->where([
                             'user_id' => $this->userId,
                             'name' => $name
-                        ])->first();
+                        ])
+                        ->where('article', '!=', $article)
+                        ->first();
                     if ($duplicateItem) {
-                        \Log::warning(sprintf("Item name duplication: %s", $name));
+                        throw new \Exception(sprintf("Товар с имененм '%s' уже существует в прайсе!", $name));
                     }
 
                     if ($item) {

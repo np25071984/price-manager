@@ -133,12 +133,14 @@ class ContractorController extends Controller
         $tmpName   = time() . '.' . $price->getClientOriginalExtension();
         $price->move(storage_path('tmp'), $tmpName);
 
-        ParsePrice::dispatch(\Auth::id(), $contractor->id, storage_path('tmp') . '/' . $tmpName);
+        ParsePrice::dispatch(\Auth::id(), $contractor->id, storage_path('tmp') . '/' . $tmpName)
+            ->onQueue('price_list');
 
         JobStatus::updateOrCreate(
             ['contractor_id' => $contractor->id],
             [
                 'status_id' => 1,
+                'user_id' => \Auth::id(),
                 'message' => 'Прайс успешно загружен',
             ]
         );

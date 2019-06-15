@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobFailed;
+use App\Scopes\UserScope;
 use App\JobStatus;
 use App\Jobs\ParsePrice;
 
@@ -30,15 +31,15 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Queue::before(function (JobProcessing $event) {
-
-            $class = $event->job->resolveName();
-
-            if (is_a($class, ParsePrice::class, true)) {
+            if ($event->job->getQueue() === 'price_list') {
                 $payload = $event->job->payload();
                 $job = unserialize($payload['data']['command']);
 
-                JobStatus::updateOrCreate(
-                    ['contractor_id' => $job->getContractorId()],
+                JobStatus::withoutGlobalScope(UserScope::class)->updateOrCreate(
+                    [
+                        'user_id' => $job->getUserId(),
+                        'contractor_id' => $job->getContractorId()
+                    ],
                     [
                         'status_id' => 2,
                         'message' => 'Прайс в процессе обработки',
@@ -49,25 +50,27 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Queue::after(function (JobProcessed $event) {
-            $class = $event->job->resolveName();
-
-            if (is_a($class, ParsePrice::class, true)) {
+            if ($event->job->getQueue() === 'price_list') {
                 $payload = $event->job->payload();
                 $job = unserialize($payload['data']['command']);
 
-                JobStatus::where(['contractor_id' => $job->getContractorId()])->delete();
+                JobStatus::withoutGlobalScope(UserScope::class)->where([
+                    'user_id' => $job->getUserId(),
+                    'contractor_id' => $job->getContractorId()
+                ])->delete();
             }
         });
 
         Queue::failing(function (JobFailed $event) {
-            $class = $event->job->resolveName();
-
-            if (is_a($class, ParsePrice::class, true)) {
+            if ($event->job->getQueue() === 'price_list') {
                 $payload = $event->job->payload();
                 $job = unserialize($payload['data']['command']);
 
-                JobStatus::updateOrCreate(
-                    ['contractor_id' => $job->getContractorId()],
+                JobStatus::withoutGlobalScope(UserScope::class)->updateOrCreate(
+                    [
+                        'user_id' => $job->getUserId(),
+                        'contractor_id' => $job->getContractorId()
+                    ],
                     [
                         'status_id' => 3,
                         'message' => mb_substr($event->exception->getMessage(), 0, 1024),
