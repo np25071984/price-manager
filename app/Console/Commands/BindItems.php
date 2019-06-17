@@ -54,7 +54,6 @@ class BindItems extends Command
 
         $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
 
-
         $user = User::find($userId);
         if (!$user) {
             $this->error(sprintf("user_id = %s didn't find!", $userId));
@@ -101,8 +100,8 @@ class BindItems extends Command
             $contractorName = trim($worksheet->getCellByColumnAndRow(1, $row)->getCalculatedValue());
 
             $contractorItem = $contractor
-                ->items()
                 ->withoutGlobalScope(UserScope::class)
+                ->items()
                 ->where([
                     'user_id' => $userId,
                     'name' => $contractorName,
@@ -122,7 +121,7 @@ class BindItems extends Command
                     ]);
                 }
             } else {
-                $this->line(sprintf("Для поставщика '%s' не найден товар с названием '%s'", $contractor->name, $name));
+                $this->line(sprintf("Для поставщика '%s' не найден товар с названием '%s'", $contractor->name, $contractorName));
             }
 
         }
