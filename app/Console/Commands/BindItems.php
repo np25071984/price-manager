@@ -100,8 +100,8 @@ class BindItems extends Command
             $contractorName = trim($worksheet->getCellByColumnAndRow(1, $row)->getCalculatedValue());
 
             $contractorItem = $contractor
-                ->withoutGlobalScope(UserScope::class)
                 ->items()
+                ->withoutGlobalScope(UserScope::class)
                 ->where([
                     'user_id' => $userId,
                     'name' => $contractorName,
