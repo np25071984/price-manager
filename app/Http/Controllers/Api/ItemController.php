@@ -7,15 +7,17 @@ use App\Brand;
 use App\Http\Resources\ItemResouceCollection;
 use App\Http\Resources\ItemBrandResourceCollection;
 use App\Http\Resources\ItemUnrelatedResouceCollection;
+use App\Http\Resources\ItemRelatedResourceCollection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class ItemController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * List of user items
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return ItemResouceCollection
      */
     public function index(Request $request)
     {
@@ -56,9 +58,10 @@ class ItemController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * List of user unrelated items
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return ItemResouceCollection
      */
     public function indexUnrelated(Request $request)
     {
@@ -99,9 +102,52 @@ class ItemController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * List of related items
      *
-     * @param  int  $id
+     * @param Request $request
+     * @param Item $item
+     * @return ItemResouceCollection
+     */
+    public function relatedItems(Request $request, Item $item)
+    {
+        $column = $request->input('column');
+        if (!in_array($column, ['contractor', 'name', 'price'])) {
+            $column = 'price';
+        }
+        $order = $request->input('order');
+        if (!in_array($order, ['asc', 'desc'])) {
+            $order = 'asc';
+        }
+
+        $items = $item->contractorItems()
+            ->select([
+                'contractor_items.*',
+                'contractors.name as contractor',
+            ])
+            ->leftJoin('contractors', 'contractor_items.contractor_id', '=', 'contractors.id');
+
+        $query = $request->input('q', null);
+        if ($query) {
+            $items->where('contractor_items.name', 'ilike', "%{$query}%");
+        }
+
+        if ($column) {
+            $items->orderBy($column, $order);
+        } else {
+            $items->orderBy('items.updated_at', 'desc');
+        }
+
+        $page = $request->input('page', 1);
+
+        $items = $items->paginate(30, ['*'], 'page', $page);
+
+        return new ItemRelatedResourceCollection($items);
+    }
+
+    /**
+     * Remove the specified item from storage
+     *
+     * @param Item $item
      * @return \Illuminate\Http\Response
      */
     public function destroy(Item $item)
@@ -111,6 +157,13 @@ class ItemController extends Controller
         return response()->json(null, 204);
     }
 
+    /**
+     * List of brand items
+     *
+     * @param Request $request
+     * @param Brand $brand
+     * @return ItemBrandResourceCollection
+     */
     public function brandItems(Request $request, Brand $brand)
     {
         $column = $request->input('column');
@@ -143,4 +196,5 @@ class ItemController extends Controller
 
         return new ItemBrandResourceCollection($items);
     }
+
 }

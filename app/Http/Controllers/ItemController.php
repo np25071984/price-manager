@@ -90,7 +90,9 @@ class ItemController extends Controller
      */
     public function show(Item $item)
     {
-        return view('item/show', compact('item'));
+        $apiLink = route('api.item.related', [$item->id]);
+
+        return view('item/show', compact('item', 'apiLink'));
     }
 
     /**
