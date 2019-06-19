@@ -33,11 +33,16 @@ class Item extends SmartSearch
         return $this->belongsToMany('App\ContractorItem', 'relations');
     }
 
-    public function scopeUnrelated($query) {
+    public function scopeUnrelated($query, $contractorId) {
+        $contractorRelations =\DB::table('relations')->select('item_id')->where(['contractor_id' => $contractorId]);
+
         $itemsWithoutRelation = \DB::table('items')
             ->select('items.id')
             ->leftJoin('relations', 'items.id', '=', 'relations.item_id')
-            ->whereNull('relations.id');
+            ->where(function ($query) use ($contractorRelations) {
+                $query->whereNotIn('items.id', $contractorRelations)
+                    ->orWhereNull('relations.id');
+            });
 
         return $query->wherein($this->qualifyColumn("id"), $itemsWithoutRelation);
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Item;
 use App\Brand;
+use App\Contractor;
 use App\Http\Resources\ItemResouceCollection;
 use App\Http\Resources\ItemBrandResourceCollection;
 use App\Http\Resources\ItemUnrelatedResouceCollection;
@@ -63,7 +64,7 @@ class ItemController extends Controller
      * @param Request $request
      * @return ItemResouceCollection
      */
-    public function indexUnrelated(Request $request)
+    public function indexUnrelated(Request $request, Contractor $contractor)
     {
         $column = $request->input('column');
         if (!in_array($column, ['article', 'brand_name', 'item_name', 'price'])) {
@@ -84,7 +85,7 @@ class ItemController extends Controller
                 'price',
             ])
             ->leftJoin('brands', 'items.brand_id', '=', 'brands.id')
-            ->unrelated();
+            ->unrelated($contractor->id);
 
         if (!$query) {
             if ($column) {
