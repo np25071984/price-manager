@@ -30,8 +30,7 @@ services:
       SERVICE_NAME: price-web
       SERVICE_TAGS: dev
     ports:
-      - "80:80"
-      - "443:443"
+      - 8080:80
     volumes:
     - ./:/var/www
     - ./config/docker-images/nginx/conf.d/:/etc/nginx/conf.d/
