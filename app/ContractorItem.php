@@ -64,12 +64,18 @@ class ContractorItem extends SmartSearch
                 $tsvItems->where([$tsvItems->qualifyColumn('contractor_id') => $contractorId]);
             }
 
+            $items = $tsvItems;
+
+            /** Turn off TRGM */
+            /*
             $trgmItems = self::getTrgmQuery($searchString);
             if ($trgmItems && $contractorId) {
                 $trgmItems->where([$tsvItems->qualifyColumn('contractor_id') => $contractorId]);
             }
 
+
             $items = self::getSmartSearchQuery($tsvItems, $trgmItems, 'contractor_items');
+            */
         }
 
         return $items;
