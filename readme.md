@@ -1,3 +1,68 @@
+## Deployment
+
+\# apt get git, docker, docker-compose
+
+\# git clone https://github.com/GHopperMSK/price-manager.git && cd !$:t
+
+\# cp .env.example .env
+
+\# vim .env
+
+> DB_CONNECTION=pgsql
+> DB_HOST=price-db
+> DB_PORT=5432
+> DB_DATABASE=price_manager
+> DB_USERNAME=postgres
+> DB_PASSWORD=postgres
+>
+> QUEUE_CONNECTION=database
+>
+> APP_DEBUG=true
+>
+> APP_KEY=
+
+\# docker-compose up # in another console
+
+\# docker ps
+
+\# docker exec -it price-web bash
+
+\# php artisan key:generate
+
+\# php artisan config:cache
+
+\# composer install
+
+\# exit
+
+\# docker exec -it price-db bash
+
+\# psql -U postgres
+
+&nbsp;&nbsp;&nbsp;&nbsp;CREATE DATABASE price_manager;
+
+&nbsp;&nbsp;&nbsp;&nbsp;\c price_manager;
+
+&nbsp;&nbsp;&nbsp;&nbsp;CREATE EXTENSION pg_trgm;
+
+&nbsp;&nbsp;&nbsp;&nbsp;\q
+
+\# exit
+
+\# docker exec -it price-web bash
+
+&nbsp;&nbsp;&nbsp;&nbsp;\# php artisan migrate
+
+&nbsp;&nbsp;&nbsp;&nbsp;\# php artisan db:seed
+
+&nbsp;&nbsp;&nbsp;&nbsp;\# exit
+
+\# sudo docker run -v "$PWD":/usr/src/app -w /usr/src/app node npm install
+
+\# sudo docker run -v "$PWD":/usr/src/app -w /usr/src/app node npm run dev
+
+##
+
 <p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
 
 <p align="center">
