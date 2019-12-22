@@ -9,10 +9,15 @@
 \# vim .env
 
 > DB_CONNECTION=pgsql
+>
 > DB_HOST=price-db
+>
 > DB_PORT=5432
+>
 > DB_DATABASE=price_manager
+>
 > DB_USERNAME=postgres
+>
 > DB_PASSWORD=postgres
 >
 > QUEUE_CONNECTION=database
@@ -25,13 +30,13 @@
 
 \# docker ps
 
-\# docker exec -it price-web bash
+\# docker exec -it price-app bash
+
+\# composer install
 
 \# php artisan key:generate
 
 \# php artisan config:cache
-
-\# composer install
 
 \# exit
 
@@ -49,7 +54,7 @@
 
 \# exit
 
-\# docker exec -it price-web bash
+\# docker exec -it price-app bash
 
 &nbsp;&nbsp;&nbsp;&nbsp;\# php artisan migrate
 
@@ -57,9 +62,9 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;\# exit
 
-\# sudo docker run -v "$PWD":/usr/src/app -w /usr/src/app node npm install
+\# docker run -it --rm -u "node:node" -v "$PWD":/app -w /app node:latest npm install
 
-\# sudo docker run -v "$PWD":/usr/src/app -w /usr/src/app node npm run dev
+\# docker run -it --rm -u "node:node" -v "$PWD":/app -w /app node:latest npm run dev
 
 ##
 
