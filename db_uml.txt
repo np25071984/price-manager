@@ -1,0 +1,25 @@
+# https://yuml.me
+
+[users|id:int;name:string;email:string;email_verified_at:timestamp;password:string;remember_token:string;create_at:timestamp;updated_at:timestamp]
+
+[brand|id:int;user_id:int;name:string]
+
+[items|id:int;user_id:int;brand_id:int;group_id:int;article:string;name:string;price:int;stock:int]->[items_group|id:int;name:string]
+
+[contractors|id:int;name:string;config:json;create_at:timestamp;updated_at:timestamp]
+
+[contractor_items|id:int;user_id:int;article:string;name:string;price:int;create_at:timestamp;updated_at:timestamp]
+[relations|id:int;item_id:int;contractor_id:int;contractor_item_id:int]
+
+[users]<-[items]
+
+[brand]<-[items]
+[brand]<-[users]
+
+[contractors]<-[contractor_items]
+
+[users]<-[contractor_items]
+
+[relations]<-[items]
+[relations]<-[contractors]
+[relations]<-[contractor_items]
