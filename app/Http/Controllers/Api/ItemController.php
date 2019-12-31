@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Item;
 use App\Brand;
+use App\Group;
 use App\Contractor;
 use App\Http\Resources\ItemResouceCollection;
 use App\Http\Resources\ItemBrandResourceCollection;
@@ -198,4 +199,44 @@ class ItemController extends Controller
         return new ItemBrandResourceCollection($items);
     }
 
+    /**
+     * List of group items
+     *
+     * @param Request $request
+     * @param Brand $group
+     * @return ItemBrandResourceCollection
+     */
+    public function groupItems(Request $request, Group $group)
+    {
+        $column = $request->input('column');
+        if (!in_array($column, ['article', 'name', 'price', 'stock'])) {
+            $column = null;
+        }
+        $order = $request->input('order');
+        if (!in_array($order, ['asc', 'desc'])) {
+            $order = 'asc';
+        }
+
+        $items = Item::all();
+//        $items = Item::where(['group_id' => $group->id]);
+//
+//        $query = $request->input('q', null);
+//        if ($query) {
+//            $items->where('name', 'ilike', "%{$query}%");
+//        }
+//
+//        if (!$query) {
+//            if ($column) {
+//                $items->orderBy($column, $order);
+//            } else {
+//                $items->orderBy('updated_at', 'desc');
+//            }
+//        }
+
+        $page = $request->input('page', 1);
+
+//        $items = $items->paginate(30, ['*'], 'page', $page);
+
+        return new ItemBrandResourceCollection($items);
+    }
 }

@@ -19,6 +19,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('brand', 'BrandController')->except(['destroy']);
     Route::resource('item', 'ItemController')->except(['destroy']);
     Route::resource('contractor', 'ContractorController')->except(['destroy']);
+    Route::resource('group', 'GroupController')->except(['destroy']);
 
     // upload own price list
     Route::get('upload', 'ItemController@priceUploadForm')->name('item.upload_form');
@@ -34,4 +35,5 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('contractor/{contractor}/upload', 'ContractorController@priceUpload')->name('contractor.upload');
     Route::get('contractor/{contractor}/{contractorItem}/relation', 'ContractorController@showReationForm')->name('contractor.relation_form');
     Route::post('contractor/{contractor}/{contractorItem}/relation', 'ContractorController@updateRelation')->name('contractor.relation_update');
+
 });

@@ -1,3 +1,15 @@
+## TODO
+
+* add item groups
+* remove multiuser feature
+* introduce websites for feeding with own items, prices...
+* add type item option (EDP/EDT/Perfume)
+* add sale_price option
+* add country
+* add tag
+* add aromas
+* add sale groups for every website
+
 ## Deployment
 
 \# apt get git, docker, docker-compose

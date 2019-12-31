@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class BrandResourceCollection extends ResourceCollection
+class GroupResourceCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -33,7 +33,7 @@ class BrandResourceCollection extends ResourceCollection
                     'sort' => ($column === 'name') ? $order : false,
                     'type' => 'text',
                     'code' => 'name',
-                    'title' => 'Наименование бренда'
+                    'title' => 'Наименование группы'
                 ],
                 [
                     'class' => ['text-center'],

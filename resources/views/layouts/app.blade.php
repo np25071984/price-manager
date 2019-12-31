@@ -45,6 +45,10 @@
                                    href="{{ route('item.index') }}">Прайс</a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link{{ Route::current()->getName() === 'group.index' ? ' active' : '' }}"
+                                   href="{{ route('group.index') }}">Группы</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link{{ Route::current()->getName() === 'brand.index' ? ' active' : '' }}"
                                    href="{{ route('brand.index') }}">Бренды</a>
                             </li>
