@@ -217,25 +217,24 @@ class ItemController extends Controller
             $order = 'asc';
         }
 
-        $items = Item::all();
-//        $items = Item::where(['group_id' => $group->id]);
-//
-//        $query = $request->input('q', null);
-//        if ($query) {
-//            $items->where('name', 'ilike', "%{$query}%");
-//        }
-//
-//        if (!$query) {
-//            if ($column) {
-//                $items->orderBy($column, $order);
-//            } else {
-//                $items->orderBy('updated_at', 'desc');
-//            }
-//        }
+        $items = Item::where(['group_id' => $group->id]);
+
+        $query = $request->input('q', null);
+        if ($query) {
+            $items->where('name', 'ilike', "%{$query}%");
+        }
+
+        if (!$query) {
+            if ($column) {
+                $items->orderBy($column, $order);
+            } else {
+                $items->orderBy('updated_at', 'desc');
+            }
+        }
 
         $page = $request->input('page', 1);
 
-//        $items = $items->paginate(30, ['*'], 'page', $page);
+        $items = $items->paginate(30, ['*'], 'page', $page);
 
         return new ItemBrandResourceCollection($items);
     }

@@ -15,6 +15,13 @@
 
         <div class="row">
             <div class="col-4 text-right">
+                <strong>Группа</strong>
+            </div>
+            <div class="col-8">{{ $item->group->name }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-4 text-right">
                 <strong>Артикул</strong>
             </div>
             <div class="col-8">{{ $item->article }}</div>

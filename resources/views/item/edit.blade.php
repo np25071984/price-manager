@@ -25,6 +25,19 @@
             </div>
 
             <div class="form-group required">
+                <label for="name">Группа</label>
+                <select name="group_id"
+                        class="form-control{{ $errors->has('group_id') ? ' is-invalid' : '' }}">
+                    <option value="" disabled>Выберите группу</option>
+                    @foreach ($groups as $group)
+                        <option {{ $item->group->id === $group->id ? 'selected ' : '' }}value="{{ $group->id }}">{{ $group->name }}</option>
+                    @endforeach
+                </select>
+
+                <div class="invalid-feedback">{{ $errors->first('group_id') }}</div>
+            </div>
+
+            <div class="form-group required">
                 <label for="name">Артикул</label>
                 <input type="text"
                        class="form-control{{ $errors->has('article') ? ' is-invalid' : '' }}"

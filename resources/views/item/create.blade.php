@@ -23,6 +23,19 @@
             </div>
 
             <div class="form-group required">
+                <label for="name">Группа</label>
+                <select name="group_id"
+                        class="form-control{{ $errors->has('group_id') ? ' is-invalid' : '' }}">
+                    <option value="" disabled{{  old('group_id') ? '' : ' selected' }}>Выберите группу</option>
+                    @foreach ($groups as $group)
+                        <option value="{{ $group->id }}"{{  old('group_id') === $group->id ? ' selected' : '' }}>{{ $group->name }}</option>
+                    @endforeach
+                </select>
+
+                <div class="invalid-feedback">{{ $errors->first('group_id') }}</div>
+            </div>
+
+            <div class="form-group required">
                 <label for="name">Артикул</label>
                 <input type="text"
                        class="form-control{{ $errors->has('article') ? ' is-invalid' : '' }}"

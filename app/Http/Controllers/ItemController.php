@@ -6,10 +6,10 @@ use Illuminate\Filesystem\Filesystem;
 
 use App\JobStatus;
 use App\Brand;
+use App\Group;
 use App\Item;
 use App\Jobs\ParsePrice;
 use App\Jobs\GeneratePrice;
-use App\ContractorItem;
 use Illuminate\Http\Request;
 use App\Http\Requests\ItemRequest;
 
@@ -56,8 +56,9 @@ class ItemController extends Controller
      */
     public function create()
     {
-        $brands = Brand::all();
-        return view('item/create', compact('brands'));
+        $brands = Brand::orderBy('name', 'asc')->get();
+        $groups = Group::orderBy('name', 'asc')->get();
+        return view('item/create', compact('brands', 'groups'));
     }
 
     /**
@@ -71,6 +72,7 @@ class ItemController extends Controller
         $item = Item::create([
             'user_id' => \Auth::id(),
             'brand_id' => $request->brand_id,
+            'group_id' => $request->group_id,
             'article' => $request->article,
             'name' => $request->name,
             'price' => $request->price,
@@ -104,7 +106,8 @@ class ItemController extends Controller
     public function edit(Item $item)
     {
         $brands = Brand::orderBy('name', 'asc')->get();
-        return view('item/edit', compact('item', 'brands'));
+        $groups = Group::orderBy('name', 'asc')->get();
+        return view('item/edit', compact('item', 'brands', 'groups'));
     }
 
     /**

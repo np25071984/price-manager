@@ -8,7 +8,7 @@ use App\SmartSearch;
 
 class Item extends SmartSearch
 {
-    protected $fillable = ['user_id', 'brand_id', 'article', 'name', 'price', 'stock'];
+    protected $fillable = ['user_id', 'brand_id', 'group_id',  'article', 'name', 'price', 'stock'];
 
     protected static function boot()
     {
@@ -26,6 +26,13 @@ class Item extends SmartSearch
      */
     public function brand() {
         return $this->hasOne('App\Brand', 'id', 'brand_id');
+    }
+
+    /**
+     * @return App\Group
+     */
+    public function group() {
+        return $this->hasOne('App\Group', 'id', 'group_id');
     }
 
     public function contractorItems()
