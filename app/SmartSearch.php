@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Scopes\UserScope;
 use Illuminate\Database\Eloquent\Model;
 
 class SmartSearch extends Model
@@ -105,12 +104,10 @@ class SmartSearch extends Model
             $items = $tsvQuery->union($trgmQuery);
 
             $items = self::query()
-                ->withoutGlobalScope(UserScope::class)
                 ->from(\DB::raw("({$items->toSql()}) as {$alias}"))
                 ->setBindings($items->getBindings());
         } else {
             $items = self::query()
-                ->withoutGlobalScope(UserScope::class)
                 ->from(\DB::raw("({$tsvQuery->toSql()}) as {$alias}"))
                 ->setBindings($tsvQuery->getBindings());
         }

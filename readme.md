@@ -1,7 +1,5 @@
 ## TODO
 
-* add item groups
-* remove multiuser feature
 * introduce websites for feeding with own items, prices...
 * add type item option (EDP/EDT/Perfume)
 * add sale_price option

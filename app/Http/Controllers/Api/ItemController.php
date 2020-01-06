@@ -16,7 +16,7 @@ use App\Http\Controllers\Controller;
 class ItemController extends Controller
 {
     /**
-     * List of user items
+     * List of items
      *
      * @param Request $request
      * @return ItemResouceCollection
@@ -60,7 +60,7 @@ class ItemController extends Controller
     }
 
     /**
-     * List of user unrelated items
+     * List of unrelated items
      *
      * @param Request $request
      * @return ItemResouceCollection
