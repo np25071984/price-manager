@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Item;
+use App\Shop;
 use App\Brand;
 use App\Group;
 use App\Contractor;
 use App\Http\Resources\ItemResouceCollection;
+use App\Http\Resources\ItemShopResourceCollection;
+use App\Http\Resources\ItemGroupResourceCollection;
 use App\Http\Resources\ItemBrandResourceCollection;
 use App\Http\Resources\ItemUnrelatedResouceCollection;
 use App\Http\Resources\ItemRelatedResourceCollection;
@@ -200,11 +203,51 @@ class ItemController extends Controller
     }
 
     /**
+     * List of shop items
+     *
+     * @param Request $request
+     * @param Brand $group
+     * @return ItemShopResourceCollection
+     */
+    public function shopItems(Request $request, Shop $shop)
+    {
+        $column = $request->input('column');
+        if (!in_array($column, ['article', 'name', 'price', 'stock'])) {
+            $column = null;
+        }
+        $order = $request->input('order');
+        if (!in_array($order, ['asc', 'desc'])) {
+            $order = 'asc';
+        }
+
+        $items = $shop->items(); //Item::query();
+
+        $query = $request->input('q', null);
+        if ($query) {
+            $items->where('name', 'ilike', "%{$query}%");
+        }
+
+        if (!$query) {
+            if ($column) {
+                $items->orderBy($column, $order);
+            } else {
+                $items->orderBy('updated_at', 'desc');
+            }
+        }
+
+        $page = $request->input('page', 1);
+
+        $items = $items->paginate(30, ['*'], 'page', $page);
+
+        return new ItemShopResourceCollection($items);
+    }
+
+    /**
      * List of group items
      *
      * @param Request $request
      * @param Brand $group
-     * @return ItemBrandResourceCollection
+     * @return ItemGroupResourceCollection
      */
     public function groupItems(Request $request, Group $group)
     {
@@ -236,6 +279,6 @@ class ItemController extends Controller
 
         $items = $items->paginate(30, ['*'], 'page', $page);
 
-        return new ItemBrandResourceCollection($items);
+        return new ItemGroupResourceCollection($items);
     }
 }

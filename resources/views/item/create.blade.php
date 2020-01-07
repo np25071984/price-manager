@@ -9,6 +9,17 @@
 
             {{ csrf_field() }}
 
+            <div class="form-group">
+                <label for="name">Магазины</label>
+                <select name="shop_id[]" class="form-control" size="3" multiple>
+                    @foreach ($shops as $shop)
+                        <option value="{{ $shop->id }}"{{  old('shop_id') === $shop->id ? ' selected' : '' }}>{{ $shop->name }}</option>
+                    @endforeach
+                </select>
+
+                <div class="invalid-feedback">{{ $errors->first('shop_id') }}</div>
+            </div>
+
             <div class="form-group required">
                 <label for="name">Бренд</label>
                 <select name="brand_id"
@@ -22,10 +33,9 @@
                 <div class="invalid-feedback">{{ $errors->first('brand_id') }}</div>
             </div>
 
-            <div class="form-group required">
+            <div class="form-group">
                 <label for="name">Группа</label>
-                <select name="group_id"
-                        class="form-control{{ $errors->has('group_id') ? ' is-invalid' : '' }}">
+                <select name="group_id" class="form-control">
                     <option value="" disabled{{  old('group_id') ? '' : ' selected' }}>Выберите группу</option>
                     @foreach ($groups as $group)
                         <option value="{{ $group->id }}"{{  old('group_id') === $group->id ? ' selected' : '' }}>{{ $group->name }}</option>

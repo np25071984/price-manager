@@ -1,12 +1,12 @@
 ## TODO
 
 * introduce websites for feeding with own items, prices...
+* rename Price to BasePrice
+* add Sales for websites
 * add type item option (EDP/EDT/Perfume)
-* add sale_price option
 * add country
 * add tag
 * add aromas
-* add sale groups for every website
 
 ## Deployment
 

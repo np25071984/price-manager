@@ -2,8 +2,6 @@
 
 namespace App;
 
-use App\Scopes\UserScope;
-use Illuminate\Database\Eloquent\Model;
 use App\SmartSearch;
 
 class Item extends SmartSearch
@@ -14,11 +12,25 @@ class Item extends SmartSearch
     {
         parent::boot();
 
-        static::addGlobalScope(new UserScope);
-
         static::deleting(function (Item $item) {
             Relation::where(['item_id' => $item->id])->delete();
         });
+    }
+
+    /**
+     * Get all of the shops where the item exists.
+     * @return App\Shop[]
+     */
+    public function shops()
+    {
+        return $this->hasManyThrough(
+                'App\Shop',
+                'App\ShopItem',
+                'item_id',
+                'id',
+                'id',
+                'shop_id'
+            )->orderBy('name', 'asc');
     }
 
     /**

@@ -8,6 +8,19 @@
 
         <div class="row">
             <div class="col-4 text-right">
+                <strong>Магазины</strong>
+            </div>
+            <div class="col-8">
+                <ul>
+                    @foreach ($item->shops as $shop)
+                        <li>{{ $shop->name }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-4 text-right">
                 <strong>Бренд</strong>
             </div>
             <div class="col-8">{{ $item->brand->name }}</div>

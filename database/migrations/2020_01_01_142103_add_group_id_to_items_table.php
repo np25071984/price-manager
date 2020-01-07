@@ -14,12 +14,12 @@ class AddGroupIdToItemsTable extends Migration
     public function up()
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->unsignedBigInteger('group_id')->after('id');
+            $table->unsignedBigInteger('group_id')->nullable()->after('id');
             $table->foreign('group_id')
                 ->references('id')
                 ->on('groups')
                 ->onUpdate('cascade')
-                ->onDelete('cascade');
+                ->onDelete('set null');
         });
     }
 

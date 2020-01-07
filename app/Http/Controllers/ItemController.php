@@ -6,6 +6,8 @@ use Illuminate\Filesystem\Filesystem;
 
 use App\JobStatus;
 use App\Brand;
+use App\Shop;
+use App\ShopItem;
 use App\Group;
 use App\Item;
 use App\Jobs\ParsePrice;
@@ -56,9 +58,10 @@ class ItemController extends Controller
      */
     public function create()
     {
+        $shops = Shop::orderBy('name', 'asc')->get();
         $brands = Brand::orderBy('name', 'asc')->get();
         $groups = Group::orderBy('name', 'asc')->get();
-        return view('item/create', compact('brands', 'groups'));
+        return view('item/create', compact('brands', 'groups', 'shops'));
     }
 
     /**
@@ -69,15 +72,28 @@ class ItemController extends Controller
      */
     public function store(ItemRequest $request)
     {
-        $item = Item::create([
-            'user_id' => \Auth::id(),
-            'brand_id' => $request->brand_id,
-            'group_id' => $request->group_id,
-            'article' => $request->article,
-            'name' => $request->name,
-            'price' => $request->price,
-            'stock' => $request->stock,
-        ]);
+        $item = \DB::transaction(function() use ($request) {
+            $item = Item::create([
+                'user_id' => \Auth::id(),
+                'brand_id' => $request->brand_id,
+                'group_id' => $request->group_id,
+                'article' => $request->article,
+                'name' => $request->name,
+                'price' => $request->price,
+                'stock' => $request->stock,
+            ]);
+
+            if ($request->shop_id) {
+                foreach ($request->shop_id as $shopId) {
+                    ShopItem::create([
+                        'item_id' => $item->id,
+                        'shop_id' => $shopId,
+                    ]);
+                }
+            }
+
+            return $item;
+        });
 
         $request->session()->flash('message', 'Новый товар успешно добавлен!');
 

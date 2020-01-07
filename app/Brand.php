@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Scopes\UserScope;
 use Illuminate\Database\Eloquent\Model;
 
 class Brand extends Model
@@ -12,8 +11,6 @@ class Brand extends Model
     protected static function boot()
     {
         parent::boot();
-
-        static::addGlobalScope(new UserScope);
 
         static::deleting(function (Brand $brand) {
             $brand->items()->delete();
