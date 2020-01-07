@@ -32,11 +32,11 @@ class ItemShopResource extends JsonResource
         $controls[] = [
             'name' => 'button-component',
             'class' => ['fa', 'fa-lg', 'fa-trash', 'm-1'],
-            'title' => 'Удалить товар',
+            'title' => 'Убрать из магазина',
             'href' => null,
             'clickevent' => [
-                'text' => 'Вы уверены что хотите удалить товар?',
-                'link' => route('api.item.destroy', [$this->id]),
+                'text' => 'Вы уверены что хотите убрать этот товар из магазина?',
+                'link' => route('api.shop.remove_item', [1, $this->id]),
             ],
         ];
 

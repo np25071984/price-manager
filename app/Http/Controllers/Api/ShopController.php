@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Shop;
+use App\ShopItem;
+use App\Item;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ShopResourceCollection;
@@ -39,6 +41,21 @@ class ShopController extends Controller
         $shops = $shops->paginate(30, ['*'], 'page', $page);
 
         return new ShopResourceCollection($shops);
+    }
+
+    /**
+     * Remove Item from the shop
+     *
+     * @param Item $item
+     * @return \Illuminate\Http\Response
+     */
+    public function remove(Shop $shop, Item $item)
+    {
+        ShopItem::query()->where([
+            'item_id' => $item->id,
+            'shop_id' => $shop->id,
+        ])->delete();
+        return response()->json(null, 204);
     }
 
     /**
