@@ -4,14 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Filesystem\Filesystem;
 
-use App\JobStatus;
 use App\Brand;
 use App\Shop;
 use App\ShopItem;
 use App\Group;
 use App\Item;
 use App\Jobs\ParsePrice;
-use App\Jobs\GeneratePrice;
 use Illuminate\Http\Request;
 use App\Http\Requests\ItemRequest;
 
@@ -25,30 +23,10 @@ class ItemController extends Controller
      */
     public function index(Request $request)
     {
-        $job = JobStatus::where(['contractor_id' => null])->first();
-        if ($job && !$job->hasError()) {
-            return view('price_processing_placeholder', [
-                'job' => $job,
-                'owner' => 'прайсом',
-            ]);
-        } else {
-            $path = storage_path('prices/' . \Auth::id());
-            $files = glob($path . '/*.xlsx');
+        $itemApiLink = route('api.item.index');
+        $contractorApiLink = route('api.contractors-items.unrelated.index');
 
-            if (isset($files[0])) {
-                $filesystem = new Filesystem;
-                $pathinfo = pathinfo($files[0]);
-
-                $price = sprintf("%s (%s Кб)", $pathinfo['basename'], ceil($filesystem->size($files[0])/1024));
-            } else {
-                $price = null;
-            }
-
-            $itemApiLink = route('api.item.index');
-            $contractorApiLink = route('api.contractors-items.unrelated.index');
-
-            return view('item/index', compact('job', 'price', 'itemApiLink', 'contractorApiLink'));
-        }
+        return view('item/index', compact('job', 'itemApiLink', 'contractorApiLink'));
     }
 
     /**
@@ -74,7 +52,6 @@ class ItemController extends Controller
     {
         $item = \DB::transaction(function() use ($request) {
             $item = Item::create([
-                'user_id' => \Auth::id(),
                 'brand_id' => $request->brand_id,
                 'group_id' => $request->group_id,
                 'article' => $request->article,
@@ -171,7 +148,6 @@ class ItemController extends Controller
             ['contractor_id' => null],
             [
                 'status_id' => 1,
-                'user_id' => \Auth::id(),
                 'message' => 'Прайс успешно загружен',
             ]
         );
@@ -196,7 +172,7 @@ class ItemController extends Controller
 
     public function priceGenerate(Request $request)
     {
-        $path = storage_path('prices/' . \Auth::id());
+        $path = storage_path('prices/');
 
         $filesystem = new Filesystem;
         if ($filesystem->exists($path)) {

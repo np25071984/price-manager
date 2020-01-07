@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Scopes\UserScope;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -55,9 +54,8 @@ class ParsePrice implements ShouldQueue
 
         \DB::beginTransaction();
         if ($this->contractorId) {
-            $contractor = Contractor::withoutGlobalScope(UserScope::class)
+            $contractor = Contractor::query()
                 ->where([
-                    'user_id' => $this->userId,
                     'id' => $this->contractorId,
                 ])
                 ->firstOrFail();
@@ -68,10 +66,10 @@ class ParsePrice implements ShouldQueue
             $startRow = 1;
 
             // Truly delete all SoftDeleted items (bunch deleting doesn't support the Events!)
-            $contractor->items()->withoutGlobalScope(UserScope::class)->onlyTrashed()->forceDelete();
+            $contractor->items()->onlyTrashed()->forceDelete();
 
             // SoftDelete all remain contractor's items
-            $contractor->items()->withoutGlobalScope(UserScope::class)->delete();
+            $contractor->items()->delete();
         } else {
             $contractor = null;
             $columnArticle = 1;
@@ -111,10 +109,8 @@ class ParsePrice implements ShouldQueue
 
                     $contractorItem = $contractor
                         ->items()
-                        ->withoutGlobalScope(UserScope::class)
                         ->withTrashed()
                         ->where([
-                            'user_id' => $this->userId,
                             'article' => $article
                         ])->first();
 
@@ -124,9 +120,8 @@ class ParsePrice implements ShouldQueue
                         $contractorItem->price = $price;
                         $contractorItem->save();
                     } else {
-                        $contractorItem = ContractorItem::withoutGlobalScope(UserScope::class)
+                        $contractorItem = ContractorItem::query()
                             ->create([
-                                'user_id' => $this->userId,
                                 'contractor_id' => $contractor->id,
                                 'article' => $article,
                                 'name' => $name,
@@ -134,9 +129,8 @@ class ParsePrice implements ShouldQueue
                             ]);
                     }
 
-                    $item = Item::withoutGlobalScope(UserScope::class)
+                    $item = Item::query()
                         ->where([
-                            'user_id' => $this->userId,
                             'name' => $name,
                         ])->first();
                     if ($item) {
@@ -148,24 +142,21 @@ class ParsePrice implements ShouldQueue
                     }
                 } else {
                     $brandName = trim($worksheet->getCellByColumnAndRow(2, $row)->getCalculatedValue());
-                    $brand = Brand::withoutGlobalScope(UserScope::class)
+                    $brand = Brand::query()
                         ->firstOrCreate([
-                            'user_id' => $this->userId,
                             'name' => $brandName,
                         ]);
 
                     $article = trim($worksheet->getCellByColumnAndRow($columnArticle, $row)->getCalculatedValue());
-                    $item = Item::withoutGlobalScope(UserScope::class)
+                    $item = Item::query()
                         ->where([
-                            'user_id' => $this->userId,
                             'article' => $article,
                         ])->first();
 
                     $stock = intval(trim($worksheet->getCellByColumnAndRow(8, $row)->getCalculatedValue()));
 
-                    $duplicateItem = Item::withoutGlobalScope(UserScope::class)
+                    $duplicateItem = Item::query()
                         ->where([
-                            'user_id' => $this->userId,
                             'name' => $name
                         ])
                         ->where('article', '!=', $article)
@@ -182,7 +173,6 @@ class ParsePrice implements ShouldQueue
                         $item->save();
                     } else {
                         Item::create([
-                            'user_id' => $this->userId,
                             'brand_id' => $brand->id,
                             'article' => $article,
                             'name' => $name,

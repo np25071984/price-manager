@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
+use Illuminate\Filesystem\Filesystem;
+use App\Jobs\GeneratePrice;
 use App\Shop;
+use App\PriceGenerationStatus;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
@@ -54,9 +58,22 @@ class ShopController extends Controller
      */
     public function show(Shop $shop)
     {
+        $job = PriceGenerationStatus::where(['shop_id' => $shop->id])->first();
+        $path = storage_path('prices/' . $shop->id);
+        $files = glob($path . '/*.xlsx');
+
+        if (isset($files[0])) {
+            $filesystem = new Filesystem;
+            $pathinfo = pathinfo($files[0]);
+
+            $price = sprintf("%s (%s Кб)", $pathinfo['basename'], ceil($filesystem->size($files[0])/1024));
+        } else {
+            $price = null;
+        }
+
         $apiLink = route('api.item.shop', [$shop->id]);
 
-        return view('shop/show', compact('shop', 'apiLink'));
+        return view('shop/show', compact('shop', 'job', 'price', 'apiLink'));
     }
 
     /**
@@ -87,4 +104,26 @@ class ShopController extends Controller
 
         return redirect(route('shop.show' , $shop->id));
     }
+
+    public function priceGenerate(Request $request, Shop $shop)
+    {
+        $shopId = $shop->id;
+        $path = storage_path('prices/' . $shopId);
+
+        $filesystem = new Filesystem;
+        if ($filesystem->exists($path)) {
+            $filesystem->cleanDirectory($path);
+        } else {
+            $filesystem->makeDirectory($path);
+        }
+
+        $name = date("d-m-Y") . '-' . Str::slug($shop->name, '-') . '.xlsx';
+
+        GeneratePrice::dispatch($shopId, $path . '/' . $name)->onQueue('pricelist_generation');
+
+        $request->session()->flash('message', 'Запущен процесс генерации нового прайса!');
+
+        return redirect(route('shop.show', $shopId));
+    }
+
 }

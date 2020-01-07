@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Scopes\UserScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\SmartSearch;
@@ -11,13 +10,11 @@ class ContractorItem extends SmartSearch
 {
     use SoftDeletes;
 
-    protected $fillable = ['user_id', 'contractor_id', 'article', 'name', 'price'];
+    protected $fillable = ['contractor_id', 'article', 'name', 'price'];
 
     protected static function boot()
     {
         parent::boot();
-
-        static::addGlobalScope(new UserScope);
 
         static::deleting(function (ContractorItem $contractorItem) {
             Relation::where(['contractor_item_id' => $contractorItem->id])->delete();

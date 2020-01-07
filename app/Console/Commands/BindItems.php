@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Scopes\UserScope;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use App\Item;
@@ -20,7 +19,6 @@ class BindItems extends Command
      * @var string
      */
     protected $signature = 'items:bind '
-        . '{user_id : The ID of user} '
         . '{contractor_id : The ID of contractor which items will be binded} '
         . '{file : File name with relations}';
 
@@ -48,21 +46,13 @@ class BindItems extends Command
      */
     public function handle()
     {
-        $userId = (int) $this->argument('user_id');
         $contractorId = (int) $this->argument('contractor_id');
         $file = $this->argument('file');
 
         $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
 
-        $user = User::find($userId);
-        if (!$user) {
-            $this->error(sprintf("user_id = %s didn't find!", $userId));
-            return;
-        }
-
-        $contractor = Contractor::withoutGlobalScope(UserScope::class)
+        $contractor = Contractor::query()
             ->where([
-                'user_id' => $userId,
                 'id' => $contractorId,
             ])
             ->first();
@@ -87,9 +77,8 @@ class BindItems extends Command
                 continue;
             }
 
-            $item = Item::withoutGlobalScope(UserScope::class)
+            $item = Item::query()
                 ->where([
-                    'user_id' => $userId,
                     'name' => $name,
                 ])->first();
             if (!$item) {
@@ -101,9 +90,7 @@ class BindItems extends Command
 
             $contractorItem = $contractor
                 ->items()
-                ->withoutGlobalScope(UserScope::class)
                 ->where([
-                    'user_id' => $userId,
                     'name' => $contractorName,
                 ])->first();
             if ($contractorItem) {

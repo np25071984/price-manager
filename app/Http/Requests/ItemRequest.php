@@ -28,8 +28,8 @@ class ItemRequest extends FormRequest
 
         return [
             'brand_id' => 'required',
-            'article' => 'required|min:3|unique:items,article,' . ($item ? $item->id : 'NULL') . ',id,user_id,' . $userId,
-            'name' => 'required|min:3|unique:items,name,' . ($item ? $item->id : 'NULL') . ',id,user_id,' . $userId,
+            'article' => 'required|min:3|unique:items,article,' . ($item ? $item->id : 'NULL') . ',id',
+            'name' => 'required|min:3|unique:items,name,' . ($item ? $item->id : 'NULL') . ',id',
         ];
     }
 

@@ -2,17 +2,17 @@
 
 namespace App;
 
-use App\Jobs\ParsePrice;
 use Illuminate\Database\Eloquent\Model;
+use App\Jobs\GeneratePrice;
 
-class JobStatus extends Model
+class PriceGenerationStatus extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'jobs_status';
+    protected $table = 'jobs_price_generation_status';
 
     /**
      * Indicates if the model should be timestamped.
@@ -21,10 +21,11 @@ class JobStatus extends Model
      */
     public $timestamps = false;
 
-    protected $fillable = ['contractor_id', 'status_id', 'message'];
+    protected $fillable = ['shop_id', 'status_id', 'message'];
 
     public function hasError()
     {
-        return $this->status_id === ParsePrice::ERROR;
+        return $this->status_id === GeneratePrice::ERROR;
     }
+
 }

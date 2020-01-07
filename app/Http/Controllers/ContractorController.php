@@ -48,7 +48,6 @@ class ContractorController extends Controller
             'col_price' => $request->col_price,
         ];
         $contractor = Contractor::create([
-            'user_id' => \Auth::id(),
             'name' => $request->name,
             'config' => $config,
         ]);
@@ -140,7 +139,6 @@ class ContractorController extends Controller
             ['contractor_id' => $contractor->id],
             [
                 'status_id' => 1,
-                'user_id' => \Auth::id(),
                 'message' => 'Прайс успешно загружен',
             ]
         );

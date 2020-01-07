@@ -30,7 +30,7 @@
             <div class="col-4 text-right">
                 <strong>Группа</strong>
             </div>
-            <div class="col-8">{{ $item->group->name }}</div>
+            <div class="col-8">{{ $item->group ? $item->group->name : ''}}</div>
         </div>
 
         <div class="row">

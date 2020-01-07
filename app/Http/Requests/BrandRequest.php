@@ -24,10 +24,9 @@ class BrandRequest extends FormRequest
     public function rules()
     {
         $brand = $this->route('brand');
-        $userId = \Auth::user()->id;
 
         return [
-            'name' => 'required|min:3|unique:brands,name,' . ($brand ? $brand->id : 'NULL') . ',id,user_id,' . $userId,
+            'name' => 'required|min:3|unique:brands,name,' . ($brand ? $brand->id : 'NULL') . ',id',
         ];
     }
 

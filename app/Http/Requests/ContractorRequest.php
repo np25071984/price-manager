@@ -27,7 +27,7 @@ class ContractorRequest extends FormRequest
         $userId = \Auth::user()->id;
 
         return [
-            'name' => 'required|min:3|unique:contractors,name,' . ($contractor ? $contractor->id : 'NULL') . ',id,user_id,' . $userId,
+            'name' => 'required|min:3|unique:contractors,name,' . ($contractor ? $contractor->id : 'NULL') . ',id',
             'col_name' => 'required|numeric|min:1',
             'col_price' => 'required|numeric|min:1',
         ];

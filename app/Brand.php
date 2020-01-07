@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Brand extends Model
 {
-    protected $fillable = ['user_id', 'name'];
+    protected $fillable = ['name'];
 
     protected static function boot()
     {

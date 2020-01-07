@@ -42,7 +42,7 @@
                         @auth
                             <li class="nav-item">
                                 <a class="nav-link{{ Route::current()->getName() === 'item.index' ? ' active' : '' }}"
-                                   href="{{ route('item.index') }}">Прайс</a>
+                                   href="{{ route('item.index') }}">Товары</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link{{ Route::current()->getName() === 'group.index' ? ' active' : '' }}"
