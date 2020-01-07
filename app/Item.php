@@ -18,7 +18,7 @@ class Item extends SmartSearch
     }
 
     /**
-     * Get all of the shops where the item exists.
+     * Get all of the shops where the item present.
      * @return App\Shop[]
      */
     public function shops()
@@ -31,6 +31,20 @@ class Item extends SmartSearch
                 'id',
                 'shop_id'
             )->orderBy('name', 'asc');
+    }
+
+    /**
+     * Get all shop`s Ids, where the item present.
+     *
+     * @return array
+     */
+    public function shopIds()
+    {
+        $ids = [];
+        foreach ($this->shops as $shop) {
+            $ids[] = $shop->id;
+        }
+        return $ids;
     }
 
     /**

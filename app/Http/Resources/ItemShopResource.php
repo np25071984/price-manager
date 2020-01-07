@@ -36,7 +36,7 @@ class ItemShopResource extends JsonResource
             'href' => null,
             'clickevent' => [
                 'text' => 'Вы уверены что хотите убрать этот товар из магазина?',
-                'link' => route('api.shop.remove_item', [1, $this->id]),
+                'link' => route('api.shop.remove_item', [$request->shop, $this->id]),
             ],
         ];
 

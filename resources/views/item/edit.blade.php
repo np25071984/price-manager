@@ -11,6 +11,17 @@
 
             <input type="hidden" name="_method" value="PUT">
 
+            <div class="form-group">
+                <label for="name">Магазины</label>
+                <select name="shop_id[]" class="form-control" size="3" multiple>
+                    @foreach ($shops as $shop)
+                        <option value="{{ $shop->id }}"{{  in_array($shop->id, $item->shopIds()) ? ' selected' : '' }}>{{ $shop->name }}</option>
+                    @endforeach
+                </select>
+
+                <div class="invalid-feedback">{{ $errors->first('shop_id') }}</div>
+            </div>
+
             <div class="form-group required">
                 <label for="name">Бренд</label>
                 <select name="brand_id"

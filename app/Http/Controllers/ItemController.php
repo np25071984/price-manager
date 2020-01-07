@@ -98,9 +98,10 @@ class ItemController extends Controller
      */
     public function edit(Item $item)
     {
+        $shops = Shop::orderBy('name', 'asc')->get();
         $brands = Brand::orderBy('name', 'asc')->get();
         $groups = Group::orderBy('name', 'asc')->get();
-        return view('item/edit', compact('item', 'brands', 'groups'));
+        return view('item/edit', compact('item', 'shops', 'brands', 'groups'));
     }
 
     /**
@@ -112,11 +113,28 @@ class ItemController extends Controller
      */
     public function update(ItemRequest $request, Item $item)
     {
-        $item->brand_id = $request->brand_id;
-        $item->article = $request->article;
-        $item->name = $request->name;
-        $item->price = $request->price;
-        $item->stock = $request->stock;
+        $item = \DB::transaction(function() use ($request, $item) {
+            $item->brand_id = $request->brand_id;
+            $item->article = $request->article;
+            $item->name = $request->name;
+            $item->price = $request->price;
+            $item->stock = $request->stock;
+
+            ShopItem::query()->where([
+                'item_id' => $item->id,
+            ])->delete();
+            if ($request->shop_id) {
+                foreach ($request->shop_id as $shopId) {
+                    ShopItem::create([
+                        'item_id' => $item->id,
+                        'shop_id' => $shopId,
+                    ]);
+                }
+            }
+
+            return $item;
+        });
+
         $item->save();
 
         $request->session()->flash('message', 'Товар успешно обновлен!');
