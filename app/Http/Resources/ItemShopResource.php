@@ -31,7 +31,7 @@ class ItemShopResource extends JsonResource
         ];
         $controls[] = [
             'name' => 'button-component',
-            'class' => ['fa', 'fa-lg', 'fa-trash', 'm-1'],
+            'class' => ['fa', 'fa-lg', 'fa-unlink', 'm-1'],
             'title' => 'Убрать из магазина',
             'href' => null,
             'clickevent' => [

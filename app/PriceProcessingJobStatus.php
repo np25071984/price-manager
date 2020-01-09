@@ -5,14 +5,14 @@ namespace App;
 use App\Jobs\ParsePrice;
 use Illuminate\Database\Eloquent\Model;
 
-class JobStatus extends Model
+class PriceProcessingJobStatus extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'jobs_status';
+    protected $table = 'jobs_price_processing_status';
 
     /**
      * Indicates if the model should be timestamped.

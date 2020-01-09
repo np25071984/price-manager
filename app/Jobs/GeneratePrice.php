@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Item;
+use App\ShopItem;
 
 class GeneratePrice implements ShouldQueue
 {
@@ -66,7 +67,7 @@ class GeneratePrice implements ShouldQueue
             ->getNumberFormat()
             ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE);
 
-        $items = Item::all();
+        $items = Item::whereIn('id', ShopItem::query()->select(['item_id'])->where(['shop_id' => $this->shopId]))->get();
 
         foreach ($items as $key => $item) {
             $row = $key + 2;

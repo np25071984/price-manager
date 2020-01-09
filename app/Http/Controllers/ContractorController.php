@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ContractorRequest;
-use App\JobStatus;
+use App\PriceProcessingJobStatus;
 use App\Item;
 use App\Relation;
 use App\Contractor;
@@ -133,15 +133,13 @@ class ContractorController extends Controller
         $price->move(storage_path('tmp'), $tmpName);
 
         ParsePrice::dispatch(\Auth::id(), $contractor->id, storage_path('tmp') . '/' . $tmpName)
-            ->onQueue('price_list');
+            ->onQueue('pricelist_processing');
 
-        JobStatus::updateOrCreate(
-            ['contractor_id' => $contractor->id],
-            [
-                'status_id' => 1,
-                'message' => 'Прайс успешно загружен',
-            ]
-        );
+        PriceProcessingJobStatus::create([
+            'contractor_id' => $contractor->id,
+            'status_id' => 1,
+            'message' => 'Прайс успешно загружен',
+        ]);
 
         $request->session()->flash('message', 'Прайс поставщика успешно загружен!');
 

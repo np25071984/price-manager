@@ -14,13 +14,12 @@ class JobsPriceGenerationStatusTable extends Migration
     public function up()
     {
         Schema::create('jobs_price_generation_status', function (Blueprint $table) {
-            $table->bigIncrements('id');
             $table->integer('status_id');
             $table->string('message', 1024);
         });
 
         Schema::table('jobs_price_generation_status', function (Blueprint $table) {
-            $table->unsignedBigInteger('shop_id')->after('id');
+            $table->integer('shop_id')->unsigned()->after('id');
             $table->foreign('shop_id')->references('id')->on('shops')->onUpdate('cascade')->onDelete('cascade');
         });
 

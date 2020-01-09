@@ -162,7 +162,7 @@ class ItemController extends Controller
         ParsePrice::dispatch(\Auth::id(), null, storage_path('tmp') . '/' . $tmpName)
             ->onQueue('price_list');
 
-        JobStatus::updateOrCreate(
+        PriceProcessingJobStatus::updateOrCreate(
             ['contractor_id' => null],
             [
                 'status_id' => 1,

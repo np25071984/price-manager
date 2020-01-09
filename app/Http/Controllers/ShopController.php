@@ -121,6 +121,12 @@ class ShopController extends Controller
 
         GeneratePrice::dispatch($shopId, $path . '/' . $name)->onQueue('pricelist_generation');
 
+        PriceGenerationStatus::create([
+            'shop_id' => $shopId,
+            'status_id' => 1,
+            'message' => 'Прайс успешно загружен',
+        ]);
+
         $request->session()->flash('message', 'Запущен процесс генерации нового прайса!');
 
         return redirect(route('shop.show', $shopId));

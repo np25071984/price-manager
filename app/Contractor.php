@@ -23,7 +23,7 @@ class Contractor extends Model
 
     public function job()
     {
-        return $this->hasOne('App\JobStatus');
+        return $this->hasOne('App\PriceProcessingJobStatus');
     }
 
     public function items()

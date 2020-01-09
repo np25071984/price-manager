@@ -7,7 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobFailed;
-use App\JobStatus;
+use App\PriceProcessingJobStatus;
 use App\PriceGenerationStatus;
 
 class AppServiceProvider extends ServiceProvider
@@ -35,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
 
             switch ($event->job->getQueue()) {
                 case 'pricelist_processing':
-                    JobStatus::query()->updateOrCreate(
+                    PriceProcessingJobStatus::query()->updateOrCreate(
                         [
                             'contractor_id' => $job->getContractorId()
                         ],
@@ -66,7 +66,7 @@ class AppServiceProvider extends ServiceProvider
 
             switch ($event->job->getQueue()) {
                 case 'pricelist_processing':
-                    JobStatus::query()->where([
+                    PriceProcessingJobStatus::query()->where([
                         'contractor_id' => $job->getContractorId()
                     ])->delete();
                     break;
@@ -84,7 +84,7 @@ class AppServiceProvider extends ServiceProvider
 
             switch ($event->job->getQueue()) {
                 case 'pricelist_processing':
-                    JobStatus::query()->updateOrCreate(
+                    PriceProcessingJobStatus::query()->updateOrCreate(
                         [
                             'contractor_id' => $job->getContractorId()
                         ],
