@@ -14,6 +14,7 @@ class JobsStatusRenameTable extends Migration
     public function up()
     {
         Schema::create('jobs_price_processing_status', function (Blueprint $table) {
+            $table->bigIncrements('id');
             $table->integer('contractor_id')->nullable()->unsigned();
             $table->integer('status_id');
             $table->string('message', 1024);

@@ -71,16 +71,6 @@
             </div>
 
             <div class="form-group required">
-                <label for="name">Цена</label>
-                <input type="text"
-                       class="form-control{{ $errors->has('price') ? ' is-invalid' : '' }}"
-                       name="price"
-                       value="{{ $item->price }}">
-
-                <div class="invalid-feedback">{{ $errors->first('price') }}</div>
-            </div>
-
-            <div class="form-group required">
                 <label for="name">Остаток</label>
                 <input type="text"
                        class="form-control{{ $errors->has('stock') ? ' is-invalid' : '' }}"

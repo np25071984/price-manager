@@ -6,7 +6,7 @@ use App\SmartSearch;
 
 class Item extends SmartSearch
 {
-    protected $fillable = ['brand_id', 'group_id',  'article', 'name', 'price', 'stock'];
+    protected $fillable = ['brand_id', 'group_id',  'article', 'name', 'stock'];
 
     protected static function boot()
     {

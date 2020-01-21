@@ -45,7 +45,6 @@ class ItemResouce extends JsonResource
             'article' => $this->article,
             'brand_name' => $this->brand_name,
             'item_name' => $this->item_name,
-            'price' => $this->price,
             'stock' => $this->stock,
             'func' => $controls,
         ];

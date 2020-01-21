@@ -212,7 +212,7 @@ class ItemController extends Controller
     public function shopItems(Request $request, Shop $shop)
     {
         $column = $request->input('column');
-        if (!in_array($column, ['article', 'name', 'price', 'stock'])) {
+        if (!in_array($column, ['article', 'name', 'stock'])) {
             $column = null;
         }
         $order = $request->input('order');
@@ -252,7 +252,7 @@ class ItemController extends Controller
     public function groupItems(Request $request, Group $group)
     {
         $column = $request->input('column');
-        if (!in_array($column, ['article', 'name', 'price', 'stock'])) {
+        if (!in_array($column, ['article', 'name', 'stock'])) {
             $column = null;
         }
         $order = $request->input('order');

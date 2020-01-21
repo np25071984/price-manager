@@ -1,9 +1,10 @@
 ## TODO
 
+* set item price for specific shop
 * Queue for both price generation and processing with statuses
 * Item Delete button on shop page (remove from the shop)
-* rename Price to BasePrice
 * add Sales for websites
+
 * add type item option (EDP/EDT/Perfume)
 * add country
 * add tag

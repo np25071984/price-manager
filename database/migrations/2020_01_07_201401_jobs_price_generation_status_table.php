@@ -14,6 +14,7 @@ class JobsPriceGenerationStatusTable extends Migration
     public function up()
     {
         Schema::create('jobs_price_generation_status', function (Blueprint $table) {
+            $table->bigIncrements('id');
             $table->integer('status_id');
             $table->string('message', 1024);
         });

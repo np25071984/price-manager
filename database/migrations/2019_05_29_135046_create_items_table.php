@@ -17,7 +17,6 @@ class CreateItemsTable extends Migration
             $table->bigIncrements('id');
             $table->string('article')->unique();
             $table->string('name')->unique();
-            $table->float('price')->nullable();
             $table->integer('stock')->nullable();
             $table->timestamps();
         });

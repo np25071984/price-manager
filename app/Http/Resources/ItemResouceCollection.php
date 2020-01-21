@@ -15,7 +15,7 @@ class ItemResouceCollection extends ResourceCollection
     public function toArray($request)
     {
         $column = $request->input('column');
-        if ($column && !in_array($column, ['article', 'brand_name', 'item_name', 'price', 'stock'])) {
+        if ($column && !in_array($column, ['article', 'brand_name', 'item_name', 'stock'])) {
             $column = null;
         }
 
@@ -50,14 +50,6 @@ class ItemResouceCollection extends ResourceCollection
                     'type' => 'text',
                     'code' => 'item_name',
                     'title' => 'Наименование товара'
-                ],
-                [
-                    'class' => ['text-center'],
-                    'sortable' => true,
-                    'sort' => ($column === 'price') ? $order : false,
-                    'type' => 'text',
-                    'code' => 'price',
-                    'title' => 'Цена'
                 ],
                 [
                     'class' => ['text-center'],

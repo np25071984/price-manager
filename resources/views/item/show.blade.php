@@ -49,13 +49,6 @@
 
         <div class="row">
             <div class="col-4 text-right">
-                <strong>Цена</strong>
-            </div>
-            <div class="col-8">{{ $item->price }}</div>
-        </div>
-
-        <div class="row">
-            <div class="col-4 text-right">
                 <strong>Остаток</strong>
             </div>
             <div class="col-8">{{ $item->stock }}</div>
