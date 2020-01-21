@@ -27,7 +27,7 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         $column = $request->input('column');
-        if (!in_array($column, ['article', 'brand_name', 'item_name', 'price', 'stock'])) {
+        if (!in_array($column, ['article', 'brand_name', 'item_name', 'stock'])) {
             $column = null;
         }
         $order = $request->input('order');
@@ -42,7 +42,6 @@ class ItemController extends Controller
                 'article',
                 'brands.name as brand_name',
                 'items.name as item_name',
-                'price',
                 'stock',
             ])
             ->leftJoin('brands', 'items.brand_id', '=', 'brands.id');
@@ -71,7 +70,7 @@ class ItemController extends Controller
     public function indexUnrelated(Request $request, Contractor $contractor)
     {
         $column = $request->input('column');
-        if (!in_array($column, ['article', 'brand_name', 'item_name', 'price'])) {
+        if (!in_array($column, ['article', 'brand_name', 'item_name'])) {
             $column = null;
         }
         $order = $request->input('order');
@@ -86,7 +85,6 @@ class ItemController extends Controller
                 'article',
                 'brands.name as brand_name',
                 'items.name as item_name',
-                'price',
             ])
             ->leftJoin('brands', 'items.brand_id', '=', 'brands.id')
             ->unrelated($contractor->id);
@@ -116,8 +114,8 @@ class ItemController extends Controller
     public function relatedItems(Request $request, Item $item)
     {
         $column = $request->input('column');
-        if (!in_array($column, ['contractor', 'name', 'price'])) {
-            $column = 'price';
+        if (!in_array($column, ['contractor', 'name'])) {
+            $column = 'name';
         }
         $order = $request->input('order');
         if (!in_array($order, ['asc', 'desc'])) {
@@ -172,7 +170,7 @@ class ItemController extends Controller
     public function brandItems(Request $request, Brand $brand)
     {
         $column = $request->input('column');
-        if (!in_array($column, ['article', 'name', 'price', 'stock'])) {
+        if (!in_array($column, ['article', 'name', 'stock'])) {
             $column = null;
         }
         $order = $request->input('order');

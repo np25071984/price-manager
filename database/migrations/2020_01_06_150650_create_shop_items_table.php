@@ -16,6 +16,7 @@ class CreateShopItemsTable extends Migration
         Schema::create('shop_items', function (Blueprint $table) {
             $table->unsignedBigInteger('item_id');
             $table->unsignedBigInteger('shop_id');
+            $table->float('price')->nullable();
             $table->timestamps();
         });
 

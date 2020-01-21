@@ -56,7 +56,6 @@ class ItemController extends Controller
                 'group_id' => $request->group_id,
                 'article' => $request->article,
                 'name' => $request->name,
-                'price' => $request->price,
                 'stock' => $request->stock,
             ]);
 
@@ -117,7 +116,6 @@ class ItemController extends Controller
             $item->brand_id = $request->brand_id;
             $item->article = $request->article;
             $item->name = $request->name;
-            $item->price = $request->price;
             $item->stock = $request->stock;
 
             ShopItem::query()->where([
