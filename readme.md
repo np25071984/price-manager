@@ -1,6 +1,5 @@
 ## TODO
 
-* set item price for specific shop
 * Queue for both price generation and processing with statuses
 * Item Delete button on shop page (remove from the shop)
 * add Sales for websites

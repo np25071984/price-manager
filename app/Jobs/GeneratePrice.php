@@ -50,14 +50,9 @@ class GeneratePrice implements ShouldQueue
         $sheet->getColumnDimension('B')->setWidth(25);
         $sheet->setCellValue('C1', 'Наименование товара');
         $sheet->getColumnDimension('C')->setWidth(40);
-        $sheet->setCellValue('D1', 'Оптовая (закупочная) цена');
-        $sheet->getColumnDimension('D')->setWidth(14);
-        $sheet->setCellValue('E1', 'Розничная цена');
+        $sheet->setCellValue('D1', 'Цена');
+        $sheet->setCellValue('E1', 'Доступное количество');
         $sheet->getColumnDimension('E')->setWidth(14);
-        $sheet->setCellValue('F1', 'Доступное количество');
-        $sheet->getColumnDimension('F')->setWidth(14);
-        $sheet->setCellValue('G1', 'Наценка');
-        $sheet->getColumnDimension('G')->setWidth(14);
 
         $sheet->getStyle('1:1')->getFont()->setBold(true);
         $sheet->getStyle('1:1')->getAlignment()->setHorizontal('center');
@@ -85,53 +80,18 @@ class GeneratePrice implements ShouldQueue
                     ->orderBy('price')
                     ->first();
 
-                $opt = $bestPriceContractorItem->price;
+                $price = $bestPriceContractorItem->price;
             } else {
-                $opt = $item->price;
+                $shopItem = ShopItem::firstOrCreate([
+                    'shop_id' => $this->shopId,
+                    'item_id' => $item->id,
+                ]);
+
+                $price = $shopItem->price;
             }
-            $sheet->setCellValue('D' . $row, $opt);
+            $sheet->setCellValue('D' . $row, $price);
 
-            switch (true) {
-                case $opt < 51:
-                    $markup = 45;
-                    break;
-                case $opt < 101:
-                    $markup = 40;
-                    break;
-                case $opt < 151:
-                    $markup = 35;
-                    break;
-                case $opt < 201:
-                    $markup = 30;
-                    break;
-                case $opt < 251:
-                    $markup = 25;
-                    break;
-                case $opt < 301:
-                    $markup = 20;
-                    break;
-                case $opt < 401:
-                    $markup = 15;
-                    break;
-                case $opt < 600:
-                    $markup = 10;
-                    break;
-                case $opt < 700:
-                    $markup = 8;
-                    break;
-                case $opt < 1000:
-                    $markup = 7;
-                    break;
-                default:
-                    $markup = 6;
-                    break;
-            }
-
-            $sheet->setCellValue('E' . $row, "=SUM(D{$row}, D{$row} * G{$row})");
-
-            $sheet->setCellValue('F' . $row, $item->stock);
-
-            $sheet->setCellValue('G' . $row, $markup / 100);
+            $sheet->setCellValue('E' . $row, $item->stock);
         }
 
         $writer = new Xlsx($spreadsheet);
