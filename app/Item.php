@@ -6,7 +6,7 @@ use App\SmartSearch;
 
 class Item extends SmartSearch
 {
-    protected $fillable = ['brand_id', 'group_id',  'article', 'name', 'stock'];
+    protected $fillable = ['brand_id', 'group_id', 'country_id', 'article', 'name', 'stock'];
 
     protected static function boot()
     {
@@ -52,6 +52,13 @@ class Item extends SmartSearch
      */
     public function brand() {
         return $this->hasOne('App\Brand', 'id', 'brand_id');
+    }
+
+    /**
+     * @return App\Country
+     */
+    public function country() {
+        return $this->hasOne('App\Country', 'id', 'country_id');
     }
 
     /**

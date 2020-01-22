@@ -34,6 +34,19 @@
             </div>
 
             <div class="form-group">
+                <label for="name">Страна</label>
+                <select name="country_id"
+                        class="form-control{{ $errors->has('country_id') ? ' is-invalid' : '' }}">
+                    <option value="" disabled{{  old('country_id') ? '' : ' selected' }}>Выберите страну</option>
+                    @foreach ($countries as $country)
+                        <option value="{{ $country->id }}"{{  old('country_id') === $country->id ? ' selected' : '' }}>{{ $country->name }}</option>
+                    @endforeach
+                </select>
+
+                <div class="invalid-feedback">{{ $errors->first('country_id') }}</div>
+            </div>
+
+            <div class="form-group">
                 <label for="name">Группа</label>
                 <select name="group_id" class="form-control">
                     <option value="" disabled{{  old('group_id') ? '' : ' selected' }}>Выберите группу</option>

@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Item;
 use App\Shop;
 use App\Brand;
+use App\Country;
 use App\Group;
 use App\Contractor;
 use App\Http\Resources\ItemResouceCollection;
 use App\Http\Resources\ItemShopResourceCollection;
 use App\Http\Resources\ItemGroupResourceCollection;
 use App\Http\Resources\ItemBrandResourceCollection;
+use App\Http\Resources\ItemCountryResourceCollection;
 use App\Http\Resources\ItemUnrelatedResouceCollection;
 use App\Http\Resources\ItemRelatedResourceCollection;
 use Illuminate\Http\Request;
@@ -27,7 +29,7 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         $column = $request->input('column');
-        if (!in_array($column, ['article', 'brand_name', 'item_name', 'stock'])) {
+        if (!in_array($column, ['article', 'brand_name', 'country_name', 'item_name', 'stock'])) {
             $column = null;
         }
         $order = $request->input('order');
@@ -41,10 +43,12 @@ class ItemController extends Controller
                 'items.id as id',
                 'article',
                 'brands.name as brand_name',
+                'countries.name as country_name',
                 'items.name as item_name',
                 'stock',
             ])
-            ->leftJoin('brands', 'items.brand_id', '=', 'brands.id');
+            ->leftJoin('brands', 'items.brand_id', '=', 'brands.id')
+            ->leftJoin('countries', 'items.country_id', '=', 'countries.id');
 
         if (!$query) {
             if ($column) {
@@ -198,6 +202,46 @@ class ItemController extends Controller
         $items = $items->paginate(30, ['*'], 'page', $page);
 
         return new ItemBrandResourceCollection($items);
+    }
+
+    /**
+     * List of Country items
+     *
+     * @param Request $request
+     * @param Country $country
+     * @return ItemCountryResourceCollection
+     */
+    public function countryItems(Request $request, Country $country)
+    {
+        $column = $request->input('column');
+        if (!in_array($column, ['article', 'name', 'stock'])) {
+            $column = null;
+        }
+        $order = $request->input('order');
+        if (!in_array($order, ['asc', 'desc'])) {
+            $order = 'asc';
+        }
+
+        $items = Item::where(['country_id' => $country->id]);
+
+        $query = $request->input('q', null);
+        if ($query) {
+            $items->where('name', 'ilike', "%{$query}%");
+        }
+
+        if (!$query) {
+            if ($column) {
+                $items->orderBy($column, $order);
+            } else {
+                $items->orderBy('updated_at', 'desc');
+            }
+        }
+
+        $page = $request->input('page', 1);
+
+        $items = $items->paginate(30, ['*'], 'page', $page);
+
+        return new ItemCountryResourceCollection($items);
     }
 
     /**

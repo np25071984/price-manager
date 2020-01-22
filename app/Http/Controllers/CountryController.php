@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Brand;
 use Illuminate\Http\Request;
-use App\Http\Requests\BrandRequest;
+use App\Country;
+use App\Http\Requests\CountryRequest;
 
-class BrandController extends Controller
+class CountryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,8 +15,8 @@ class BrandController extends Controller
      */
     public function index()
     {
-        $apiLink = route('api.brand.index');
-        return view('brand/index', compact('apiLink'));
+        $apiLink = route('api.country.index');
+        return view('country/index', compact('apiLink'));
     }
 
     /**
@@ -26,7 +26,7 @@ class BrandController extends Controller
      */
     public function create()
     {
-        return view('brand/create' );
+        return view('country/create' );
     }
 
     /**
@@ -35,55 +35,56 @@ class BrandController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(BrandRequest $request)
+    public function store(CountryRequest $request)
     {
-        $brand = Brand::create([
+        $country = Country::create([
             'name' => $request->name,
         ]);
 
         $request->session()->flash('message', 'Новый бренд успешно добавлен!');
 
-        return redirect(route('brand.show' , $brand->id));
+        return redirect(route('country.show' , $country->id));
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Brand  $brand
+     * @param  \App\Country  $country
      * @return \Illuminate\Http\Response
      */
-    public function show(Brand $brand)
+    public function show(Country $country)
     {
-        $apiLink = route('api.item.brand', [$brand->id]);
+        $apiLink = route('api.item.country', [$country->id]);
 
-        return view('brand/show', compact('brand', 'apiLink'));
+        return view('country/show', compact('apiLink', 'country'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Brand  $brand
+     * @param  \App\Country  $country
      * @return \Illuminate\Http\Response
      */
-    public function edit(Brand $brand)
+    public function edit(Country $country)
     {
-        return view('brand/edit', compact('brand'));
+        return view('country/edit', compact('country'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Brand  $brand
+     * @param  \App\Country  $country
      * @return \Illuminate\Http\Response
      */
-    public function update(BrandRequest $request, Brand $brand)
+    public function update(CountryRequest $request, Country $country)
     {
-        $brand->name = $request->name;
-        $brand->save();
+        $country->name = $request->name;
+        $country->save();
 
-        $request->session()->flash('message', 'Бренд успешно обновлен!');
+        $request->session()->flash('message', 'Страна успешно обновлена!');
 
-        return redirect(route('brand.show' , $brand->id));
+        return redirect(route('country.show' , $country->id));
     }
+
 }

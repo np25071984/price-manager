@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Filesystem\Filesystem;
 
 use App\Brand;
+use App\Country;
 use App\Shop;
 use App\ShopItem;
 use App\Group;
@@ -37,9 +38,10 @@ class ItemController extends Controller
     public function create()
     {
         $shops = Shop::orderBy('name', 'asc')->get();
+        $countries = Country::orderBy('name', 'asc')->get();
         $brands = Brand::orderBy('name', 'asc')->get();
         $groups = Group::orderBy('name', 'asc')->get();
-        return view('item/create', compact('brands', 'groups', 'shops'));
+        return view('item/create', compact('brands', 'countries', 'groups', 'shops'));
     }
 
     /**
@@ -53,6 +55,7 @@ class ItemController extends Controller
         $item = \DB::transaction(function() use ($request) {
             $item = Item::create([
                 'brand_id' => $request->brand_id,
+                'country_id' => $request->country_id,
                 'group_id' => $request->group_id,
                 'article' => $request->article,
                 'name' => $request->name,
@@ -99,8 +102,9 @@ class ItemController extends Controller
     {
         $shops = Shop::orderBy('name', 'asc')->get();
         $brands = Brand::orderBy('name', 'asc')->get();
+        $countries = Country::orderBy('name', 'asc')->get();
         $groups = Group::orderBy('name', 'asc')->get();
-        return view('item/edit', compact('item', 'shops', 'brands', 'groups'));
+        return view('item/edit', compact('item', 'shops', 'brands', 'countries', 'groups'));
     }
 
     /**
@@ -114,6 +118,7 @@ class ItemController extends Controller
     {
         $item = \DB::transaction(function() use ($request, $item) {
             $item->brand_id = $request->brand_id;
+            $item->country_id = $request->country_id;
             $item->article = $request->article;
             $item->name = $request->name;
             $item->stock = $request->stock;

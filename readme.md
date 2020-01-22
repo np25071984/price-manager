@@ -1,11 +1,9 @@
 ## TODO
 
 * Queue for both price generation and processing with statuses
-* Item Delete button on shop page (remove from the shop)
 * add Sales for websites
 
 * add type item option (EDP/EDT/Perfume)
-* add country
 * add tag
 * add aromas
 

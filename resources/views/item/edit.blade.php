@@ -35,7 +35,20 @@
                 <div class="invalid-feedback">{{ $errors->first('brand_id') }}</div>
             </div>
 
-            <div class="form-group required">
+            <div class="form-group">
+                <label for="name">Страна</label>
+                <select name="country_id"
+                        class="form-control{{ $errors->has('country_id') ? ' is-invalid' : '' }}">
+                    <option value="" {{ $item->country ? '' : 'selected ' }} disabled>Выберите страну</option>
+                    @foreach ($countries as $country)
+                        <option {{ ($item->country && $item->country->id === $country->id) ? 'selected ' : '' }}value="{{ $country->id }}">{{ $country->name }}</option>
+                    @endforeach
+                </select>
+
+                <div class="invalid-feedback">{{ $errors->first('country_id') }}</div>
+            </div>
+
+            <div class="form-group">
                 <label for="name">Группа</label>
                 <select name="group_id"
                         class="form-control{{ $errors->has('group_id') ? ' is-invalid' : '' }}">

@@ -60,6 +60,10 @@
                                 <a class="nav-link{{ Route::current()->getName() === 'contractor.index' ? ' active' : '' }}"
                                    href="{{ route('contractor.index') }}">Поставщики</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link{{ Route::current()->getName() === 'country.index' ? ' active' : '' }}"
+                                   href="{{ route('country.index') }}">Страны</a>
+                            </li>
                         @endauth
                     </ul>
 

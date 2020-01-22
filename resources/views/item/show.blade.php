@@ -28,6 +28,13 @@
 
         <div class="row">
             <div class="col-4 text-right">
+                <strong>Страна</strong>
+            </div>
+            <div class="col-8">{{ $item->country->name }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-4 text-right">
                 <strong>Группа</strong>
             </div>
             <div class="col-8">{{ $item->group ? $item->group->name : ''}}</div>

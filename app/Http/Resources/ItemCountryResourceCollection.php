@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class ItemResouceCollection extends ResourceCollection
+class ItemCountryResourceCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -15,7 +15,7 @@ class ItemResouceCollection extends ResourceCollection
     public function toArray($request)
     {
         $column = $request->input('column');
-        if ($column && !in_array($column, ['article', 'brand_name', 'item_name', 'stock'])) {
+        if ($column && !in_array($column, ['article', 'name', 'stock'])) {
             $column = null;
         }
 
@@ -36,27 +36,11 @@ class ItemResouceCollection extends ResourceCollection
                     'title' => 'Артикул'
                 ],
                 [
-                    'class' => ['text-center'],
-                    'sortable' => true,
-                    'sort' => ($column === 'brand_name') ? $order : false,
-                    'type' => 'text',
-                    'code' => 'brand_name',
-                    'title' => 'Бренд'
-                ],
-                [
-                    'class' => ['text-center'],
-                    'sortable' => true,
-                    'sort' => ($column === 'country_name') ? $order : false,
-                    'type' => 'text',
-                    'code' => 'country_name',
-                    'title' => 'Страна'
-                ],
-                [
                     'class' => '',
                     'sortable' => true,
-                    'sort' => ($column === 'item_name') ? $order : false,
+                    'sort' => ($column === 'name') ? $order : false,
                     'type' => 'text',
-                    'code' => 'item_name',
+                    'code' => 'name',
                     'title' => 'Наименование товара'
                 ],
                 [

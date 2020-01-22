@@ -21,6 +21,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('contractor', 'ContractorController')->except(['destroy']);
     Route::resource('group', 'GroupController')->except(['destroy']);
     Route::resource('shop', 'ShopController')->except(['destroy']);
+    Route::resource('country', 'CountryController')->except(['destroy']);
 
     // upload own price list
     Route::get('upload', 'ItemController@priceUploadForm')->name('item.upload_form');
