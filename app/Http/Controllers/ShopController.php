@@ -6,6 +6,8 @@ use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
 use App\Jobs\GeneratePrice;
 use App\Shop;
+use App\ShopItem;
+use App\Item;
 use App\PriceGenerationStatus;
 use Illuminate\Http\Request;
 
@@ -29,13 +31,13 @@ class ShopController extends Controller
      */
     public function create()
     {
-        return view('shop/create' );
+        return view('shop/create');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -47,13 +49,13 @@ class ShopController extends Controller
 
         $request->session()->flash('message', 'Новый магазин успешно добавлен!');
 
-        return redirect(route('shop.show' , $shop->id));
+        return redirect(route('shop.show', $shop->id));
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Shop  $shop
+     * @param \App\Shop $shop
      * @return \Illuminate\Http\Response
      */
     public function show(Shop $shop)
@@ -66,7 +68,7 @@ class ShopController extends Controller
             $filesystem = new Filesystem;
             $pathinfo = pathinfo($files[0]);
 
-            $price = sprintf("%s (%s Кб)", $pathinfo['basename'], ceil($filesystem->size($files[0])/1024));
+            $price = sprintf("%s (%s Кб)", $pathinfo['basename'], ceil($filesystem->size($files[0]) / 1024));
         } else {
             $price = null;
         }
@@ -79,7 +81,7 @@ class ShopController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Shop  $shop
+     * @param \App\Shop $shop
      * @return \Illuminate\Http\Response
      */
     public function edit(Shop $shop)
@@ -90,8 +92,8 @@ class ShopController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Shop  $shop
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Shop $shop
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Shop $shop)
@@ -102,7 +104,7 @@ class ShopController extends Controller
 
         $request->session()->flash('message', 'Магазин успешно обновлен!');
 
-        return redirect(route('shop.show' , $shop->id));
+        return redirect(route('shop.show', $shop->id));
     }
 
     public function priceGenerate(Request $request, Shop $shop)
@@ -130,6 +132,24 @@ class ShopController extends Controller
         $request->session()->flash('message', 'Запущен процесс генерации нового прайса!');
 
         return redirect(route('shop.show', $shopId));
+    }
+
+    public function editItem(ShopItem $shopItem)
+    {
+        $shop = $shopItem->shop;
+        $item = $shopItem->item;
+
+        return view('shopitem/shop-item-edit', compact('shop', 'item', 'shopItem'));
+    }
+
+    public function updateItem(Request $request, ShopItem $shopItem)
+    {
+        $shopItem->price = (float) $request->price;
+        $shopItem->save();
+
+        $request->session()->flash('message', 'Товар успешно обновлен!');
+
+        return redirect(route('shop.show', $shopItem->shop_id));
     }
 
 }

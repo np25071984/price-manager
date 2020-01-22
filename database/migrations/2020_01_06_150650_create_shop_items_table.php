@@ -14,6 +14,7 @@ class CreateShopItemsTable extends Migration
     public function up()
     {
         Schema::create('shop_items', function (Blueprint $table) {
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('item_id');
             $table->unsignedBigInteger('shop_id');
             $table->float('price')->nullable();

@@ -38,4 +38,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('contractor/{contractor}/{contractorItem}/relation', 'ContractorController@showReationForm')->name('contractor.relation_form');
     Route::post('contractor/{contractor}/{contractorItem}/relation', 'ContractorController@updateRelation')->name('contractor.relation_update');
 
+    Route::get('shopitem/{shopItem}/edit', 'ShopController@editItem')->name('shop.item.edit');
+    Route::post('shopitem/{shopItem}/edit', 'ShopController@updateItem')->name('shop.item.update');
+
 });

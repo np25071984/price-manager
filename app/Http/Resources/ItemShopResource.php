@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\ShopItem;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ItemShopResource extends JsonResource
@@ -15,6 +16,12 @@ class ItemShopResource extends JsonResource
     public function toArray($request)
     {
         $controls = [];
+
+        $shopItem = ShopItem::firstOrCreate([
+            'shop_id' => $request->shop->id,
+            'item_id' => $this->id,
+        ]);
+
         $controls[] = [
             'name' => 'button-component',
             'class' => ['fa', 'fa-lg', 'fa-eye', 'm-1'],
@@ -26,7 +33,7 @@ class ItemShopResource extends JsonResource
             'name' => 'button-component',
             'class' => ['fa', 'fa-lg', 'fa-edit', 'm-1'],
             'title' => 'Редактировать товар',
-            'href' => route('item.edit', [$this->id]),
+            'href' => route('shop.item.edit', [$shopItem->id]),
             'clickevent' => null,
         ];
         $controls[] = [
@@ -44,7 +51,7 @@ class ItemShopResource extends JsonResource
             'id' => $this->id,
             'article' => $this->article,
             'name' => $this->name,
-            'price' => $this->price,
+            'price' => $shopItem->price,
             'stock' => $this->stock,
             'func' => $controls,
         ];
