@@ -63,6 +63,13 @@
 
         <div class="row">
             <div class="col-4 text-right">
+                <strong>Объем</strong>
+            </div>
+            <div class="col-8">{{ $item->volume }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-4 text-right">
                 <strong>Остаток</strong>
             </div>
             <div class="col-8">{{ $item->stock }}</div>

@@ -61,6 +61,7 @@ class ItemController extends Controller
                 'article' => $request->article,
                 'type' => $request->type,
                 'name' => $request->name,
+                'volume' => $request->volume,
                 'stock' => $request->stock,
             ]);
 
@@ -125,6 +126,7 @@ class ItemController extends Controller
             $item->article = $request->article;
             $item->type = $request->type;
             $item->name = $request->name;
+            $item->volume = $request->volume;
             $item->stock = $request->stock;
 
             ShopItem::query()->where([

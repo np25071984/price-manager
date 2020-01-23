@@ -12,7 +12,7 @@
             <input type="hidden" name="_method" value="PUT">
 
             <div class="form-group">
-                <label for="name">Магазины</label>
+                <label for="shop_id[]">Магазины</label>
                 <select name="shop_id[]" class="form-control" size="3" multiple>
                     @foreach ($shops as $shop)
                         <option value="{{ $shop->id }}"{{  in_array($shop->id, $item->shopIds()) ? ' selected' : '' }}>{{ $shop->name }}</option>
@@ -23,7 +23,7 @@
             </div>
 
             <div class="form-group required">
-                <label for="name">Бренд</label>
+                <label for="brand_id">Бренд</label>
                 <select name="brand_id"
                         class="form-control{{ $errors->has('brand_id') ? ' is-invalid' : '' }}">
                     <option value="" disabled>Выберите бренд</option>
@@ -36,7 +36,7 @@
             </div>
 
             <div class="form-group">
-                <label for="name">Страна</label>
+                <label for="county_id">Страна</label>
                 <select name="country_id"
                         class="form-control{{ $errors->has('country_id') ? ' is-invalid' : '' }}">
                     <option value="" {{ $item->country ? '' : 'selected ' }} disabled>Выберите страну</option>
@@ -49,7 +49,7 @@
             </div>
 
             <div class="form-group">
-                <label for="name">Группа</label>
+                <label for="group_id">Группа</label>
                 <select name="group_id"
                         class="form-control{{ $errors->has('group_id') ? ' is-invalid' : '' }}">
                     <option value="" disabled>Выберите группу</option>
@@ -62,7 +62,7 @@
             </div>
 
             <div class="form-group required">
-                <label for="name">Тип</label>
+                <label for="type">Тип</label>
                 <select name="type" class="form-control">
                     <option value="" disabled{{  old('type') ? '' : ' selected' }}>Выберите тип парфюмерной продукции</option>
                     @foreach ($types as $type)
@@ -74,7 +74,7 @@
             </div>
 
             <div class="form-group required">
-                <label for="name">Артикул</label>
+                <label for="article">Артикул</label>
                 <input type="text"
                        class="form-control{{ $errors->has('article') ? ' is-invalid' : '' }}"
                        name="article"
@@ -95,8 +95,18 @@
                 <div class="invalid-feedback">{{ $errors->first('name') }}</div>
             </div>
 
-            <div class="form-group required">
-                <label for="name">Остаток</label>
+            <div class="form-group">
+                <label for="volume">Объем</label>
+                <input type="text"
+                       class="form-control{{ $errors->has('volume') ? ' is-invalid' : '' }}"
+                       name="volume"
+                       value="{{ $item->volume }}">
+
+                <div class="invalid-feedback">{{ $errors->first('volume') }}</div>
+            </div>
+
+            <div class="form-group">
+                <label for="stock">Остаток</label>
                 <input type="text"
                        class="form-control{{ $errors->has('stock') ? ' is-invalid' : '' }}"
                        name="stock"
@@ -104,7 +114,6 @@
 
                 <div class="invalid-feedback">{{ $errors->first('stock') }}</div>
             </div>
-
 
             <div class="row">
                 <div class="col-12">

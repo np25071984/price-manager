@@ -72,7 +72,7 @@
             </div>
 
             <div class="form-group required">
-                <label for="name">Артикул</label>
+                <label for="article">Артикул</label>
                 <input type="text"
                        class="form-control{{ $errors->has('article') ? ' is-invalid' : '' }}"
                        name="article"
@@ -94,7 +94,17 @@
             </div>
 
             <div class="form-group">
-                <label for="name">Остаток</label>
+                <label for="volume">Объем</label>
+                <input type="text"
+                       class="form-control{{ $errors->has('volume') ? ' is-invalid' : '' }}"
+                       name="volume"
+                       value="{{ old('volume') }}">
+
+                <div class="invalid-feedback">{{ $errors->first('volume') }}</div>
+            </div>
+
+            <div class="form-group">
+                <label for="stock">Остаток</label>
                 <input type="text"
                        class="form-control{{ $errors->has('stock') ? ' is-invalid' : '' }}"
                        name="stock"

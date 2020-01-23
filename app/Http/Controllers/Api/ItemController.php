@@ -44,7 +44,7 @@ class ItemController extends Controller
                 'article',
                 'brands.name as brand_name',
                 'countries.name as country_name',
-                \DB::raw("CONCAT(items.name, ' ', items.type) AS item_name"),
+                \DB::raw("CONCAT(items.name, ' ', items.volume, ' ', items.type) AS item_name"),
                 'stock',
             ])
             ->leftJoin('brands', 'items.brand_id', '=', 'brands.id')
