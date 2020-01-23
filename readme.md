@@ -4,6 +4,7 @@
 * add Sales for websites
 
 * add type item option (EDP/EDT/Perfume)
+* add valume
 * add tag
 * add aromas
 

@@ -30,7 +30,7 @@
             <div class="col-4 text-right">
                 <strong>Страна</strong>
             </div>
-            <div class="col-8">{{ $item->country->name }}</div>
+            <div class="col-8">{{ $item->country ? $item->country->name : '' }}</div>
         </div>
 
         <div class="row">
@@ -38,6 +38,13 @@
                 <strong>Группа</strong>
             </div>
             <div class="col-8">{{ $item->group ? $item->group->name : ''}}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-4 text-right">
+                <strong>Тип</strong>
+            </div>
+            <div class="col-8">{{ $item->type }}</div>
         </div>
 
         <div class="row">

@@ -41,7 +41,8 @@ class ItemController extends Controller
         $countries = Country::orderBy('name', 'asc')->get();
         $brands = Brand::orderBy('name', 'asc')->get();
         $groups = Group::orderBy('name', 'asc')->get();
-        return view('item/create', compact('brands', 'countries', 'groups', 'shops'));
+        $types = Item::getTypes();
+        return view('item/create', compact('brands', 'countries', 'groups', 'shops', 'types'));
     }
 
     /**
@@ -58,6 +59,7 @@ class ItemController extends Controller
                 'country_id' => $request->country_id,
                 'group_id' => $request->group_id,
                 'article' => $request->article,
+                'type' => $request->type,
                 'name' => $request->name,
                 'stock' => $request->stock,
             ]);
@@ -104,7 +106,8 @@ class ItemController extends Controller
         $brands = Brand::orderBy('name', 'asc')->get();
         $countries = Country::orderBy('name', 'asc')->get();
         $groups = Group::orderBy('name', 'asc')->get();
-        return view('item/edit', compact('item', 'shops', 'brands', 'countries', 'groups'));
+        $types = Item::getTypes();
+        return view('item/edit', compact('item', 'shops', 'brands', 'countries', 'groups', 'types'));
     }
 
     /**
@@ -120,6 +123,7 @@ class ItemController extends Controller
             $item->brand_id = $request->brand_id;
             $item->country_id = $request->country_id;
             $item->article = $request->article;
+            $item->type = $request->type;
             $item->name = $request->name;
             $item->stock = $request->stock;
 

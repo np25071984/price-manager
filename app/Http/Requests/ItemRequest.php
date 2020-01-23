@@ -24,10 +24,10 @@ class ItemRequest extends FormRequest
     public function rules()
     {
         $item = $this->route('item');
-        $userId = \Auth::user()->id;
 
         return [
             'brand_id' => 'required',
+            'type' => 'required',
             'article' => 'required|min:3|unique:items,article,' . ($item ? $item->id : 'NULL') . ',id',
             'name' => 'required|min:3|unique:items,name,' . ($item ? $item->id : 'NULL') . ',id',
         ];
@@ -42,6 +42,7 @@ class ItemRequest extends FormRequest
     {
         return [
             'brand_id.required' => 'Выберите бренд',
+            'type.required' => 'Выберите тип парфюмерной продукции',
             'article.required' => 'Укажите артикул товара',
             'article.min' => 'Артикул не может быть меньше трех символов',
             'article.unique' => 'Товар с таким артикулом уже существует',

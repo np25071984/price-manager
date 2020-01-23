@@ -6,7 +6,12 @@ use App\SmartSearch;
 
 class Item extends SmartSearch
 {
-    protected $fillable = ['brand_id', 'group_id', 'country_id', 'article', 'name', 'stock'];
+    protected $fillable = ['brand_id', 'group_id', 'country_id', 'article', 'name', 'type', 'stock'];
+
+    public static function getTypes()
+    {
+        return ['EDP', 'EDT', 'EDC', 'Perfume', 'Perfume extract', 'Dry perfume', 'Perfume oil'];
+    }
 
     protected static function boot()
     {

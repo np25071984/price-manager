@@ -10,10 +10,10 @@
             {{ csrf_field() }}
 
             <div class="form-group">
-                <label for="name">Магазины</label>
+                <label for="shop_id[]">Магазины</label>
                 <select name="shop_id[]" class="form-control" size="3" multiple>
                     @foreach ($shops as $shop)
-                        <option value="{{ $shop->id }}"{{  old('shop_id') === $shop->id ? ' selected' : '' }}>{{ $shop->name }}</option>
+                        <option value="{{ $shop->id }}"{{  is_array(old('shop_id')) && in_array($shop->id, old('shop_id'))  ? ' selected' : '' }}>{{ $shop->name }}</option>
                     @endforeach
                 </select>
 
@@ -21,7 +21,7 @@
             </div>
 
             <div class="form-group required">
-                <label for="name">Бренд</label>
+                <label for="brand_id">Бренд</label>
                 <select name="brand_id"
                         class="form-control{{ $errors->has('brand_id') ? ' is-invalid' : '' }}">
                     <option value="" disabled{{  old('brand_id') ? '' : ' selected' }}>Выберите бренд</option>
@@ -34,7 +34,7 @@
             </div>
 
             <div class="form-group">
-                <label for="name">Страна</label>
+                <label for="county_id">Страна</label>
                 <select name="country_id"
                         class="form-control{{ $errors->has('country_id') ? ' is-invalid' : '' }}">
                     <option value="" disabled{{  old('country_id') ? '' : ' selected' }}>Выберите страну</option>
@@ -47,7 +47,7 @@
             </div>
 
             <div class="form-group">
-                <label for="name">Группа</label>
+                <label for="group_id">Группа</label>
                 <select name="group_id" class="form-control">
                     <option value="" disabled{{  old('group_id') ? '' : ' selected' }}>Выберите группу</option>
                     @foreach ($groups as $group)
@@ -56,6 +56,19 @@
                 </select>
 
                 <div class="invalid-feedback">{{ $errors->first('group_id') }}</div>
+            </div>
+
+            <div class="form-group required">
+                <label for="type">Тип</label>
+                <select name="type"
+                        class="form-control{{ $errors->has('type') ? ' is-invalid' : '' }}">
+                    <option value="" disabled{{  old('type') ? '' : ' selected' }}>Выберите тип парфюмерной продукции</option>
+                    @foreach ($types as $type)
+                        <option value="{{ $type }}"{{  old('type') === $type ? ' selected' : '' }}>{{ $type }}</option>
+                    @endforeach
+                </select>
+
+                <div class="invalid-feedback">{{ $errors->first('type') }}</div>
             </div>
 
             <div class="form-group required">

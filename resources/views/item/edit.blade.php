@@ -62,6 +62,18 @@
             </div>
 
             <div class="form-group required">
+                <label for="name">Тип</label>
+                <select name="type" class="form-control">
+                    <option value="" disabled{{  old('type') ? '' : ' selected' }}>Выберите тип парфюмерной продукции</option>
+                    @foreach ($types as $type)
+                        <option value="{{ $type }}"{{  $item->type === $type ? ' selected' : '' }}>{{ $type }}</option>
+                    @endforeach
+                </select>
+
+                <div class="invalid-feedback">{{ $errors->first('type') }}</div>
+            </div>
+
+            <div class="form-group required">
                 <label for="name">Артикул</label>
                 <input type="text"
                        class="form-control{{ $errors->has('article') ? ' is-invalid' : '' }}"
