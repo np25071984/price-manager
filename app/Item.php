@@ -53,6 +53,20 @@ class Item extends SmartSearch
     }
 
     /**
+     * Get all aroma`s Ids.
+     *
+     * @return array
+     */
+    public function aromaIds()
+    {
+        $ids = [];
+        foreach ($this->aromas as $aroma) {
+            $ids[] = $aroma->id;
+        }
+        return $ids;
+    }
+
+    /**
      * @return App\Brand
      */
     public function brand() {
@@ -64,6 +78,20 @@ class Item extends SmartSearch
      */
     public function country() {
         return $this->hasOne('App\Country', 'id', 'country_id');
+    }
+
+    /**
+     * @return App\Aroma[]
+     */
+    public function aromas() {
+        return $this->hasManyThrough(
+            'App\Aroma',
+            'App\ItemAroma',
+            'item_id',
+            'id',
+            'id',
+            'aroma_id'
+        )->orderBy('name', 'asc');
     }
 
     /**

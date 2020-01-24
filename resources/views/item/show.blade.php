@@ -49,6 +49,19 @@
 
         <div class="row">
             <div class="col-4 text-right">
+                <strong>Ароматы</strong>
+            </div>
+            <div class="col-8">
+                <ul>
+                    @foreach ($item->aromas as $aroma)
+                        <li>{{ $aroma->name }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-4 text-right">
                 <strong>Артикул</strong>
             </div>
             <div class="col-8">{{ $item->article }}</div>

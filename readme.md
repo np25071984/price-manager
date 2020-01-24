@@ -3,10 +3,7 @@
 * Queue for both price generation and processing with statuses
 * add Sales for websites
 
-* add type item option (EDP/EDT/Perfume)
-* add valume
 * add tag
-* add aromas
 
 ## Deployment
 

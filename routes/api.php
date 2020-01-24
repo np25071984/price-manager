@@ -26,6 +26,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('country', 'Api\CountryController@index')->name('api.country.index');
     Route::delete('country/{country}', 'Api\CountryController@destroy')->name('api.country.destroy');
 
+    Route::get('aroma', 'Api\AromaController@index')->name('api.aroma.index');
+    Route::delete('aroma/{aroma}', 'Api\AromaController@destroy')->name('api.aroma.destroy');
+
     Route::get('shop', 'Api\ShopController@index')->name('api.shop.index');
     Route::delete('shop/{shop}', 'Api\ShopController@destroy')->name('api.shop.destroy');
     Route::delete('shop/{shop}/{item}', 'Api\ShopController@remove')->name('api.shop.remove_item');

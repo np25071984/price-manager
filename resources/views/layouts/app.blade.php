@@ -64,6 +64,10 @@
                                 <a class="nav-link{{ Route::current()->getName() === 'country.index' ? ' active' : '' }}"
                                    href="{{ route('country.index') }}">Страны</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link{{ Route::current()->getName() === 'aroma.index' ? ' active' : '' }}"
+                                   href="{{ route('aroma.index') }}">Ароматы</a>
+                            </li>
                         @endauth
                     </ul>
 

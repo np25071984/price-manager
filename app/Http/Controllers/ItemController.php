@@ -10,6 +10,8 @@ use App\Shop;
 use App\ShopItem;
 use App\Group;
 use App\Item;
+use App\Aroma;
+use App\ItemAroma;
 use App\Jobs\ParsePrice;
 use Illuminate\Http\Request;
 use App\Http\Requests\ItemRequest;
@@ -42,7 +44,11 @@ class ItemController extends Controller
         $brands = Brand::orderBy('name', 'asc')->get();
         $groups = Group::orderBy('name', 'asc')->get();
         $types = Item::getTypes();
-        return view('item/create', compact('brands', 'countries', 'groups', 'shops', 'types'));
+        $aromas = Aroma::orderBy('name', 'asc')->get();
+        return view(
+            'item/create',
+            compact('brands', 'countries', 'groups', 'shops', 'types', 'aromas')
+        );
     }
 
     /**
@@ -70,6 +76,15 @@ class ItemController extends Controller
                     ShopItem::create([
                         'item_id' => $item->id,
                         'shop_id' => $shopId,
+                    ]);
+                }
+            }
+
+            if ($request->aroma_id) {
+                foreach ($request->aroma_id as $aromaId) {
+                    ItemAroma::create([
+                        'item_id' => $item->id,
+                        'aroma_id' => $aromaId,
                     ]);
                 }
             }
@@ -108,7 +123,11 @@ class ItemController extends Controller
         $countries = Country::orderBy('name', 'asc')->get();
         $groups = Group::orderBy('name', 'asc')->get();
         $types = Item::getTypes();
-        return view('item/edit', compact('item', 'shops', 'brands', 'countries', 'groups', 'types'));
+        $aromas = Aroma::orderBy('name', 'asc')->get();
+        return view(
+            'item/edit',
+            compact('item', 'shops', 'brands', 'countries', 'groups', 'types', 'aromas')
+        );
     }
 
     /**
@@ -137,6 +156,18 @@ class ItemController extends Controller
                     ShopItem::create([
                         'item_id' => $item->id,
                         'shop_id' => $shopId,
+                    ]);
+                }
+            }
+
+            ItemAroma::query()->where([
+                'item_id' => $item->id,
+            ])->delete();
+            if ($request->aroma_id) {
+                foreach ($request->aroma_id as $aromaId) {
+                    ItemAroma::create([
+                        'item_id' => $item->id,
+                        'aroma_id' => $aromaId,
                     ]);
                 }
             }

@@ -73,6 +73,17 @@
                 <div class="invalid-feedback">{{ $errors->first('type') }}</div>
             </div>
 
+            <div class="form-group">
+                <label for="aroma_id[]">Ароматы</label>
+                <select name="aroma_id[]" class="form-control" size="3" multiple>
+                    @foreach ($aromas as $aroma)
+                        <option value="{{ $aroma->id }}"{{ in_array($aroma->id, $item->aromaIds())  ? ' selected' : '' }}>{{ $aroma->name }}</option>
+                    @endforeach
+                </select>
+
+                <div class="invalid-feedback">{{ $errors->first('aroma_id') }}</div>
+            </div>
+
             <div class="form-group required">
                 <label for="article">Артикул</label>
                 <input type="text"
