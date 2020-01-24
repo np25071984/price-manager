@@ -12,6 +12,8 @@ use App\Group;
 use App\Item;
 use App\Aroma;
 use App\ItemAroma;
+use App\Tag;
+use App\ItemTag;
 use App\Jobs\ParsePrice;
 use Illuminate\Http\Request;
 use App\Http\Requests\ItemRequest;
@@ -45,9 +47,10 @@ class ItemController extends Controller
         $groups = Group::orderBy('name', 'asc')->get();
         $types = Item::getTypes();
         $aromas = Aroma::orderBy('name', 'asc')->get();
+        $tags = Tag::orderBy('name', 'asc')->get();
         return view(
             'item/create',
-            compact('brands', 'countries', 'groups', 'shops', 'types', 'aromas')
+            compact('brands', 'countries', 'groups', 'shops', 'types', 'aromas', 'tags')
         );
     }
 
@@ -59,6 +62,7 @@ class ItemController extends Controller
      */
     public function store(ItemRequest $request)
     {
+
         $item = \DB::transaction(function() use ($request) {
             $item = Item::create([
                 'brand_id' => $request->brand_id,
@@ -88,6 +92,8 @@ class ItemController extends Controller
                     ]);
                 }
             }
+
+            $this->fillTags($item, $request->tags);
 
             return $item;
         });
@@ -124,9 +130,11 @@ class ItemController extends Controller
         $groups = Group::orderBy('name', 'asc')->get();
         $types = Item::getTypes();
         $aromas = Aroma::orderBy('name', 'asc')->get();
+        $allTags = Tag::orderBy('name', 'asc')->get();
+        $itemTags = $item->tags;
         return view(
             'item/edit',
-            compact('item', 'shops', 'brands', 'countries', 'groups', 'types', 'aromas')
+            compact('item', 'shops', 'brands', 'countries', 'groups', 'types', 'aromas', 'allTags', 'itemTags')
         );
     }
 
@@ -172,6 +180,11 @@ class ItemController extends Controller
                 }
             }
 
+            ItemTag::query()->where([
+                'item_id' => $item->id,
+            ])->delete();
+            $this->fillTags($item, $request->tags);
+
             return $item;
         });
 
@@ -180,6 +193,30 @@ class ItemController extends Controller
         $request->session()->flash('message', 'Товар успешно обновлен!');
 
         return redirect(route('item.show' , $item->id));
+    }
+
+    private function fillTags(Item $item, $requestTags)
+    {
+        if ($requestTags) {
+            foreach(json_decode($requestTags) as $tag) {
+                if (empty($tag->key)) {
+                    // a new tag
+                    $tt = Tag::firstOrCreate(['name' => $tag->value]);
+                    $t = $tt->id;
+                } else {
+                    // an existed tag
+                    $t = $tag->key;
+                }
+
+                ItemTag::create([
+                    'item_id' => $item->id,
+                    'tag_id' => $t,
+                ]);
+            }
+        }
+
+        // remove unused tags
+        Tag::query()->whereNotIn('id', ItemTag::query()->select('tag_id')->distinct())->delete();
     }
 
     public function priceUploadForm()

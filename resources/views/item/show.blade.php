@@ -88,6 +88,19 @@
             <div class="col-8">{{ $item->stock }}</div>
         </div>
 
+        <div class="row">
+            <div class="col-4 text-right">
+                <strong>Тэги</strong>
+            </div>
+            <div class="col-8">
+                <ul>
+                    @foreach ($item->tags as $tag)
+                        <li>{{ $tag->name }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+
         <h2 class="mt-5">Предложения поставщиков</h2>
 
         <table-component api-link="{{ $apiLink }}"></table-component>

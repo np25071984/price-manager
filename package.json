@@ -25,6 +25,7 @@
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.9.0",
+        "@voerro/vue-tagsinput": "^2.1.0",
         "laravel-vue-pagination": "^2.3.0",
         "vue-resource": "^1.5.1"
     }

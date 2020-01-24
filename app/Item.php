@@ -95,6 +95,20 @@ class Item extends SmartSearch
     }
 
     /**
+     * @return App\Tag[]
+     */
+    public function tags() {
+        return $this->hasManyThrough(
+            'App\Tag',
+            'App\ItemTag',
+            'item_id',
+            'id',
+            'id',
+            'tag_id'
+        )->orderBy('name', 'asc');
+    }
+
+    /**
      * @return App\Group
      */
     public function group() {

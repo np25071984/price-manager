@@ -3,8 +3,6 @@
 * Queue for both price generation and processing with statuses
 * add Sales for websites
 
-* add tag
-
 ## Deployment
 
 \# apt get git, docker, docker-compose

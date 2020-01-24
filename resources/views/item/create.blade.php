@@ -124,6 +124,24 @@
                 <div class="invalid-feedback">{{ $errors->first('stock') }}</div>
             </div>
 
+            <div class="form-group">
+                <label for="tags">Тэги</label>
+                <tags-input element-id="tags"
+                    wrapper-class='form-control'
+                    :value="[
+                        @if (old('tags'))
+                            @foreach (json_decode(old('tags')) as $tag)
+                                { key: '{{ $tag->key }}', value: '{{ $tag->value }}' },
+                            @endforeach
+                        @endif
+                    ]"
+                    :existing-tags="[
+                        @foreach ($tags as $tag)
+                            { key: '{{ $tag->id }}', value: '{{ $tag->name }}' },
+                        @endforeach
+                    ]"
+                    :typeahead="true"></tags-input>
+            </div>
 
             <div class="row">
                 <div class="col-12">

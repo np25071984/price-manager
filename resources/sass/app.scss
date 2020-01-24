@@ -11,6 +11,7 @@
 @import '~@fortawesome/fontawesome-free/scss/regular';
 @import '~@fortawesome/fontawesome-free/scss/solid';
 @import '~@fortawesome/fontawesome-free/scss/brands';
+@import '~@voerro/vue-tagsinput/dist/style.css';
 
 .form-group.required label:after {
   content: "*";
