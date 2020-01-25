@@ -3,6 +3,8 @@
 * Queue for both price generation and processing with statuses
 * add Sales for websites
 
+* Remove app.js, app.css from Git
+
 ## Deployment
 
 \# apt get git, docker, docker-compose

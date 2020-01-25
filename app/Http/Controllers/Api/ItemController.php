@@ -323,4 +323,19 @@ class ItemController extends Controller
 
         return new ItemGroupResourceCollection($items);
     }
+
+
+    /**
+     * Remove Item from the Group
+     *
+     * @param Item $item
+     * @return \Illuminate\Http\Response
+     */
+    public function groupRemove(Item $item)
+    {
+        $item->group_id = null;
+        $item->save();
+
+        return response()->json(null, 204);
+    }
 }
