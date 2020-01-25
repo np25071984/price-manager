@@ -53,21 +53,25 @@
                                    href="{{ route('shop.index') }}">Магазины</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link{{ Route::current()->getName() === 'brand.index' ? ' active' : '' }}"
-                                   href="{{ route('brand.index') }}">Бренды</a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link{{ Route::current()->getName() === 'contractor.index' ? ' active' : '' }}"
                                    href="{{ route('contractor.index') }}">Поставщики</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link{{ Route::current()->getName() === 'country.index' ? ' active' : '' }}"
-                                   href="{{ route('country.index') }}">Страны</a>
+
+                            <li class="nav-item dropdown">
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Другие справочники<span class="caret"></span>
+                                </a>
+
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item {{ Route::current()->getName() === 'country.index' ? ' active' : '' }}"
+                                       href="{{ route('country.index') }}">Страны</a>
+                                    <a class="dropdown-item {{ Route::current()->getName() === 'brand.index' ? ' active' : '' }}"
+                                       href="{{ route('brand.index') }}">Бренды</a>
+                                    <a class="dropdown-item {{ Route::current()->getName() === 'aroma.index' ? ' active' : '' }}"
+                                       href="{{ route('aroma.index') }}">Ароматы</a>
+                                </div>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link{{ Route::current()->getName() === 'aroma.index' ? ' active' : '' }}"
-                                   href="{{ route('aroma.index') }}">Ароматы</a>
-                            </li>
+
                         @endauth
                     </ul>
 
