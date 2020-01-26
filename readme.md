@@ -2,8 +2,8 @@
 
 * Queue for both price generation and processing with statuses
 * add Sales for websites
-
-* Remove app.js, app.css from Git
+* subdirs in Resources
+* common template parts
 
 ## Deployment
 
