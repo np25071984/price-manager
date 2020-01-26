@@ -252,19 +252,6 @@ class ItemController extends Controller
         return redirect(route('main'));
     }
 
-    public function priceDownload()
-    {
-        $path = storage_path('prices/' . \Auth::id());
-
-        $files = glob($path . '/*.xlsx');
-
-        if (!isset($files[0])) {
-            abort(404);
-        }
-
-        return response()->download($files[0]);
-    }
-
     public function priceGenerate(Request $request)
     {
         $path = storage_path('prices/');

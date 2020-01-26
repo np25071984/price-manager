@@ -31,7 +31,7 @@ Route::group(['middleware' => 'auth'], function () {
     // download own price list
     Route::get('generate/{shop}', 'ShopController@priceGenerate')->name('shop.generate');
 
-    Route::get('download', 'ItemController@priceDownload')->name('item.download');
+    Route::get('shop/{shop}/download', 'ShopController@priceDownload')->name('shop.download');
 
     // upload contractor`s price list
     Route::get('contractor/{contractor}/deleted-items', 'ContractorController@deletedItems')->name('contractor.deleted_items');

@@ -54,7 +54,7 @@
                         class="form-control{{ $errors->has('group_id') ? ' is-invalid' : '' }}">
                     <option value="" disabled>Выберите группу</option>
                     @foreach ($groups as $group)
-                        <option {{ $item->group->id === $group->id ? 'selected ' : '' }}value="{{ $group->id }}">{{ $group->name }}</option>
+                        <option {{ $item->group && $item->group->id === $group->id ? 'selected ' : '' }}value="{{ $group->id }}">{{ $group->name }}</option>
                     @endforeach
                 </select>
 

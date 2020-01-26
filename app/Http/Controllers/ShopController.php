@@ -152,4 +152,17 @@ class ShopController extends Controller
         return redirect(route('shop.show', $shopItem->shop_id));
     }
 
+    public function priceDownload(Shop $shop)
+    {
+        $path = storage_path('prices/' . $shop->id);
+
+        $files = glob($path . '/*.xlsx');
+
+        if (!isset($files[0])) {
+            abort(404);
+        }
+
+        return response()->download($files[0]);
+    }
+
 }

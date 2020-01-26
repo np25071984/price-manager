@@ -22,7 +22,7 @@
         <div class="row">
             <div class="col-6">
                 @if ($price)
-                    <a target="_blank" href="{{ route('item.download') }}"><button type="button" class="btn btn-link">{{ $price }}</button></a>
+                    <a target="_blank" href="{{ route('shop.download', $shop->id) }}"><button type="button" class="btn btn-link">{{ $price }}</button></a>
                 @else
                     Прайс не сгенерирован
                 @endif
