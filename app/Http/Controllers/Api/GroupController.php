@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Group;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\GroupResourceCollection;
+use App\Http\Resources\group\GroupResourceCollection;
 
 class GroupController extends Controller
 {

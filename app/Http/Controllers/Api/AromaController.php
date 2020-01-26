@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Aroma;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\AromaResourceCollection;
+use App\Http\Resources\aroma\AromaResourceCollection;
 
 class AromaController extends Controller
 {

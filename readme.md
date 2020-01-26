@@ -2,8 +2,8 @@
 
 * Queue for both price generation and processing with statuses
 * add Sales for websites
-* subdirs in Resources
 * common template parts
+* add 'ml' to price
 
 ## Deployment
 

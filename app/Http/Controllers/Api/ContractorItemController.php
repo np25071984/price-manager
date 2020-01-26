@@ -6,9 +6,9 @@ use App\Contractor;
 use App\ContractorItem;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ContractorItemUnrelatedResourceCollection;
-use App\Http\Resources\ContractorItemResourceCollection;
-use App\Http\Resources\ContractorItemDeletedResourceCollection;
+use App\Http\Resources\item\ContractorItemUnrelatedResourceCollection;
+use App\Http\Resources\item\ContractorItemResourceCollection;
+use App\Http\Resources\item\ContractorItemDeletedResourceCollection;
 
 class ContractorItemController extends Controller
 {

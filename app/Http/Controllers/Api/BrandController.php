@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Brand;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\BrandResourceCollection;
+use App\Http\Resources\brand\BrandResourceCollection;
 
 class BrandController extends Controller
 {

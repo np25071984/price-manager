@@ -6,7 +6,7 @@ use App\Contractor;
 use App\Item;
 use App\ContractorItem;
 use App\Relation;
-use App\Http\Resources\ContractorResourceCollection;
+use App\Http\Resources\item\ContractorResourceCollection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 

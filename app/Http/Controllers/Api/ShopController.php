@@ -7,7 +7,7 @@ use App\ShopItem;
 use App\Item;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ShopResourceCollection;
+use App\Http\Resources\shop\ShopResourceCollection;
 
 class ShopController extends Controller
 {
