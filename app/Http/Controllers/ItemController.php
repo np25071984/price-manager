@@ -17,6 +17,7 @@ use App\ItemTag;
 use App\Jobs\ParsePrice;
 use Illuminate\Http\Request;
 use App\Http\Requests\ItemRequest;
+use App\PriceProcessingJobStatus;
 
 class ItemController extends Controller
 {
