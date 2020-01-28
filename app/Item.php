@@ -6,7 +6,19 @@ use App\SmartSearch;
 
 class Item extends SmartSearch
 {
-    protected $fillable = ['brand_id', 'group_id', 'country_id', 'article', 'name', 'type', 'volume', 'stock'];
+    protected $fillable = [
+        'brand_id',
+        'group_id',
+        'country_id',
+        'article',
+        'name',
+        'description',
+        'type',
+        'volume',
+        'year',
+        'stock',
+        'is_tester'
+    ];
 
     public static function getTypes()
     {

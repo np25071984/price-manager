@@ -72,8 +72,11 @@ class ItemController extends Controller
                 'article' => $request->article,
                 'type' => $request->type,
                 'name' => $request->name,
+                'description' => $request->description,
                 'volume' => $request->volume,
+                'year' => $request->year,
                 'stock' => $request->stock,
+                'is_tester' => $request->is_tester,
             ]);
 
             if ($request->shop_id) {
@@ -133,6 +136,7 @@ class ItemController extends Controller
         $aromas = Aroma::orderBy('name', 'asc')->get();
         $allTags = Tag::orderBy('name', 'asc')->get();
         $itemTags = $item->tags;
+
         return view(
             'item/edit',
             compact('item', 'shops', 'brands', 'countries', 'groups', 'types', 'aromas', 'allTags', 'itemTags')
@@ -154,8 +158,11 @@ class ItemController extends Controller
             $item->article = $request->article;
             $item->type = $request->type;
             $item->name = $request->name;
+            $item->description = $request->description;
             $item->volume = $request->volume;
+            $item->year = $request->year;
             $item->stock = $request->stock;
+            $item->is_tester = $request->is_tester ? true : false;
 
             ShopItem::query()->where([
                 'item_id' => $item->id,

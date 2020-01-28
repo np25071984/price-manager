@@ -13,7 +13,7 @@
 
             <div class="form-group">
                 <label for="shop_id[]">Магазины</label>
-                <select name="shop_id[]" class="form-control" size="3" multiple>
+                <select id="shop_id[]" name="shop_id[]" class="form-control" size="3" multiple>
                     @foreach ($shops as $shop)
                         <option value="{{ $shop->id }}"{{  in_array($shop->id, $item->shopIds()) ? ' selected' : '' }}>{{ $shop->name }}</option>
                     @endforeach
@@ -24,7 +24,7 @@
 
             <div class="form-group required">
                 <label for="brand_id">Бренд</label>
-                <select name="brand_id"
+                <select id="brand_id" name="brand_id"
                         class="form-control{{ $errors->has('brand_id') ? ' is-invalid' : '' }}">
                     <option value="" disabled>Выберите бренд</option>
                     @foreach ($brands as $brand)
@@ -36,8 +36,8 @@
             </div>
 
             <div class="form-group">
-                <label for="county_id">Страна</label>
-                <select name="country_id"
+                <label for="country_id">Страна</label>
+                <select id="country_id" name="country_id"
                         class="form-control{{ $errors->has('country_id') ? ' is-invalid' : '' }}">
                     <option value="" {{ $item->country ? '' : 'selected ' }} disabled>Выберите страну</option>
                     @foreach ($countries as $country)
@@ -50,7 +50,7 @@
 
             <div class="form-group">
                 <label for="group_id">Группа</label>
-                <select name="group_id"
+                <select id="group_id" name="group_id"
                         class="form-control{{ $errors->has('group_id') ? ' is-invalid' : '' }}">
                     <option value="" disabled>Выберите группу</option>
                     @foreach ($groups as $group)
@@ -63,7 +63,7 @@
 
             <div class="form-group required">
                 <label for="type">Тип</label>
-                <select name="type" class="form-control">
+                <select id="type" name="type" class="form-control">
                     <option value="" disabled{{  old('type') ? '' : ' selected' }}>Выберите тип парфюмерной продукции</option>
                     @foreach ($types as $type)
                         <option value="{{ $type }}"{{  $item->type === $type ? ' selected' : '' }}>{{ $type }}</option>
@@ -75,7 +75,7 @@
 
             <div class="form-group">
                 <label for="aroma_id[]">Ароматы</label>
-                <select name="aroma_id[]" class="form-control" size="3" multiple>
+                <select id="aroma_id[]" name="aroma_id[]" class="form-control" size="3" multiple>
                     @foreach ($aromas as $aroma)
                         <option value="{{ $aroma->id }}"{{ in_array($aroma->id, $item->aromaIds())  ? ' selected' : '' }}>{{ $aroma->name }}</option>
                     @endforeach
@@ -88,6 +88,7 @@
                 <label for="article">Артикул</label>
                 <input type="text"
                        class="form-control{{ $errors->has('article') ? ' is-invalid' : '' }}"
+                       id="article"
                        name="article"
                        required
                        value="{{ $item->article }}">
@@ -99,6 +100,7 @@
                 <label for="name">Название</label>
                 <input type="text"
                        class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}"
+                       id="name"
                        name="name"
                        required
                        value="{{ $item->name }}">
@@ -107,9 +109,20 @@
             </div>
 
             <div class="form-group">
+                <label for="description">Описание</label>
+                <textarea
+                    class="form-control{{ $errors->has('description') ? ' is-invalid' : '' }}"
+                    id="description"
+                    name="description">{{ $item->description }}</textarea>
+
+                <div class="invalid-feedback">{{ $errors->first('description') }}</div>
+            </div>
+
+            <div class="form-group">
                 <label for="volume">Объем</label>
                 <input type="text"
                        class="form-control{{ $errors->has('volume') ? ' is-invalid' : '' }}"
+                       id="volume"
                        name="volume"
                        value="{{ $item->volume }}">
 
@@ -117,13 +130,36 @@
             </div>
 
             <div class="form-group">
+                <label for="year">Год выхода</label>
+                <input type="number"
+                       class="form-control{{ $errors->has('year') ? ' is-invalid' : '' }}"
+                       id="year"
+                       name="year"
+                       value="{{ $item->year }}">
+
+                <div class="invalid-feedback">{{ $errors->first('year') }}</div>
+            </div>
+
+            <div class="form-group">
                 <label for="stock">Остаток</label>
                 <input type="text"
                        class="form-control{{ $errors->has('stock') ? ' is-invalid' : '' }}"
+                       id="stock"
                        name="stock"
                        value="{{ $item->stock }}">
 
                 <div class="invalid-feedback">{{ $errors->first('stock') }}</div>
+            </div>
+
+            <div class="form-check form-group">
+                <input type="checkbox"
+                       class="form-check-input{{ $errors->has('is_tester') ? ' is-invalid' : '' }}"
+                       id="is_tester"
+                       name="is_tester"
+                       {{ $item->is_tester ? 'checked' : '' }}>
+                <label class="form-check-label" for="is_tester">Является тестером</label>
+
+                <div class="invalid-feedback">{{ $errors->first('is_tester') }}</div>
             </div>
 
             <div class="form-group">

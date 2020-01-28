@@ -76,6 +76,13 @@
 
         <div class="row">
             <div class="col-4 text-right">
+                <strong>Описание</strong>
+            </div>
+            <div class="col-8">{{ $item->description }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-4 text-right">
                 <strong>Объем</strong>
             </div>
             <div class="col-8">{{ $item->volume }}</div>
@@ -83,9 +90,23 @@
 
         <div class="row">
             <div class="col-4 text-right">
+                <strong>Год выхода</strong>
+            </div>
+            <div class="col-8">{{ $item->year }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-4 text-right">
                 <strong>Остаток</strong>
             </div>
             <div class="col-8">{{ $item->stock }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-4 text-right">
+                <strong>Является тестером</strong>
+            </div>
+            <div class="col-8">{{ $item->is_tester ? 'Да' : 'Нет' }}</div>
         </div>
 
         <div class="row">

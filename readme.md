@@ -2,11 +2,6 @@
 
 * Queue for both price generation and processing with statuses
 * add Sales for websites
-* common template parts
-* add 'ml' to price
-* add Year
-* add Description
-* add is_tester flag to Item
 
 ## Deployment
 

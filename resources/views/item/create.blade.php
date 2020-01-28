@@ -11,7 +11,7 @@
 
             <div class="form-group">
                 <label for="shop_id[]">Магазины</label>
-                <select name="shop_id[]" class="form-control" size="3" multiple>
+                <select id="shop_id[]" name="shop_id[]" class="form-control" size="3" multiple>
                     @foreach ($shops as $shop)
                         <option value="{{ $shop->id }}"{{  is_array(old('shop_id')) && in_array($shop->id, old('shop_id'))  ? ' selected' : '' }}>{{ $shop->name }}</option>
                     @endforeach
@@ -22,7 +22,7 @@
 
             <div class="form-group required">
                 <label for="brand_id">Бренд</label>
-                <select name="brand_id"
+                <select id="brand_id" name="brand_id"
                         class="form-control{{ $errors->has('brand_id') ? ' is-invalid' : '' }}">
                     <option value="" disabled{{  old('brand_id') ? '' : ' selected' }}>Выберите бренд</option>
                     @foreach ($brands as $brand)
@@ -34,8 +34,8 @@
             </div>
 
             <div class="form-group">
-                <label for="county_id">Страна</label>
-                <select name="country_id"
+                <label for="country_id">Страна</label>
+                <select id="country_id" name="country_id"
                         class="form-control{{ $errors->has('country_id') ? ' is-invalid' : '' }}">
                     <option value="" disabled{{  old('country_id') ? '' : ' selected' }}>Выберите страну</option>
                     @foreach ($countries as $country)
@@ -48,7 +48,7 @@
 
             <div class="form-group">
                 <label for="group_id">Группа</label>
-                <select name="group_id" class="form-control">
+                <select id="group_id" name="group_id" class="form-control">
                     <option value="" disabled{{  old('group_id') ? '' : ' selected' }}>Выберите группу</option>
                     @foreach ($groups as $group)
                         <option value="{{ $group->id }}"{{  old('group_id') === $group->id ? ' selected' : '' }}>{{ $group->name }}</option>
@@ -60,7 +60,7 @@
 
             <div class="form-group required">
                 <label for="type">Тип</label>
-                <select name="type"
+                <select id="type" name="type"
                         class="form-control{{ $errors->has('type') ? ' is-invalid' : '' }}">
                     <option value="" disabled{{  old('type') ? '' : ' selected' }}>Выберите тип парфюмерной продукции</option>
                     @foreach ($types as $type)
@@ -73,7 +73,7 @@
 
             <div class="form-group">
                 <label for="aroma_id[]">Ароматы</label>
-                <select name="aroma_id[]" class="form-control" size="3" multiple>
+                <select id="aroma_id[]" name="aroma_id[]" class="form-control" size="3" multiple>
                     @foreach ($aromas as $aroma)
                         <option value="{{ $aroma->id }}"{{ is_array(old('aroma_id')) && in_array($aroma->id, old('aroma_id'))  ? ' selected' : '' }}>{{ $aroma->name }}</option>
                     @endforeach
@@ -86,6 +86,7 @@
                 <label for="article">Артикул</label>
                 <input type="text"
                        class="form-control{{ $errors->has('article') ? ' is-invalid' : '' }}"
+                       id="article"
                        name="article"
                        required
                        value="{{ old('article') }}">
@@ -97,6 +98,7 @@
                 <label for="name">Название</label>
                 <input type="text"
                        class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}"
+                       id="name"
                        name="name"
                        required
                        value="{{ old('name') }}">
@@ -105,9 +107,20 @@
             </div>
 
             <div class="form-group">
+                <label for="description">Описание</label>
+                <textarea
+                       class="form-control{{ $errors->has('description') ? ' is-invalid' : '' }}"
+                       id="description"
+                       name="description">{{ old('description') }}</textarea>
+
+                <div class="invalid-feedback">{{ $errors->first('description') }}</div>
+            </div>
+
+            <div class="form-group">
                 <label for="volume">Объем</label>
                 <input type="text"
                        class="form-control{{ $errors->has('volume') ? ' is-invalid' : '' }}"
+                       id="volume"
                        name="volume"
                        value="{{ old('volume') }}">
 
@@ -115,13 +128,36 @@
             </div>
 
             <div class="form-group">
+                <label for="year">Год выхода</label>
+                <input type="number"
+                       class="form-control{{ $errors->has('year') ? ' is-invalid' : '' }}"
+                       id="year"
+                       name="year"
+                       value="{{ old('year') }}">
+
+                <div class="invalid-feedback">{{ $errors->first('year') }}</div>
+            </div>
+
+            <div class="form-group">
                 <label for="stock">Остаток</label>
                 <input type="text"
                        class="form-control{{ $errors->has('stock') ? ' is-invalid' : '' }}"
+                       id="stock"
                        name="stock"
                        value="{{ old('stock') }}">
 
                 <div class="invalid-feedback">{{ $errors->first('stock') }}</div>
+            </div>
+
+            <div class="form-check form-group">
+                <input type="checkbox"
+                       class="form-check-input{{ $errors->has('is_tester') ? ' is-invalid' : '' }}"
+                       id="is_tester"
+                       name="is_tester"
+                       {{ old('is_tester') ? 'checked' : '' }}>>
+                <label class="form-check-label" for="is_tester">Является тестером</label>
+
+                <div class="invalid-feedback">{{ $errors->first('is_tester') }}</div>
             </div>
 
             <div class="form-group">

@@ -199,12 +199,14 @@ class ParsePrice implements ShouldQueue
                 $itemType = trim($worksheet->getCellByColumnAndRow($columnType, $row)->getValue());
                 $article = trim($worksheet->getCellByColumnAndRow($columnArticle, $row)->getValue());
                 $name = trim($worksheet->getCellByColumnAndRow($columnName, $row)->getValue());
+                $description = trim($worksheet->getCellByColumnAndRow($columnDesctiption, $row)->getValue());
 
                 $aromas = [];
                 $country = null;
                 $year = null;
                 $volume = null;
                 $type = 'Dry perfume';
+                $isTester = strpos($name, ' test') === false ? false : true;
 
                 try {
                     $brand = Brand::firstOrCreate([
@@ -260,13 +262,15 @@ class ParsePrice implements ShouldQueue
                                 'article' => $article
                             ]);
                             $item->name = $name;
+                            $item->description = $description;
                             $item->brand_id = $brand ? $brand->id : null;
                             $item->country_id = $country ? $country->id : null;
-                            // $item->year = $year;
+                            $item->year = $year;
                             $item->type = $type;
                             $item->volume = (int)$volume;
                             $item->group_id = $group ? $group->id : null;
                             $item->stock = 0;
+                            $item->is_tester = $isTester;
                             $item->save();
                             ItemAroma::query()->where([
                                 'item_id' => $item->id,
