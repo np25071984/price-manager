@@ -43,6 +43,7 @@ class CreateContractorItemsTable extends Migration
     public function down()
     {
         Schema::table('contractor_items', function (Blueprint $table) {
+            $table->dropUnique(['contractor_id', 'article']);
             $table->dropForeign(['contractor_id']);
         });
 

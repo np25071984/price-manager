@@ -13,6 +13,8 @@
 
 \# vim .env
 
+> APP_ENV=local
+>
 > DB_CONNECTION=pgsql
 >
 > DB_HOST=price-db
