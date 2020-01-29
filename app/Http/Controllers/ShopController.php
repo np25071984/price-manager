@@ -145,6 +145,7 @@ class ShopController extends Controller
     public function updateItem(Request $request, ShopItem $shopItem)
     {
         $shopItem->price = (float) $request->price;
+        $shopItem->discount_price = (float) $request->discount_price;
         $shopItem->save();
 
         $request->session()->flash('message', 'Товар успешно обновлен!');

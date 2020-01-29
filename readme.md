@@ -1,7 +1,6 @@
 ## TODO
 
 * Queue for both price generation and processing with statuses
-* add Sales for websites
 
 ## Deployment
 

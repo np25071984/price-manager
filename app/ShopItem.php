@@ -8,7 +8,7 @@ use App\Shop;
 
 class ShopItem extends Model
 {
-    protected $fillable = ['item_id', 'shop_id', 'price'];
+    protected $fillable = ['item_id', 'shop_id', 'price', 'discount_price'];
 
     /**
      * @return App\Shop
