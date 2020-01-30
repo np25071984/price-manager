@@ -9,9 +9,28 @@
                type="text"
                placeholder="Поиск" />
 
+        <div v-if="isMultiselect" class="row">
+            <div class="col-4 my-auto">
+                Выбрано элементов: {{ selectedElements.length }}
+            </div>
+            <div class="col-8">
+                <div class="form-inline float-right mb-1">
+                    <select class="form-control mr-1" v-model="action">
+                        <option disabled selected value="-1">Выберите действие</option>
+                        <option v-for="(mAction, index) in multiActions" :value="index">{{ mAction.label }}</option>
+                    </select>
+                    <button class="form-control btn btn-primary" v-on:click="applyAction()" :disabled=isActionButtonDisabled>Применить</button>
+                </div>
+            </div>
+        </div>
+
         <p v-if="isLoading">Loading...</p>
+
         <table v-else class="table">
             <thead>
+                <th v-if="isMultiselect">
+                    <input type="checkbox" @change="topCheckboxHandler($event)" />
+                </th>
                 <th v-for="column in columns" :class="column.class">
                     <a v-if="column.sortable" href="#"
                             @click.prevent="sortColumn(column.code, column.sort === 'asc' ? 'desc' : 'asc')">
@@ -24,6 +43,9 @@
             </thead>
             <tbody>
                 <tr v-for="item in items">
+                    <td v-if="isMultiselect">
+                        <input type="checkbox" class="cb_item_check" :value="item.id" v-model="selectedElements" />
+                    </td>
                     <td v-for="column in columns" :class="column.class">
 
                         <span v-if="column.type === 'html'" v-html="item[column.code]"></span>
@@ -71,7 +93,15 @@
             showSearch: {
                 type: Boolean,
                 default: true,
-            }
+            },
+            multiActions: {
+                type: Array,
+                default: []
+            },
+            routes: {
+                type: Object,
+                default: {}
+            },
         },
         data() {
             return {
@@ -79,6 +109,8 @@
 
                 items: [],
                 columns: [],
+                selectedElements: [],
+                action: -1,
                 data: {},
 
                 paginationLimit: 5,
@@ -91,6 +123,49 @@
             };
         },
         methods: {
+            applyAction() {
+                const action = this.multiActions[this.action];
+                let selectedData = {
+                    ids: this.selectedElements,
+                    clarifyingStep: null,
+                };
+
+                if (action.hasOwnProperty("clarifyingStep")) {
+                    switch (action.clarifyingStep.type) {
+                        case 'prompt':
+                            let clData = prompt(action.clarifyingStep.data.text);
+                            selectedData.clarifyingStep = clData;
+                            break;
+                        default:
+                            console.error('Unsupported action type "' + action.clarifyingStep.type + '"!');
+                            return;
+                    }
+                }
+
+                if (action.hasOwnProperty("confirm") && (action.confirm === true)) {
+                    if (!confirm('Вы уверены, что хотите выполнить действие')) {
+                        return;
+                    }
+                }
+
+                action.parent = this;
+                action.actionHandler(selectedData);
+            },
+            topCheckboxHandler: function(e) {
+                document.querySelectorAll(".cb_item_check").forEach(function(cbox) {
+                    const elementVal = parseInt(cbox.value, 10);
+                    const elementValIndex = this.selectedElements.indexOf(elementVal);
+                    if (e.target.checked) {
+                        if (elementValIndex === -1) {
+                            this.selectedElements.push(elementVal);
+                        }
+                    } else {
+                        if (elementValIndex !== -1) {
+                            this.selectedElements.splice(elementValIndex, 1);
+                        }
+                    }
+                }, this);
+            },
             clickHandler(event) {
                 if (confirm(event.text)) {
                     this.isLoading = true;
@@ -131,15 +206,26 @@
 
                 const colCode = this.sortColCode ? this.sortColCode : null;
                 const sortOrder = this.sortOrder ? this.sortOrder : null;
+
                 if (colCode && sortOrder) {
                     params.push('column=' + encodeURIComponent(colCode));
                     params.push('order=' + encodeURIComponent(sortOrder));
                 }
+
                 if (this.searchQuery) {
                     params.push('q=' + encodeURIComponent(this.searchQuery));
                 }
+
                 return this.apiLink + '?' + params.join('&');
             },
+        },
+        computed: {
+            isActionButtonDisabled: function() {
+                return (this.action === -1) || (this.selectedElements.length === 0);
+            },
+            isMultiselect: function() {
+                return this.multiActions.length > 0
+            }
         },
         created () {
             this.searchQueryChange = _.debounce(() => {

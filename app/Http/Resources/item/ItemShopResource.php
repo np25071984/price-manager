@@ -51,7 +51,7 @@ class ItemShopResource extends JsonResource
             'id' => $this->id,
             'article' => $this->article,
             'name' => $this->name,
-            'price' => $shopItem->discount_price > 0 ? $shopItem->discount_price . " ($shopItem->price)" : $shopItem->price,
+            'price' => $shopItem->discount_price > 0 ? $shopItem->discount_price . " <span class='old-price'>$shopItem->price</span>" : $shopItem->price,
             'stock' => $this->stock,
             'func' => $controls,
         ];

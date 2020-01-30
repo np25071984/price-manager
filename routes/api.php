@@ -36,6 +36,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::delete('shop/{shop}/item/{item}', 'Api\ShopController@remove')->name('api.shop.remove_item');
     Route::get('shop/{shop}/item', 'Api\ItemController@shopItems')->name('api.item.shop');
 
+    Route::post('shop/{shop}/discount', 'Api\ShopController@setDiscounts')->name('api.shop.item.create.discount');
+    Route::delete('shop/{shop}/discount', 'Api\ShopController@removeDiscounts')->name('api.shop.item.destroy.discount');
+
     Route::get('group', 'Api\GroupController@index')->name('api.group.index');
     Route::delete('group/{group}', 'Api\GroupController@destroy')->name('api.group.destroy');
     Route::get('group/{group}/item', 'Api\ItemController@groupItems')->name('api.item.group');

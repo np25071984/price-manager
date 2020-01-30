@@ -71,4 +71,52 @@ class ShopController extends Controller
         return response()->json(null, 204);
 
     }
+
+    /**
+     * Add discounts for the Items
+     *
+     * @param  Shop $shop
+     * @return \Illuminate\Http\Response
+     */
+    public function setDiscounts(Request $request, Shop $shop)
+    {
+        $itemIds = $request->ids;
+        $discount = $request->clarifyingStep;
+
+        foreach ($itemIds as $itemId) {
+            $shopItem = ShopItem::firstOrNew([
+                'shop_id' => $shop->id,
+                'item_id' => $itemId,
+            ]);
+            $curPrice = (int) $shopItem->price;
+            if ($curPrice > 0) {
+                $shopItem->discount_price = ceil($curPrice - ($curPrice * $discount) / 100);
+                $shopItem->save();
+            }
+        }
+
+        return response()->json(null, 200);
+    }
+
+    /**
+     * Remove discounts for the Items
+     *
+     * @param  Shop $shop
+     * @return \Illuminate\Http\Response
+     */
+    public function removeDiscounts(Request $request, Shop $shop)
+    {
+        $itemIds = $request->ids;
+
+        foreach ($itemIds as $itemId) {
+            $shopItem = ShopItem::firstOrNew([
+                'shop_id' => $shop->id,
+                'item_id' => $itemId,
+            ]);
+            $shopItem->discount_price = null;
+            $shopItem->save();
+        }
+
+        return response()->json(null, 200);
+    }
 }

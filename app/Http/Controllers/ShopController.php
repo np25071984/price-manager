@@ -148,7 +148,7 @@ class ShopController extends Controller
         $shopItem->discount_price = (float) $request->discount_price;
         $shopItem->save();
 
-        $request->session()->flash('message', 'Товар успешно обновлен!');
+        $request->session()->flash('message', 'Цена успешно обновлена!');
 
         return redirect(route('shop.show', $shopItem->shop_id));
     }

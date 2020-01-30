@@ -21,3 +21,9 @@
 main {
   min-height: calc(100vh - 142px);
 }
+
+.old-price {
+    text-decoration: line-through;
+    color: #5a6268;
+    font-size: x-small;
+}

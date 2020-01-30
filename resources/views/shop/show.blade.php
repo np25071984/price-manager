@@ -32,7 +32,13 @@
             </div>
         </div>
 
-        <table-component api-link="{{ $apiLink }}"></table-component>
+        <table-component
+            api-link="{{ $apiLink }}"
+            :routes="{
+                'api.shop.item.create.discount': '{{ route('api.shop.item.create.discount', $shop->id) }}',
+                'api.shop.item.destroy.discount': '{{ route('api.shop.item.destroy.discount', $shop->id) }}',
+            }"
+            :multi-actions="[setDiscountAction, removeDiscountAction]"></table-component>
 
     </div>
 @endsection

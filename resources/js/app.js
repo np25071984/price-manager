@@ -31,12 +31,21 @@ Vue.component('tags-input', require('@voerro/vue-tagsinput').default);
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+import {
+    setDiscountAction,
+    removeDiscountAction,
+} from './actions.js';
+
 const app = new Vue({
     el: '#app',
+    data: {
+        setDiscountAction,
+        removeDiscountAction,
+    }
 });
 
 window.setRelation = function (article, obj) {
     const name = obj.closest('TR').getElementsByTagName('td')[2].innerText;
     document.getElementById('article').value = article;
     document.getElementById('name').value = name;
-}
+};

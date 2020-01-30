@@ -47,7 +47,7 @@ class ItemShopResourceCollection extends ResourceCollection
                     'class' => ['text-center'],
                     'sortable' => true,
                     'sort' => ($column === 'price') ? $order : false,
-                    'type' => 'text',
+                    'type' => 'html',
                     'code' => 'price',
                     'title' => 'Цена'
                 ],
