@@ -10,7 +10,31 @@
             </div>
         </div>
 
-        <tab-component item-api-link="{{ $itemApiLink }}" contractor-api-link="{{ $contractorApiLink }}"></tab-component>
+        <tab-component>
+            <div slot="items">
+                <table-component
+                    ref="item"
+                    :show-search="false"
+                    api-link="{{ $itemApiLink }}"
+                    :multi-actions="[addToShopAction]">
+
+                    <div slot="clarifying">
+                        <modal v-if="showModal" @cancel="showModal = false">
+                            <h3 slot="header">Выберите магазины</h3>
+                            <div slot="body">
+                                <table-component
+                                        api-link="{{ route('api.item.shop', [1]) }}"
+                                        :multi="true"></table-component>
+                            </div>
+                        </modal>
+                    </div>
+
+                </table-component>
+            </div>
+            <div slot="items">
+                <table-component ref="contractor" :show-search="false" api-link="{{ $contractorApiLink }}"></table-component>
+            </div>
+        </tab-component>
 
     </div>
 @endsection

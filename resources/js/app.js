@@ -22,6 +22,7 @@ window.Vue = require('vue');
 Vue.component('table-component', require('./components/TableComponent.vue').default);
 Vue.component('button-component', require('./components/ButtonComponent.vue').default);
 Vue.component('tab-component', require('./components/TabComponent.vue').default);
+Vue.component('modal', require('./components/ModalComponent.vue').default);
 Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('tags-input', require('@voerro/vue-tagsinput').default);
 
@@ -34,14 +35,17 @@ Vue.component('tags-input', require('@voerro/vue-tagsinput').default);
 import {
     setDiscountAction,
     removeDiscountAction,
+    addToShopAction,
 } from './actions.js';
 
 const app = new Vue({
     el: '#app',
     data: {
+        showModal: false,
         setDiscountAction,
         removeDiscountAction,
-    }
+        addToShopAction,
+    },
 });
 
 window.setRelation = function (article, obj) {

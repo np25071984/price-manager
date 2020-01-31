@@ -19,14 +19,13 @@
 
         <div class="tab-content">
             <div class="tab-pane container active" id="items">
-
-                <table-component ref="item" :show-search="false" :api-link="itemApiLink"></table-component>
-
+                <slot name="items"></slot>
             </div>
 
             <div class="tab-pane container" id="contractor_items">
 
-                <table-component ref="contractor" :show-search="false" :api-link="contractorApiLink"></table-component>
+                <slot name="contractors"></slot>
+
 
             </div>
         </div>
@@ -40,27 +39,19 @@
             initQuerySearch: {
                 type: String,
             },
-            itemApiLink: {
-                type: String,
-            },
-            contractorApiLink: {
-                type: String,
-            },
         },
         data() {
             return {
                 searchQuery: this.initQuerySearch,
             };
         },
-        methods: {
-        },
         created () {
             this.searchQueryChange = _.debounce(() => {
                 if (this.searchQuery === '' || this.searchQuery.length > 2) {
-                    this.$refs.item.searchQuery = this.searchQuery;
-                    this.$refs.item.getResults();
-                    this.$refs.contractor.searchQuery = this.searchQuery;
-                    this.$refs.contractor.getResults();
+                    this.$slots.items[0].children[0].child.searchQuery = this.searchQuery;
+                    this.$slots.items[0].children[0].child.getResults();
+                    this.$slots.items[1].children[0].child.searchQuery = this.searchQuery;
+                    this.$slots.items[1].children[0].child.getResults();
                 }
             }, 500)
         },

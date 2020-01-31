@@ -1,5 +1,6 @@
 <template>
     <div>
+        <slot name="clarifying"></slot>
 
         <input v-if="showSearch"
                v-model.trim="searchQuery"
@@ -14,7 +15,7 @@
                 Выбрано элементов: {{ selectedElements.length }}
             </div>
             <div class="col-8">
-                <div class="form-inline float-right mb-1">
+                <div v-if="multiActions.length > 0" class="form-inline float-right mb-1">
                     <select class="form-control mr-1" v-model="action">
                         <option disabled selected value="-1">Выберите действие</option>
                         <option v-for="(mAction, index) in multiActions" :value="index">{{ mAction.label }}</option>
@@ -96,12 +97,16 @@
             },
             multiActions: {
                 type: Array,
-                default: []
+                default: () => [],
             },
             routes: {
                 type: Object,
-                default: {}
+                default: () => {},
             },
+            multi: {
+                type: Boolean,
+                default: false,
+            }
         },
         data() {
             return {
@@ -123,24 +128,13 @@
             };
         },
         methods: {
-            applyAction() {
+            processAction(clariData) {
                 const action = this.multiActions[this.action];
+
                 let selectedData = {
                     ids: this.selectedElements,
-                    clarifyingStep: null,
+                    clarifyingStep: clariData,
                 };
-
-                if (action.hasOwnProperty("clarifyingStep")) {
-                    switch (action.clarifyingStep.type) {
-                        case 'prompt':
-                            let clData = prompt(action.clarifyingStep.data.text);
-                            selectedData.clarifyingStep = clData;
-                            break;
-                        default:
-                            console.error('Unsupported action type "' + action.clarifyingStep.type + '"!');
-                            return;
-                    }
-                }
 
                 if (action.hasOwnProperty("confirm") && (action.confirm === true)) {
                     if (!confirm('Вы уверены, что хотите выполнить действие')) {
@@ -150,6 +144,30 @@
 
                 action.parent = this;
                 action.actionHandler(selectedData);
+            },
+            applyAction() {
+                const action = this.multiActions[this.action];
+
+                if (action.hasOwnProperty("clarifyingStep")) {
+                    switch (action.clarifyingStep.type) {
+                        case 'simple':
+                            this.processAction(null);
+                            break;
+                        case 'prompt':
+                            const userData = prompt(action.clarifyingStep.data.text);
+
+                            if (userData != null) {
+                                this.processAction(userData);
+                            }
+                            break;
+                        case 'component':
+                            this.$root.$data.showModal = true;
+                            break;
+                        default:
+                            console.error('Unsupported action type "' + action.clarifyingStep.type + '"!');
+                            return;
+                    }
+                }
             },
             topCheckboxHandler: function(e) {
                 document.querySelectorAll(".cb_item_check").forEach(function(cbox) {
@@ -224,7 +242,7 @@
                 return (this.action === -1) || (this.selectedElements.length === 0);
             },
             isMultiselect: function() {
-                return this.multiActions.length > 0
+                return this.multiActions.length > 0 || this.multi;
             }
         },
         created () {

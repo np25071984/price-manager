@@ -85,6 +85,10 @@
 
 \# docker run -it --rm -u "node:node" -v "$PWD":/app -w /app node:latest npm run dev
 
+Run queue 
+
+\# php artisan queue:work --queue=price_list
+
 ##
 
 <p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
