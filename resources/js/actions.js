@@ -32,7 +32,7 @@ const removeDiscountAction = {
         }
     },
     actionHandler: function(data) {
-        axios.delete(this.parent.routes[this.route], { data: data})
+        axios.delete(this.parent.routes[this.route], {data: data})
             .then(response => {
                 this.parent.getResults(this.parent.data.meta.current_page);
             })
@@ -44,22 +44,38 @@ const removeDiscountAction = {
 
 const addToShopAction = {
     label: 'Добавить в магазин',
-    route: 'api.shop.item.destroy.discount',
+    route: 'api.item.shop.assign',
     confirm: true,
     clarifyingStep: {
         type: 'component',
     },
     actionHandler: function(data) {
-        console.dir(data);
-        console.log('Add to shop action have shoted');
-        // axios.delete(this.parent.routes[this.route], { data: data})
-        //     .then(response => {
-        //         this.parent.getResults(this.parent.data.meta.current_page);
-        //     })
-        //     .catch(function (error) {
-        //         console.error(error);
-        //     });
+        axios.post(this.parent.routes[this.route], data)
+            .then(response => {
+                this.parent.getResults(this.parent.data.meta.current_page);
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
     },
 };
 
-export { setDiscountAction, removeDiscountAction, addToShopAction };
+const removeFromShopAction = {
+    label: 'Удалить из магазина',
+    route: 'api.item.shop.remove',
+    confirm: true,
+    clarifyingStep: {
+        type: 'component',
+    },
+    actionHandler: function(data) {
+        axios.delete(this.parent.routes[this.route], {data: data})
+            .then(response => {
+                this.parent.getResults(this.parent.data.meta.current_page);
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    },
+};
+
+export { setDiscountAction, removeDiscountAction, addToShopAction, removeFromShopAction };

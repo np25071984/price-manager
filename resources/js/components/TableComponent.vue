@@ -131,6 +131,10 @@
             processAction(clariData) {
                 const action = this.multiActions[this.action];
 
+                if (!action) {
+                    return;
+                }
+
                 let selectedData = {
                     ids: this.selectedElements,
                     clarifyingStep: clariData,

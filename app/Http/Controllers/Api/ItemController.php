@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Item;
 use App\Shop;
+use App\ShopItem;
 use App\Brand;
 use App\Country;
 use App\Group;
@@ -324,6 +325,51 @@ class ItemController extends Controller
         return new ItemGroupResourceCollection($items);
     }
 
+    /**
+     * Add Items into Shops
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function assignItemToShop(Request $request)
+    {
+        $itemIds = $request->ids;
+        $shopIds = $request->clarifyingStep;
+
+        foreach($shopIds as $shopId) {
+            foreach($itemIds as $itemId) {
+                ShopItem::firstOrCreate([
+                    'shop_id' => $shopId,
+                    'item_id' => $itemId,
+                ]);
+            }
+        }
+
+        return response()->json(null, 200);
+    }
+
+    /**
+     * Remove Items from Shops
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function removeItemFromShop(Request $request)
+    {
+        $itemIds = $request->ids;
+        $shopIds = $request->clarifyingStep;
+
+        foreach($shopIds as $shopId) {
+            foreach($itemIds as $itemId) {
+                ShopItem::query()->where([
+                    'shop_id' => $shopId,
+                    'item_id' => $itemId,
+                ])->delete();
+            }
+        }
+
+        return response()->json(null, 200);
+    }
 
     /**
      * Remove Item from the Group

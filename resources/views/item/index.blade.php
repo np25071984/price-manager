@@ -16,14 +16,18 @@
                     ref="item"
                     :show-search="false"
                     api-link="{{ $itemApiLink }}"
-                    :multi-actions="[addToShopAction]">
+                    :routes="{
+                        'api.item.shop.assign': '{{ route('api.item.shop.assign') }}',
+                        'api.item.shop.remove': '{{ route('api.item.shop.remove') }}',
+                    }"
+                    :multi-actions="[addToShopAction, removeFromShopAction]">
 
                     <div slot="clarifying">
                         <modal v-if="showModal" @cancel="showModal = false">
                             <h3 slot="header">Выберите магазины</h3>
                             <div slot="body">
                                 <table-component
-                                        api-link="{{ route('api.item.shop', [1]) }}"
+                                        api-link="{{ route('api.shop.index') }}"
                                         :multi="true"></table-component>
                             </div>
                         </modal>

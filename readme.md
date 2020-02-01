@@ -6,12 +6,14 @@
 
     actionObjects:
      - delete all
-     - assign to a shop
-     - remove from a shop
+     + assign to a shop
+     + remove from a shop
      + set discount
      + remove discount
   
-  https://forum.vuejs.org/t/add-component-to-dom-programatically/7308/3     
+  https://forum.vuejs.org/t/add-component-to-dom-programatically/7308/3
+  
+* use Vue Bus
 
 ## Deployment
 
