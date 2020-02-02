@@ -15,7 +15,7 @@ class ItemResouceCollection extends ResourceCollection
     public function toArray($request)
     {
         $column = $request->input('column');
-        if ($column && !in_array($column, ['article', 'brand_name', 'item_name', 'stock'])) {
+        if ($column && !in_array($column, ['article', 'brand_name', 'country_name', 'item_name', 'stock'])) {
             $column = null;
         }
 

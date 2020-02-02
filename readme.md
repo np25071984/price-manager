@@ -1,7 +1,6 @@
 ## TODO
 
 * Queue for both price generation and processing with statuses
-* fix ordering in TableComponent
 * frontend multiselect interface
 
     actionObjects:

@@ -21,7 +21,7 @@ class Shop extends Model
             'id',
             'id',
             'item_id'
-        )->orderBy('name', 'asc');
+        );
     }
 
 }
