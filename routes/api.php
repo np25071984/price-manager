@@ -45,6 +45,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('item', 'Api\ItemController@index')->name('api.item.index');
     Route::delete('item/{item}', 'Api\ItemController@groupRemove')->name('api.item.destroy');
+    Route::delete('items', 'Api\ItemController@itemsDestroy')->name('api.items.destroy');
     Route::delete('item/{item}/group', 'Api\ItemController@destroy')->name('api.item.group.remove');
     Route::get('item/{item}/related', 'Api\ItemController@relatedItems')->name('api.item.related');
 

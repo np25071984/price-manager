@@ -166,6 +166,19 @@ class ItemController extends Controller
     }
 
     /**
+     * Remove the specified item from storage
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function itemsDestroy(Request $request)
+    {
+        Item::whereIn('id', $request->ids)->delete();
+
+        return response()->json(null, 200);
+    }
+
+    /**
      * List of brand items
      *
      * @param Request $request

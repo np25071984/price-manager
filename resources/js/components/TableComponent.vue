@@ -146,6 +146,10 @@
                     }
                 }
 
+                if (action.hasOwnProperty("resetSelection") && action.resetSelection === true) {
+                    this.selectedElements = [];
+                }
+
                 action.parent = this;
                 action.actionHandler(selectedData);
             },

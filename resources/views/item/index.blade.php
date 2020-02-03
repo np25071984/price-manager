@@ -19,8 +19,9 @@
                     :routes="{
                         'api.item.shop.assign': '{{ route('api.item.shop.assign') }}',
                         'api.item.shop.remove': '{{ route('api.item.shop.remove') }}',
+                        'api.items.destroy': '{{ route('api.items.destroy') }}',
                     }"
-                    :multi-actions="[addToShopAction, removeFromShopAction]">
+                    :multi-actions="[addToShopAction, removeFromShopAction, itemDestroyAction]">
 
                     <div slot="clarifying">
                         <modal v-if="showModal" @cancel="showModal = false">

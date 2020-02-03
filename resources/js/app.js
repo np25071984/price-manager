@@ -37,6 +37,7 @@ import {
     removeDiscountAction,
     addToShopAction,
     removeFromShopAction,
+    itemDestroyAction,
 } from './actions.js';
 
 const app = new Vue({
@@ -47,6 +48,7 @@ const app = new Vue({
         removeDiscountAction,
         addToShopAction,
         removeFromShopAction,
+        itemDestroyAction,
     },
 });
 

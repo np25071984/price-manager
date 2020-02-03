@@ -78,4 +78,24 @@ const removeFromShopAction = {
     },
 };
 
-export { setDiscountAction, removeDiscountAction, addToShopAction, removeFromShopAction };
+
+const itemDestroyAction = {
+    label: 'Удалить товары',
+    route: 'api.items.destroy',
+    confirm: true,
+    resetSelection: true,
+    clarifyingStep: {
+        type: 'simple',
+    },
+    actionHandler: function(data) {
+        axios.delete(this.parent.routes[this.route], {data: data})
+            .then(response => {
+                this.parent.getResults(this.parent.data.meta.current_page);
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    },
+};
+
+export { setDiscountAction, removeDiscountAction, addToShopAction, removeFromShopAction, itemDestroyAction };
