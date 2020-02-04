@@ -1,7 +1,7 @@
 ## TODO
 
 * Queue for both price generation and processing with statuses
-* use Vue Bus
+* confine checkAll function by its table
 
 ## Deployment
 

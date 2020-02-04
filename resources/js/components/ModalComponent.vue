@@ -33,8 +33,7 @@
         },
         methods: {
             confirm() {
-                this.$root.$data.showModal = false;
-                this.$parent.processAction(this.$children[0].selectedElements);
+                window.Bus.$emit('modal-confirm', this.$slots.body[0].children[0].child.getSelected());
             },
         },
     }

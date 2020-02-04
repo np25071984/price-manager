@@ -128,6 +128,9 @@
             };
         },
         methods: {
+            getSelected() {
+                return this.selectedElements;
+            },
             processAction(clariData) {
                 const action = this.multiActions[this.action];
 
@@ -262,6 +265,10 @@
         },
         mounted() {
             this.getResults();
+            window.Bus.$on('modal-confirm', function (data) {
+                this.$root.$data.showModal = false;
+                this.processAction(data);
+            }.bind(this));
         }
     }
 </script>

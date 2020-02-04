@@ -32,6 +32,8 @@ Vue.component('tags-input', require('@voerro/vue-tagsinput').default);
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+window.Bus = new Vue();
+
 import {
     setDiscountAction,
     removeDiscountAction,
