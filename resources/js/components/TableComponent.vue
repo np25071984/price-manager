@@ -181,7 +181,7 @@
                 }
             },
             topCheckboxHandler: function(e) {
-                document.querySelectorAll(".cb_item_check").forEach(function(cbox) {
+                e.target.closest("table").querySelectorAll(".cb_item_check").forEach(function(cbox) {
                     const elementVal = parseInt(cbox.value, 10);
                     const elementValIndex = this.selectedElements.indexOf(elementVal);
                     if (e.target.checked) {
