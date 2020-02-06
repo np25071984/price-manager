@@ -103,7 +103,7 @@ class Item extends SmartSearch
             'id',
             'id',
             'aroma_id'
-        )->orderBy('name', 'asc');
+        );
     }
 
     /**
@@ -117,7 +117,7 @@ class Item extends SmartSearch
             'id',
             'id',
             'tag_id'
-        )->orderBy('name', 'asc');
+        );
     }
 
     /**
