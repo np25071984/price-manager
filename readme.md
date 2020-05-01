@@ -58,6 +58,18 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;CREATE EXTENSION pg_trgm;
 
+&nbsp;&nbsp;&nbsp;&nbsp;CREATE USER homestead WITH PASSWORD 'secret';
+
+&nbsp;&nbsp;&nbsp;&nbsp;GRANT CONNECT ON DATABASE price_manager TO homestead;
+
+&nbsp;&nbsp;&nbsp;&nbsp;GRANT USAGE ON SCHEMA public TO homestead;
+
+&nbsp;&nbsp;&nbsp;&nbsp;GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO homestead;
+
+&nbsp;&nbsp;&nbsp;&nbsp;GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO homestead;
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+
 &nbsp;&nbsp;&nbsp;&nbsp;\q
 
 \# exit
