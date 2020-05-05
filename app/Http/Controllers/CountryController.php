@@ -41,7 +41,7 @@ class CountryController extends Controller
             'name' => $request->name,
         ]);
 
-        $request->session()->flash('message', 'Новый бренд успешно добавлен!');
+        $request->session()->flash('message', 'Страна успешно добавлена!');
 
         return redirect(route('country.show' , $country->id));
     }
